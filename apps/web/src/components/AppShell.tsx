@@ -2,6 +2,7 @@ import { GraduationCap, type LucideIcon, Settings, Swords } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink, Outlet } from 'react-router';
 import { cn } from '../lib/cn';
+import { ThemeController } from './ThemeController';
 
 const NAV: ReadonlyArray<{ to: string; key: string; icon: LucideIcon; end?: boolean }> = [
   { to: '/', key: 'nav.play', icon: Swords, end: true },
@@ -13,6 +14,7 @@ export function AppShell() {
   const { t } = useTranslation();
   return (
     <div className="min-h-dvh bg-canvas text-ink md:flex">
+      <ThemeController />
       <nav
         aria-label={t('nav.label')}
         className="fixed inset-x-0 bottom-0 z-30 flex border-t-2 border-line bg-canvas px-2 pb-[env(safe-area-inset-bottom)] md:sticky md:top-0 md:h-dvh md:w-64 md:flex-col md:gap-2 md:border-t-0 md:border-r-2 md:px-4 md:py-6"

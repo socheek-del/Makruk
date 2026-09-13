@@ -326,12 +326,16 @@
       "milestone": "M2",
       "title": "Theme system",
       "user_visible_behavior": "A user can switch board theme and light/dark mode in settings; the choice persists.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Switch between at least 2 board themes and light/dark; board and UI update.",
         "Reload: choice persists."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/theme.spec.ts — 4 passed: light default (body rgb(255,255,255)) → มืด sets data-theme=dark and body rgb(19,31,36), persists after reload, back to light; system mode follows emulated OS dark/light live; 6 board themes listed, jade makes squares rgb(168,216,185), lacquer persists after reload and paints rgb(74,31,26); coordinates switch hides labels.",
+        "2026-09-13: screenshots settings-dark.png (theme previews) and board-lacquer.png reviewed; inline script in index.html applies saved scheme before first paint.",
+        "2026-09-13: board.spec.ts now also asserts both player bars in viewport and window.scrollY stays 0 after 3 moves on 360–1280px (fixed page-scroll bug from move list scrollIntoView)."
+      ],
       "notes": ""
     },
     {
@@ -341,12 +345,17 @@
       "milestone": "M3",
       "title": "Computer opponent in a Web Worker",
       "user_visible_behavior": "A user plays against the computer, which replies with legal moves without freezing the UI.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Playwright: start vs computer, make a move, computer replies within the time budget.",
         "UI stays responsive (animation keeps running) while the computer thinks."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/computer.spec.ts — 'the computer replies with a legal move': level 3, after e3e4 move list reaches 2 plies, White to move again, 32 pieces.",
+        "2026-09-13: computer.spec.ts — 'UI keeps animating while the strongest bot thinks': level 6 (Grand Khun) as White thinking, thinking indicator visible, requestAnimationFrame counted >30 frames in 1s on the main thread, then the move arrives and indicator hides.",
+        "2026-09-13: packages/ai/src/ai.test.ts — 13 passed (mate in one, captures hanging Ruea, avoids defended Bia, escapes check, no-move null, six bots legal & reproducible).",
+        "Search: alpha-beta + iterative deepening + quiescence + check extension on @makruk/engine/core, run in a module Web Worker (features/ai/ai.worker.ts); stale searches cancelled by terminating the worker."
+      ],
       "notes": "Own TS search first; Fairy-Stockfish WASM (GPL-3.0, allowed) for strongest levels."
     },
     {
@@ -356,7 +365,7 @@
       "milestone": "M3",
       "title": "Difficulty levels and bot personas",
       "user_visible_behavior": "A user picks from named bots of increasing strength.",
-      "status": "not_started",
+      "status": "in_progress",
       "verification": [
         "Automated match: each level beats the level below in a majority of 20 games."
       ],
@@ -370,11 +379,15 @@
       "milestone": "M3",
       "title": "Hints and takeback vs computer",
       "user_visible_behavior": "A user can ask for a hint (best move highlighted) and take back a move against the computer.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Hint highlights a legal move; takeback restores the position before the user's last move."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/computer.spec.ts — 'hint highlights a legal move': คำใบ้ marks exactly 2 [data-hint] squares, one holding a White piece; playing from→to succeeds and the bot replies (2 plies).",
+        "2026-09-13: computer.spec.ts — 'takeback restores the position': after e3e4 and the bot's reply, ถอนตา removes both plies (move list empty), Bia back on e3, White to move.",
+        "Takeback cancels an in-flight search; hint only enabled on the player's turn while following the live game."
+      ],
       "notes": ""
     },
     {

@@ -110,11 +110,45 @@
       "abandon": "ออกจากเกม"
     }
   },
+  "computer": {
+    "chooseBot": "เลือกคู่ต่อสู้",
+    "level": "ระดับ {{level}}",
+    "side": "เล่นฝ่าย",
+    "sideWhite": "ขาว",
+    "sideBlack": "ดำ",
+    "sideRandom": "สุ่ม",
+    "you": "คุณ",
+    "thinking": "{{name}} กำลังคิด…",
+    "hint": "คำใบ้"
+  },
+  "bots": {
+    "bia": { "name": "น้องเบี้ย", "desc": "เพิ่งหัดเดิน พลาดบ่อย" },
+    "met": { "name": "เม็ดมือใหม่", "desc": "ชอบกินหมาก แต่ยังมองไม่ไกล" },
+    "khon": { "name": "โคนนักสู้", "desc": "คิดล่วงหน้าสองตา" },
+    "ma": { "name": "ม้าเจ้าเล่ห์", "desc": "ชอบหาจังหวะเล่นกล" },
+    "ruea": { "name": "เรือเหล็ก", "desc": "เล่นแน่นและแม่นยำ" },
+    "khun": { "name": "ขุนพลใหญ่", "desc": "เก่งที่สุด คิดลึกที่สุด" }
+  },
   "settings": {
     "title": "ตั้งค่า",
     "language": "ภาษา",
     "languageTh": "ไทย",
-    "languageEn": "English"
+    "languageEn": "English",
+    "appearance": "รูปลักษณ์",
+    "colorScheme": "โหมดสี",
+    "system": "ตามระบบ",
+    "light": "สว่าง",
+    "dark": "มืด",
+    "boardTheme": "ลายกระดาน",
+    "boardThemes": {
+      "teak": "ไม้สัก",
+      "jade": "หยก",
+      "lacquer": "ลงรักปิดทอง",
+      "night": "ตลาดกลางคืน",
+      "minimal": "มินิมอล",
+      "contrast": "คอนทราสต์สูง"
+    },
+    "coordinates": "แสดงพิกัดบนกระดาน"
   },
   "design": {
     "title": "ระบบดีไซน์",

@@ -16,6 +16,8 @@ export interface Settings {
   showCoordinates: boolean;
   passAndPlayView: PassAndPlayView;
   timeControl: TimeControlChoice;
+  computerLevel: number;
+  computerSide: 'w' | 'b' | 'random';
 }
 
 export interface SettingsState extends Settings {
@@ -31,6 +33,8 @@ export const DEFAULT_SETTINGS: Settings = {
   showCoordinates: true,
   passAndPlayView: 'fixed',
   timeControl: { kind: 'none' },
+  computerLevel: 2,
+  computerSide: 'w',
 };
 
 export const SETTINGS_STORAGE_KEY = 'makruk.settings';

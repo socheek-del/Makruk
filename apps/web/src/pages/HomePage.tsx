@@ -9,7 +9,7 @@ import { Card } from '../components/ui/Card';
 type ServerStatus = 'checking' | 'ok' | 'down';
 
 const MODES: ReadonlyArray<{ key: string; icon: LucideIcon; color: string; to?: string }> = [
-  { key: 'single', icon: Bot, color: 'bg-secondary' },
+  { key: 'single', icon: Bot, color: 'bg-secondary', to: '/play/computer' },
   { key: 'local', icon: Users, color: 'bg-primary', to: '/play/local' },
   { key: 'online', icon: Globe, color: 'bg-gold' },
   { key: 'learn', icon: GraduationCap, color: 'bg-danger' },

@@ -110,11 +110,45 @@
       "abandon": "Game abandoned"
     }
   },
+  "computer": {
+    "chooseBot": "Choose your opponent",
+    "level": "Level {{level}}",
+    "side": "Play as",
+    "sideWhite": "White",
+    "sideBlack": "Black",
+    "sideRandom": "Random",
+    "you": "You",
+    "thinking": "{{name}} is thinking…",
+    "hint": "Hint"
+  },
+  "bots": {
+    "bia": { "name": "Little Bia", "desc": "Just learning — makes lots of mistakes" },
+    "met": { "name": "Rookie Met", "desc": "Grabs pieces but doesn't look ahead" },
+    "khon": { "name": "Khon the Fighter", "desc": "Thinks two moves ahead" },
+    "ma": { "name": "Tricky Ma", "desc": "Loves tactical tricks" },
+    "ruea": { "name": "Iron Ruea", "desc": "Solid and precise" },
+    "khun": { "name": "Grand Khun", "desc": "The strongest — thinks deepest" }
+  },
   "settings": {
     "title": "Settings",
     "language": "Language",
     "languageTh": "ไทย",
-    "languageEn": "English"
+    "languageEn": "English",
+    "appearance": "Appearance",
+    "colorScheme": "Colour mode",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark",
+    "boardTheme": "Board theme",
+    "boardThemes": {
+      "teak": "Teak",
+      "jade": "Jade",
+      "lacquer": "Gold lacquer",
+      "night": "Night market",
+      "minimal": "Minimal",
+      "contrast": "High contrast"
+    },
+    "coordinates": "Show board coordinates"
   },
   "design": {
     "title": "Design system",

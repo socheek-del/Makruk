@@ -35,6 +35,16 @@ for (const width of [360, 390, 768, 1280]) {
     expect(box!.x + box!.width).toBeLessThanOrEqual(width - 8);
     expect(box!.width).toBeGreaterThan(Math.min(width - 64, 300));
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    await expect(page.getByTestId('player-b')).toBeInViewport();
+    await expect(page.getByTestId('player-w')).toBeInViewport();
+
+    // Playing moves must not scroll the page (e.g. to the move list on phones).
+    for (const [from, to] of [['e3', 'e4'], ['d6', 'd5'], ['e4', 'd5']]) {
+      await page.locator(`[data-square="${from}"]`).click();
+      await page.locator(`[data-square="${to}"]`).click();
+    }
+    await expect(page.getByTestId('move-list').locator('[data-ply]')).toHaveCount(3);
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
     await page.screenshot({ path: `e2e-evidence/board-${width}.png` });
   });
 }

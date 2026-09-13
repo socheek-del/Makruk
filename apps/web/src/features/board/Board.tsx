@@ -14,6 +14,8 @@ export interface BoardProps {
   targets?: ReadonlyArray<Square>;
   lastMove?: { from: Square; to: Square } | null;
   checkSquare?: Square | null;
+  /** Suggested move from the hint engine. */
+  hint?: { from: Square; to: Square } | null;
   onSquareClick?: (square: Square) => void;
   canDrag?: (square: Square) => boolean;
   onDrop?: (from: Square, to: Square) => boolean;
@@ -59,6 +61,7 @@ export function Board({
   targets = [],
   lastMove = null,
   checkSquare = null,
+  hint = null,
   onSquareClick,
   canDrag,
   onDrop,
@@ -159,6 +162,7 @@ export function Board({
               data-target={isTarget || undefined}
               data-last-move={isLast || undefined}
               data-check={square === checkSquare || undefined}
+              data-hint={(!!hint && (square === hint.from || square === hint.to)) || undefined}
               aria-label={
                 piece
                   ? t('board.squareWithPiece', { square: name, piece: pieceName(piece) })
@@ -172,6 +176,9 @@ export function Board({
             >
               {highlight && <span className="absolute inset-0" style={{ background: highlight }} />}
               {hovered === square && <span className="absolute inset-0 border-4" style={{ borderColor: theme.selected }} />}
+              {hint && (square === hint.from || square === hint.to) && (
+                <span className="absolute inset-0 animate-pulse border-4 border-gold bg-gold/25" />
+              )}
               {square === checkSquare && (
                 <span
                   className="absolute inset-0"

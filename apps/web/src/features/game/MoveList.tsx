@@ -12,10 +12,17 @@ export interface MoveListProps {
 
 export function MoveList({ records, currentPly, onSelect }: MoveListProps) {
   const { t } = useTranslation();
+  const listRef = useRef<HTMLOListElement>(null);
   const currentRef = useRef<HTMLButtonElement>(null);
 
+  // Keep the current move visible by scrolling the list itself — never the page.
   useEffect(() => {
-    currentRef.current?.scrollIntoView({ block: 'nearest' });
+    const list = listRef.current;
+    const item = currentRef.current;
+    if (!list || !item) return;
+    const top = item.offsetTop - list.offsetTop;
+    if (top < list.scrollTop) list.scrollTop = top;
+    else if (top + item.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = top + item.offsetHeight - list.clientHeight;
   }, [currentPly, records.length]);
 
   const offset = records[0]?.color === 'b' ? 1 : 0;
@@ -31,7 +38,11 @@ export function MoveList({ records, currentPly, onSelect }: MoveListProps) {
       {records.length === 0 ? (
         <p className="px-4 py-3 text-sm text-muted">{t('play.noMoves')}</p>
       ) : (
-        <ol data-testid="move-list" className="max-h-48 overflow-y-auto p-2 text-sm lg:max-h-[calc(100dvh-26rem)]">
+        <ol
+          ref={listRef}
+          data-testid="move-list"
+          className="relative max-h-48 overflow-y-auto p-2 text-sm lg:max-h-[calc(100dvh-26rem)]"
+        >
           {rows.map((row, r) => (
             <li key={r} className="grid grid-cols-[2.25rem_1fr_1fr] items-center gap-1">
               <span className="pl-1 text-muted">{r + 1}.</span>

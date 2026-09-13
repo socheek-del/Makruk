@@ -6,6 +6,16 @@
     <meta name="theme-color" content="#58cc02" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>หมากรุกไทย · Makruk</title>
+    <script>
+      // Apply saved colour scheme and language before first paint (avoids a light flash in dark mode).
+      try {
+        var saved = (JSON.parse(localStorage.getItem('makruk.settings') || '{}').state) || {};
+        var scheme = saved.colorScheme || 'system';
+        var dark = scheme === 'dark' || (scheme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        if (saved.language) document.documentElement.lang = saved.language;
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

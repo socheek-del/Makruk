@@ -121,3 +121,6 @@ export function createGameSession() {
 
 /** Pass-and-play game on this device. */
 export const useLocalSession = createGameSession();
+
+/** Game against the computer. */
+export const useComputerSession = createGameSession();
