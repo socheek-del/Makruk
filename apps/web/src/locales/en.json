@@ -1,0 +1,22 @@
+{
+  "app": {
+    "name": "Makruk",
+    "tagline": "Learn, play and compete in Thai chess anywhere",
+    "comingSoon": "Coming soon"
+  },
+  "modes": {
+    "single": "Play the computer",
+    "online": "Play online",
+    "local": "Pass and play",
+    "learn": "Lessons"
+  },
+  "status": {
+    "label": "Server",
+    "checking": "Checking…",
+    "ok": "Online",
+    "down": "Offline"
+  },
+  "language": {
+    "switch": "ภาษาไทย"
+  }
+}

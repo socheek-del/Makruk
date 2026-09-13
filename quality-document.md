@@ -1,0 +1,50 @@
+# Quality Document
+
+A quality snapshot for each product domain and architectural layer. Both agents
+and humans use this document to see where the codebase is strong and where it
+needs work.
+
+**Update cadence:** After each significant session, or before starting a new milestone.
+
+**Grading scale:**
+
+- **A**: All verification passing, clean architecture, agent-legible, stable tests
+- **B**: Verification passing, mostly clean, minor gaps in legibility or test coverage
+- **C**: Partially working, known gaps, some code areas hard for agents to understand
+- **D**: Not working, or major structural issues
+
+---
+
+## Product Domains
+
+| Domain | Grade | Verification | Agent Legibility | Test Stability | Key Gaps | Last Updated |
+|--------|-------|-------------|-----------------|---------------|----------|-------------|
+| Rules engine (Makruk) | - | - | - | - | Not started | 2026-09-13 |
+| Local play & pass-and-play | - | - | - | - | Not started | 2026-09-13 |
+| Single player (AI) | - | - | - | - | Not started | 2026-09-13 |
+| Tutorials & gamification | - | - | - | - | Not started | 2026-09-13 |
+| Online play | - | - | - | - | Not started | 2026-09-13 |
+| Accounts & ratings | - | - | - | - | Not started | 2026-09-13 |
+| Themes & art | - | - | - | - | Not started | 2026-09-13 |
+| Localization (TH/EN) | - | - | - | - | Not started | 2026-09-13 |
+
+## Architectural Layers
+
+| Layer | Grade | Boundary Enforcement | Agent Legibility | Key Gaps | Last Updated |
+|-------|-------|---------------------|-----------------|----------|-------------|
+| `packages/engine` | - | Must stay pure (no DOM/network) | - | Not started | 2026-09-13 |
+| `packages/ai` | - | Depends only on engine | - | Not started | 2026-09-13 |
+| `packages/protocol` | - | Schemas only, no logic | - | Not started | 2026-09-13 |
+| `apps/web` | - | No rules logic outside engine | - | Not started | 2026-09-13 |
+| `apps/worker` | - | Validates all moves via engine | - | Not started | 2026-09-13 |
+| CI & deploy | - | - | - | Not started | 2026-09-13 |
+
+## Change History
+
+### 2026-09-13
+
+- Changes: Harness files created; plan written.
+- Domains promoted: none
+- Domains demoted: none
+- New gaps identified: everything not started
+- Gaps closed: none

@@ -1,0 +1,39 @@
+{
+  "name": "makruk",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0-or-later",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "concurrently -n worker,web -c yellow,green \"npm run dev -w apps/worker\" \"npm run dev -w apps/web\"",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "verify": "npm run lint && npm run typecheck && npm run test",
+    "build": "npm run build -w apps/web && npm run build -w apps/worker",
+    "deploy": "npm run build -w apps/web && npm run deploy -w apps/worker"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.20.2",
+    "concurrently": "^9.2.0",
+    "eslint": "^10.10.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.12.0",
+    "prettier": "^3.9.6",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.70.0",
+    "vitest": "^4.1.11"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "workerd@1.20260911.1": true
+  }
+}

@@ -1,0 +1,607 @@
+{
+  "project": "Makruk (Thai chess)",
+  "last_updated": "2026-09-13",
+  "rules": {
+    "single_active_feature": true,
+    "passing_requires_evidence": true,
+    "do_not_skip_verification": true
+  },
+  "status_legend": {
+    "not_started": "Work has not begun.",
+    "in_progress": "The feature is the current active task.",
+    "blocked": "Work cannot continue until a documented blocker is resolved.",
+    "passing": "Required verification has passed and evidence is recorded."
+  },
+  "features": [
+    {
+      "id": "infra-001",
+      "priority": 1,
+      "area": "infra",
+      "milestone": "M0",
+      "title": "Monorepo scaffold",
+      "user_visible_behavior": "A developer can run ./init.sh and npm run dev and see the placeholder app (Thai title) served locally.",
+      "status": "passing",
+      "verification": [
+        "Run ./init.sh on a clean clone; it exits 0.",
+        "npm run verify passes (lint, typecheck, unit tests in every workspace).",
+        "npm run dev serves the web app; the page shows the Thai app name.",
+        "npm run build produces the web build and the worker bundle."
+      ],
+      "evidence": [
+        "2026-09-13: npm run verify → lint ✓, typecheck ✓, tests 6 passed across engine/protocol/worker/web.",
+        "2026-09-13: npm run build → vite built dist/index.html; wrangler dry-run Total Upload 62.28 KiB.",
+        "2026-09-13: npm run dev → GET :5173/ title 'หมากรุกไทย · Makruk'; GET :5173/api/health (proxied) 200 {ok:true}; GET :8787/api/nope 404."
+      ],
+      "notes": "Workspaces: apps/web, apps/worker, packages/engine, packages/protocol (packages/ai deferred to M3). Installs need npm 11 (npm 10.9.8 arborist crash); esbuild + workerd install scripts approved via allowScripts. ./init.sh on a fresh clone not yet re-run — recheck in infra-002 CI."
+    },
+    {
+      "id": "infra-002",
+      "priority": 2,
+      "area": "infra",
+      "milestone": "M0",
+      "title": "Continuous integration",
+      "user_visible_behavior": "Every push and pull request to main runs lint, typecheck, tests and build on GitHub Actions.",
+      "status": "not_started",
+      "verification": [
+        "Push a commit to GitHub.",
+        "Verify the CI workflow runs and passes (gh run list / gh run view)."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "infra-003",
+      "priority": 3,
+      "area": "infra",
+      "milestone": "M0",
+      "title": "Deploy placeholder to th-chess.beanroti.com",
+      "user_visible_behavior": "Visiting https://th-chess.beanroti.com shows the placeholder app over HTTPS, and /api/health returns ok.",
+      "status": "not_started",
+      "verification": [
+        "Run npm run deploy.",
+        "Open https://th-chess.beanroti.com and verify the placeholder page loads with valid TLS.",
+        "GET https://th-chess.beanroti.com/api/health returns {\"ok\":true}.",
+        "Deploy from GitHub Actions on push to main succeeds."
+      ],
+      "evidence": [],
+      "notes": "Worker custom domain on the beanroti.com zone; scoped API token as repo secret."
+    },
+    {
+      "id": "engine-001",
+      "priority": 4,
+      "area": "engine",
+      "milestone": "M1",
+      "title": "Board model and FEN",
+      "user_visible_behavior": "The engine can load and export Makruk positions in FEN, starting from rnsmksnr/8/pppppppp/8/8/PPPPPPPP/8/RNSKMSNR w - - 0 1.",
+      "status": "not_started",
+      "verification": [
+        "Unit tests: parse → serialize round-trips for the start position and 10+ varied positions.",
+        "Invalid FEN inputs are rejected with typed errors."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "engine-002",
+      "priority": 5,
+      "area": "engine",
+      "milestone": "M1",
+      "title": "Move generation for all pieces",
+      "user_visible_behavior": "The engine lists every pseudo-legal and legal move for Khun, Met, Khon, Ma, Ruea, Bia and promoted Bia.",
+      "status": "not_started",
+      "verification": [
+        "Unit tests per piece type from hand-built positions.",
+        "Illegal moves that leave own Khun in check are excluded."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "engine-003",
+      "priority": 6,
+      "area": "engine",
+      "milestone": "M1",
+      "title": "Check, checkmate, stalemate, repetition",
+      "user_visible_behavior": "The engine reports check, checkmate (win), stalemate (draw) and threefold repetition (draw).",
+      "status": "not_started",
+      "verification": [
+        "Unit tests with known mate, stalemate and repetition positions."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "engine-004",
+      "priority": 7,
+      "area": "engine",
+      "milestone": "M1",
+      "title": "Bia promotion",
+      "user_visible_behavior": "A Bia reaching the opponent's third rank becomes a promoted Bia that moves like a Met.",
+      "status": "not_started",
+      "verification": [
+        "Unit tests for promotion by push and by capture, for both colors."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "engine-005",
+      "priority": 8,
+      "area": "engine",
+      "milestone": "M1",
+      "title": "Counting rules (Sak Kradan and Sak Mak)",
+      "user_visible_behavior": "When counting rules apply, the engine tracks the count and declares a draw when the limit is reached.",
+      "status": "not_started",
+      "verification": [
+        "Scenario tests for board's-honour counting (no Bia left, limit 64).",
+        "Scenario tests for pieces'-honour limits: 2 Ruea 8, 1 Ruea 16, 2 Khon 22, 2 Ma 32, 1 Khon 44, otherwise 64.",
+        "Results cross-checked against Fairy-Stockfish makruk for the same move sequences."
+      ],
+      "evidence": [],
+      "notes": "Document edge cases in docs/rules.md."
+    },
+    {
+      "id": "engine-006",
+      "priority": 9,
+      "area": "engine",
+      "milestone": "M1",
+      "title": "Perft verification against Fairy-Stockfish",
+      "user_visible_behavior": "Engine move counts match the reference engine, so rules cannot silently drift.",
+      "status": "not_started",
+      "verification": [
+        "Perft depth 1-5 from the start position matches Fairy-Stockfish.",
+        "Perft depth 1-4 from 5+ tricky positions matches Fairy-Stockfish.",
+        "Perft tests run in npm run verify (fast depths) and a slower script (deep depths)."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "design-001",
+      "priority": 10,
+      "area": "design",
+      "milestone": "M2",
+      "title": "Design system foundation",
+      "user_visible_behavior": "The app uses consistent Duolingo-style tokens and components (chunky rounded buttons, cards, progress bars) in light and dark mode.",
+      "status": "not_started",
+      "verification": [
+        "Component showcase page renders all base components in light and dark.",
+        "Playwright screenshot of the showcase at 390px and 1280px widths.",
+        "docs/design.md describes tokens, components and the illustration style guide."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "i18n-001",
+      "priority": 11,
+      "area": "i18n",
+      "milestone": "M2",
+      "title": "Thai default with English toggle",
+      "user_visible_behavior": "The app opens in Thai; the user can switch to English and the choice persists after reload.",
+      "status": "not_started",
+      "verification": [
+        "Fresh load shows Thai UI and <html lang=\"th\">.",
+        "Switch to English: UI updates immediately and <html lang=\"en\">.",
+        "Reload: English persists.",
+        "Test fails if any key is missing from th or en locale files."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "play-001",
+      "priority": 12,
+      "area": "play",
+      "milestone": "M2",
+      "title": "Board rendering",
+      "user_visible_behavior": "A user sees the Makruk start position on an un-checkered board with placeholder SVG pieces and coordinates.",
+      "status": "not_started",
+      "verification": [
+        "Open the play screen; verify 32 pieces in the correct start squares.",
+        "Board is responsive from 360px to desktop."
+      ],
+      "evidence": [],
+      "notes": "Placeholder art; final art is art-001."
+    },
+    {
+      "id": "play-002",
+      "priority": 13,
+      "area": "play",
+      "milestone": "M2",
+      "title": "Tap and drag to move",
+      "user_visible_behavior": "A user moves pieces by tap-tap or drag; legal destinations are shown and illegal moves are rejected.",
+      "status": "not_started",
+      "verification": [
+        "Playwright: tap a Bia, see legal dots, tap destination, piece moves.",
+        "Playwright: drag a Ma to a legal square works; drag to an illegal square snaps back.",
+        "Last move and check are highlighted."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "play-003",
+      "priority": 14,
+      "area": "play",
+      "milestone": "M2",
+      "title": "Move list, history navigation and undo",
+      "user_visible_behavior": "A user sees the move list, steps back and forward through the game, and can undo in local games.",
+      "status": "not_started",
+      "verification": [
+        "Play 6 moves; move list shows 6 entries.",
+        "Step back 2 and forward 2; board matches.",
+        "Undo removes the last move."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "play-004",
+      "priority": 15,
+      "area": "play",
+      "milestone": "M2",
+      "title": "Pass-and-play on one device",
+      "user_visible_behavior": "Two people play on one device with a turn banner, optional auto-rotate or tabletop mode, and a game-over screen.",
+      "status": "not_started",
+      "verification": [
+        "Playwright: play a known short mating sequence; game-over screen shows the winner.",
+        "Auto-rotate flips the board after each move when enabled."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "play-005",
+      "priority": 16,
+      "area": "play",
+      "milestone": "M2",
+      "title": "Game settings and time-control presets",
+      "user_visible_behavior": "Before a game the user picks a time control (bullet, blitz, rapid, classical presets, no clock, or custom) and side; the last choice is remembered.",
+      "status": "not_started",
+      "verification": [
+        "Presets shown: 1+0, 2+1, 3+0, 3+2, 5+0, 5+3, 10+0, 10+5, 15+10, 30+0, 30+20, no clock, custom.",
+        "Clock counts down with increment applied after each move; flag ends the game.",
+        "Reload: last-used setting is preselected."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "theme-001",
+      "priority": 17,
+      "area": "theme",
+      "milestone": "M2",
+      "title": "Theme system",
+      "user_visible_behavior": "A user can switch board theme and light/dark mode in settings; the choice persists.",
+      "status": "not_started",
+      "verification": [
+        "Switch between at least 2 board themes and light/dark; board and UI update.",
+        "Reload: choice persists."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "ai-001",
+      "priority": 18,
+      "area": "ai",
+      "milestone": "M3",
+      "title": "Computer opponent in a Web Worker",
+      "user_visible_behavior": "A user plays against the computer, which replies with legal moves without freezing the UI.",
+      "status": "not_started",
+      "verification": [
+        "Playwright: start vs computer, make a move, computer replies within the time budget.",
+        "UI stays responsive (animation keeps running) while the computer thinks."
+      ],
+      "evidence": [],
+      "notes": "Own TS search first; Fairy-Stockfish WASM (GPL-3.0, allowed) for strongest levels."
+    },
+    {
+      "id": "ai-002",
+      "priority": 19,
+      "area": "ai",
+      "milestone": "M3",
+      "title": "Difficulty levels and bot personas",
+      "user_visible_behavior": "A user picks from named bots of increasing strength.",
+      "status": "not_started",
+      "verification": [
+        "Automated match: each level beats the level below in a majority of 20 games."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "ai-003",
+      "priority": 20,
+      "area": "ai",
+      "milestone": "M3",
+      "title": "Hints and takeback vs computer",
+      "user_visible_behavior": "A user can ask for a hint (best move highlighted) and take back a move against the computer.",
+      "status": "not_started",
+      "verification": [
+        "Hint highlights a legal move; takeback restores the position before the user's last move."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "learn-001",
+      "priority": 21,
+      "area": "learn",
+      "milestone": "M4",
+      "title": "Lesson engine",
+      "user_visible_behavior": "A user completes an interactive lesson step by step (explanation, then a task on the board) with correct/incorrect feedback.",
+      "status": "not_started",
+      "verification": [
+        "Lesson defined in data (JSON/TS) renders; correct move advances; wrong move shows feedback.",
+        "Lesson completion is saved locally."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "learn-002",
+      "priority": 22,
+      "area": "learn",
+      "milestone": "M4",
+      "title": "Board and piece lessons",
+      "user_visible_behavior": "A beginner learns the board, setup and each piece's movement through mini-puzzles.",
+      "status": "not_started",
+      "verification": [
+        "Lessons exist for setup, Khun, Met, Khon, Ma, Ruea, Bia, promotion, check and checkmate in Thai and English.",
+        "Playwright completes one full lesson."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "learn-003",
+      "priority": 23,
+      "area": "learn",
+      "milestone": "M4",
+      "title": "Counting rules lesson",
+      "user_visible_behavior": "A user learns Sak Kradan and Sak Mak with interactive examples.",
+      "status": "not_started",
+      "verification": [
+        "Lesson examples are validated by the engine's counting implementation in tests."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "learn-004",
+      "priority": 24,
+      "area": "learn",
+      "milestone": "M4",
+      "title": "Guided first game",
+      "user_visible_behavior": "A beginner plays a first game against the easiest bot with coach tips.",
+      "status": "not_started",
+      "verification": [
+        "Playwright: start guided game; coach tip appears; game can be completed."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "learn-005",
+      "priority": 25,
+      "area": "learn",
+      "milestone": "M4",
+      "title": "Lesson path, XP and streaks",
+      "user_visible_behavior": "A user sees a Duolingo-style lesson path with locked/unlocked nodes, earns XP, and keeps a daily streak.",
+      "status": "not_started",
+      "verification": [
+        "Completing a lesson unlocks the next node and adds XP.",
+        "Streak increments on consecutive days (time mocked in tests)."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "online-001",
+      "priority": 26,
+      "area": "online",
+      "milestone": "M5",
+      "title": "GameRoom Durable Object",
+      "user_visible_behavior": "Two connected clients play a game where the server validates and broadcasts every move.",
+      "status": "not_started",
+      "verification": [
+        "Worker tests: illegal move rejected; legal move broadcast to both sockets.",
+        "Game state survives Durable Object hibernation."
+      ],
+      "evidence": [],
+      "notes": "No chat messages exist in the protocol."
+    },
+    {
+      "id": "online-002",
+      "priority": 27,
+      "area": "online",
+      "milestone": "M5",
+      "title": "Private room by link or code",
+      "user_visible_behavior": "A user creates a game, shares a link, 6-character code or QR, and a friend joins and plays.",
+      "status": "not_started",
+      "verification": [
+        "Playwright with two browser contexts: create, join by code, play 4 moves, both boards match."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "online-003",
+      "priority": 28,
+      "area": "online",
+      "milestone": "M5",
+      "title": "Server-authoritative clocks",
+      "user_visible_behavior": "Online games use server-timed clocks with increment; running out of time loses.",
+      "status": "not_started",
+      "verification": [
+        "Worker tests with mocked time: increment applied; flag ends the game."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "online-004",
+      "priority": 29,
+      "area": "online",
+      "milestone": "M5",
+      "title": "Reconnect, resign, draw offer, rematch",
+      "user_visible_behavior": "A dropped player can reconnect within a grace period; players can resign, offer/accept draws and request a rematch.",
+      "status": "not_started",
+      "verification": [
+        "Playwright: close one context, reopen within grace period, game resumes.",
+        "Abandonment past grace period awards the win.",
+        "Resign, draw and rematch flows work end to end."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "acct-001",
+      "priority": 30,
+      "area": "account",
+      "milestone": "M5",
+      "title": "Guest identity",
+      "user_visible_behavior": "A new visitor gets a guest name and can play online without signing up.",
+      "status": "not_started",
+      "verification": [
+        "First visit issues a signed guest token; reload keeps the same guest."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "acct-002",
+      "priority": 31,
+      "area": "account",
+      "milestone": "M6",
+      "title": "Optional sign-in (Google and email magic link)",
+      "user_visible_behavior": "A user signs in with Google or an emailed magic link and keeps their guest history.",
+      "status": "not_started",
+      "verification": [
+        "Google OAuth sign-in works on production domain.",
+        "Magic link email arrives and signs the user in.",
+        "Guest games appear in the signed-in history."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "online-005",
+      "priority": 32,
+      "area": "online",
+      "milestone": "M6",
+      "title": "Quick match",
+      "user_visible_behavior": "A user presses Play for 3+2, 5+0 or 10+0 and is paired with an opponent.",
+      "status": "not_started",
+      "verification": [
+        "Playwright with two contexts in the same pool get paired into one game.",
+        "Cancelling search removes the user from the queue."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "acct-003",
+      "priority": 33,
+      "area": "account",
+      "milestone": "M6",
+      "title": "Ratings and game history",
+      "user_visible_behavior": "Signed-in users have a Glicko-2 rating per time class and a list of past games they can replay.",
+      "status": "not_started",
+      "verification": [
+        "Unit tests for Glicko-2 updates against reference values.",
+        "Finished rated game updates both ratings and appears in history."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "theme-002",
+      "priority": 34,
+      "area": "theme",
+      "milestone": "M7",
+      "title": "Board themes and piece sets",
+      "user_visible_behavior": "A user chooses from several board themes and piece sets.",
+      "status": "not_started",
+      "verification": [
+        "At least 5 board themes and 2 piece sets selectable; preview in settings."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "art-001",
+      "priority": 35,
+      "area": "art",
+      "milestone": "M7",
+      "title": "Final in-house piece set",
+      "user_visible_behavior": "Pieces use the final in-house SVG art, readable at small sizes.",
+      "status": "not_started",
+      "verification": [
+        "All 7 piece types x 2 colors delivered as optimized SVG.",
+        "Screenshot review at 360px board width."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "art-002",
+      "priority": 36,
+      "area": "art",
+      "milestone": "M7",
+      "title": "Mascot and lesson illustrations",
+      "user_visible_behavior": "Lessons and celebration screens feature the in-house mascot and illustrations.",
+      "status": "not_started",
+      "verification": [
+        "Mascot poses (idle, happy, thinking, sad, celebrate) used across lesson flow."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "polish-001",
+      "priority": 37,
+      "area": "polish",
+      "milestone": "M7",
+      "title": "PWA install and offline play",
+      "user_visible_behavior": "A user installs the app and can play locally, vs computer, and do lessons offline.",
+      "status": "not_started",
+      "verification": [
+        "Lighthouse PWA installable check passes.",
+        "Playwright offline mode: vs computer game and a lesson work."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "polish-002",
+      "priority": 38,
+      "area": "polish",
+      "milestone": "M7",
+      "title": "Thai translation review",
+      "user_visible_behavior": "All Thai text reads naturally and uses correct Makruk terminology.",
+      "status": "not_started",
+      "verification": [
+        "Native Thai speaker review recorded in docs/i18n-review.md."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "polish-003",
+      "priority": 39,
+      "area": "polish",
+      "milestone": "M7",
+      "title": "Sounds, animations and haptics",
+      "user_visible_behavior": "Moves, captures, checks and lesson success have sounds and animations; sound can be muted.",
+      "status": "not_started",
+      "verification": [
+        "Mute setting persists; reduced-motion preference disables heavy animation."
+      ],
+      "evidence": [],
+      "notes": ""
+    }
+  ]
+}
