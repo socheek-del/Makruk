@@ -19,32 +19,33 @@ needs work.
 
 | Domain | Grade | Verification | Agent Legibility | Test Stability | Key Gaps | Last Updated |
 |--------|-------|-------------|-----------------|---------------|----------|-------------|
-| Rules engine (Makruk) | A | Unit + perft + lock-step vs Fairy-Stockfish | docs/rules.md, typed API | Deterministic seeds | Perft uses array scan (fine for AI depth ≤6, may need bitboards later) | 2026-09-13 |
-| Local play & pass-and-play | - | - | - | - | Not started | 2026-09-13 |
-| Single player (AI) | - | - | - | - | Not started | 2026-09-13 |
-| Tutorials & gamification | - | - | - | - | Not started | 2026-09-13 |
-| Online play | - | - | - | - | Not started | 2026-09-13 |
-| Accounts & ratings | - | - | - | - | Not started | 2026-09-13 |
-| Themes & art | - | - | - | - | Not started | 2026-09-13 |
-| Localization (TH/EN) | - | - | - | - | Not started | 2026-09-13 |
+| Rules engine (Makruk) | A | Unit + perft + lock-step vs Fairy-Stockfish | docs/rules.md, typed API | Deterministic seeds | Array-scan movegen limits AI depth | 2026-09-13 |
+| Local play & pass-and-play | A | Unit + E2E (moves, history, views, clocks) | GameScreen shared by all modes | Stable; fake clock for timers | — | 2026-09-13 |
+| Single player (AI) | B | Unit (tactics, repetition, conversion) + E2E (worker, hints, takeback) | search/evaluate/bots split | Ladder is slow (tens of minutes) | Ladder evidence pending re-run; strength tuned by node budgets | 2026-09-13 |
+| Tutorials & gamification | A | Lesson content validated against engine; E2E lesson/path/guided | Lessons are plain TS data | Fake clock for streaks | Content reviewed by engineer, not a Makruk teacher | 2026-09-13 |
+| Online play | A | Pure room logic + workerd DO tests + two-browser E2E | Thin DO over pure reducer | Real wrangler dev in E2E | No spectator UI beyond read-only banner | 2026-09-13 |
+| Accounts & ratings | C | Guest identity only (acct-001) | auth.ts | — | Sign-in, ratings, history not built | 2026-09-13 |
+| Themes & art | A | E2E + screenshot review | pieces/ folder, Mascot.tsx | — | Ruea/Khun silhouettes close at 36px | 2026-09-13 |
+| Localization (TH/EN) | B | Key parity + literal-key test; E2E in both languages | locales/*.json + lesson L10n | — | Needs native Thai review (polish-002) | 2026-09-13 |
+| PWA & polish | A | Installability via CDP, offline E2E, sound/motion E2E | vite.config.ts, sound.ts | — | — | 2026-09-13 |
 
 ## Architectural Layers
 
 | Layer | Grade | Boundary Enforcement | Agent Legibility | Key Gaps | Last Updated |
 |-------|-------|---------------------|-----------------|----------|-------------|
-| `packages/engine` | A | ESLint no-restricted-globals for src (tests/testing excluded) | Small files: board, movegen, fen, game, perft | ffish is devDependency only | 2026-09-13 |
-| `packages/ai` | - | Depends only on engine | - | Not started | 2026-09-13 |
-| `packages/protocol` | - | Schemas only, no logic | - | Not started | 2026-09-13 |
-| `apps/web` | - | No rules logic outside engine | - | Not started | 2026-09-13 |
-| `apps/worker` | - | Validates all moves via engine | - | Not started | 2026-09-13 |
-| CI & deploy | B | verify + deploy jobs on push to main; scoped token | Documented in AGENTS.md / PLAN.md | npm 11 workaround; token expires 2027-09-14; no preview environments yet | 2026-09-13 |
+| `packages/engine` | A | ESLint no-restricted-globals for src; clock is pure (`now` injected) | board, movegen, fen, game, clock, perft | ffish is devDependency only | 2026-09-13 |
+| `packages/ai` | B | Uses `@makruk/engine/core` only | search/evaluate/bots/index | Strength ladder slow | 2026-09-13 |
+| `packages/protocol` | A | Zod schemas only | game.ts | — | 2026-09-13 |
+| `apps/web` | A | No rules logic outside engine; sessions share one interface | features/, pages/, stores/ | Bundle not code-split per route | 2026-09-13 |
+| `apps/worker` | A | All moves validated via engine; room rules are pure functions | room/logic.ts, GameRoom.ts, match/ | No D1 yet | 2026-09-13 |
+| CI & deploy | A | verify + deploy on main; scoped token; AUTH_SECRET as secret | .github/workflows/ci.yml | E2E not run in CI (needs browsers + wrangler) | 2026-09-13 |
 
 ## Change History
 
 ### 2026-09-13
 
-- Changes: Harness files created; plan written; M0 scaffold, CI and production deploy to th-chess.beanroti.com.
-- Domains promoted: CI & deploy → B
+- Changes: M0–M5 and most of M7 implemented and verified; see claude-progress.md.
+- Domains promoted: engine, local play, tutorials, online, themes & art, PWA → A; AI and i18n → B
 - Domains demoted: none
-- New gaps identified: everything not started
-- Gaps closed: none
+- New gaps identified: bot ladder counting-rule draws (fixed, re-running); native Thai review; accounts
+- Gaps closed: page scroll on move, coach tip after resignation, repetition shuffling in bots

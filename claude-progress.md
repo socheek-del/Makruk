@@ -8,29 +8,35 @@ handoff; no agent updates it automatically.
 
 ## Current Verified State
 
-- Repository root: `t-chess/` (GitHub `socheek-del/Makruk`)
-- Standard startup path: `./init.sh` then `npm run dev`
-- Standard verification path: `npm run verify` (lint + typecheck + unit tests); `npm run e2e` for Playwright
-- Production: https://th-chess.beanroti.com (Worker `makruk`; auto-deployed by GitHub Actions on push to `main`; manual fallback `npm run deploy`)
-- Milestone: M0 complete (`infra-001..003`); M1 rules engine complete (`engine-001..006`)
-- Deep engine verification: `npm run test:deep -w packages/engine` (perft depth 5 + 400 lock-step games vs Fairy-Stockfish)
-- Current highest-priority unfinished feature: `design-001` design system foundation
-- Current blocker: none
+- Repository root: `t-chess/` (GitHub `socheek-del/Makruk`, public, GPL-3.0)
+- Production: https://th-chess.beanroti.com — Worker `makruk` (static assets + `/api/*` + `/ws/*`, Durable Objects `GameRoom`, `Matchmaker`), auto-deployed by GitHub Actions on push to `main`
+- Standard startup path: `./init.sh` then `npm run dev` (web :5173 proxies to wrangler :8787)
+- Standard verification path: `npm run verify` (lint + typecheck + unit tests in all workspaces, incl. workerd tests)
+- E2E: `npm run e2e` (Playwright starts vite + wrangler dev) · PWA/offline: `npm run e2e:pwa -w apps/web`
+- Deep engine checks: `npm run test:deep -w packages/engine` · Bot ladder: `npm run test:strength -w packages/ai` (slow; `STRENGTH_PAIR=n`)
+- Milestones: M0 infra ✓, M1 engine ✓, M2 local play ✓, M3 vs computer (ai-001, ai-003 ✓; ai-002 ladder re-running after conversion-mode fix), M4 learning ✓, M5 online ✓ (incl. quick match), M7 polish: PWA ✓, sounds ✓, themes/art ✓
+- Remaining: `ai-002` (ladder evidence), `acct-002` sign-in, `acct-003` ratings & history, `polish-002` native Thai review
+- Current blocker: `acct-002` needs Google OAuth credentials and an email-sending API key from the owner; `polish-002` needs a native Thai reviewer
 
 ## Session Log
 
 ### Session 001
 
 - Date: 2026-09-13
-- Goal: Brainstorm + plan the product; set up harness; start M0 (scaffold, CI, deploy placeholder to th-chess.beanroti.com).
-- Completed: `docs/PLAN.md`; harness files; `git init`; `infra-001` monorepo scaffold (web placeholder with TH/EN toggle, worker `/api/health`, engine + protocol packages, CI workflow file, GPL-3.0 LICENSE).
-- Verification run: `npm run verify`, `npm run build`, dev-server smoke (see `feature_list.json` infra-001 evidence).
-- Evidence captured: recorded in `feature_list.json`.
-- Commits: initial scaffold commit.
-- Files or artifacts updated: see above
-- Known risk or unresolved issue: npm 10.9.8 crashes on install (arborist `#loadPeerSet`) → `init.sh` and CI use npm 11. `gh` CLI logged in as another account; repo creation needs `socheek-del` auth. Wrangler needs Cloudflare auth.
-- Update (same session): repo `socheek-del/Makruk` created (public) and pushed; CI run 34736916479 green (`infra-002` passing). Deployed to th-chess.beanroti.com and verified over HTTPS (`infra-003` in progress).
-- Update (same session): created scoped Cloudflare account API token (expires 2027-09-14) → repo secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`; added CI `deploy` job; run 34737557818 deployed successfully (`infra-003` passing). M0 complete.
-- Update (same session, M1): Makruk engine in `packages/engine` (numeric board, movegen, FEN, Game with SAN/undo/status/counting/insufficient material, perft). Verified against Fairy-Stockfish via ffish (test-only dep): perft fixtures + lock-step random games. Rules documented in `docs/rules.md`.
-- Gotchas: ffish needs `globalThis.fetch` hidden while loading in Node 22 (`src/testing/ffish.ts`); Fairy-Stockfish FEN omits the `~` promoted marker (normalize before comparing).
-- Next best step: M2 — `design-001` (tokens + components), then `i18n-001`, `play-001..005`, `theme-001`.
+- Goal: plan the product, set up the harness, then implement every feature in `feature_list.json`.
+- Completed:
+  - M0: monorepo scaffold, CI, production deploy on th-chess.beanroti.com with a scoped Cloudflare token.
+  - M1: Makruk engine verified against Fairy-Stockfish (perft fixtures, lock-step random games, counting rules, insufficient material).
+  - M2: design system, Thai-first i18n, board with tap/drag, move list/history/undo, pass-and-play views, clocks with presets, light/dark and board themes.
+  - M3: alpha-beta AI in a Web Worker, 6 bot personas, hints and takeback; repetition-aware search with contempt and a "conversion mode" for won endgames.
+  - M4: data-driven lessons (10 piece/rule lessons + counting lesson), guided first game with coach, Duolingo-style path with XP and streaks.
+  - M5: guest identity, GameRoom Durable Object (server validation, clocks, alarms, hibernation, reconnect/abandon, draw/resign/rematch), web client, quick-match Matchmaker.
+  - M7: installable offline PWA, synthesized sounds + haptics + move animation, final classic piece set, flat set, mascot.
+- Verification run: see evidence per feature in `feature_list.json` (unit: engine 129, ai 18, web 105, worker 30; E2E 59 + PWA 2).
+- Commits: through `f021315` (CI verify + deploy green).
+- Known risk or unresolved issue:
+  - Bot ladder originally failed on counting-rule draws (strong side could not mate before the count ran out); fixed with conversion mode; re-run in progress.
+  - npm 10 crashes on this dependency tree → use npm 11 (`init.sh`, CI).
+  - ffish needs `globalThis.fetch` hidden in Node 22 (`packages/engine/src/testing/ffish.ts`).
+  - Vitest swallows console output of passing tests: slow tests write results to files (`packages/ai/strength-results.log`, gitignored).
+- Next best step: finish `ai-002` evidence, then `acct-003`/`acct-002` (D1 accounts, magic link, Google OAuth, Glicko-2 ratings, history).

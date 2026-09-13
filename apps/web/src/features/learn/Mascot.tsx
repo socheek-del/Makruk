@@ -20,7 +20,8 @@ function Eyes({ pose }: { pose: MascotPose }) {
   if (pose === 'sad') {
     return (
       <>
-        <path d="M44 55 L54 58 M76 55 L66 58" stroke={INK} strokeWidth="3" strokeLinecap="round" />
+        {/* Inner brow ends raised: worried, not angry. */}
+        <path d="M44 58 L54 54 M76 58 L66 54" stroke={INK} strokeWidth="3" strokeLinecap="round" />
         <circle cx="50" cy="62" r="3.5" fill={INK} />
         <circle cx="70" cy="62" r="3.5" fill={INK} />
       </>

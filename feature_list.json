@@ -625,11 +625,14 @@
       "milestone": "M7",
       "title": "Board themes and piece sets",
       "user_visible_behavior": "A user chooses from several board themes and piece sets.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "At least 5 board themes and 2 piece sets selectable; preview in settings."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/art.spec.ts (theme-002) passed: Settings shows 6 board themes (teak, jade, gold lacquer, night market, minimal, high contrast) and 2 piece sets, each set preview renders 7 SVG pieces; choosing flat + night persists after reload; the game board then renders 32 flat pieces on rgb(31,45,79).",
+        "2026-09-13: screenshots settings-pieces.png and board-flat-night.png reviewed — previews readable, flat set legible on the dark theme."
+      ],
       "notes": ""
     },
     {
@@ -639,12 +642,16 @@
       "milestone": "M7",
       "title": "Final in-house piece set",
       "user_visible_behavior": "Pieces use the final in-house SVG art, readable at small sizes.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "All 7 piece types x 2 colors delivered as optimized SVG.",
         "Screenshot review at 360px board width."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/src/features/board/pieces/classic.tsx — in-house SVG set on a 100×100 grid (inline React SVG, no external assets): Khun (tiered crown), Met (lotus bud), Khon (temple spire), Ma (horse head with mane), Ruea (boat with pennant), Bia (cowrie shell), promoted Bia (cowrie with gold tiara); ivory/gold and dark lacquer palettes.",
+        "2026-09-13: apps/web/e2e/art.spec.ts (art-001) passed at 360px: all 12 squares of a crafted position render svg[data-set=classic] with the expected data-type (r, n, s, m, k, p~ for both colours); the start position contains exactly the 6 base types.",
+        "2026-09-13: classic-360.png reviewed — all types distinguishable at ~40px squares; Ruea and Khun are the closest pair (both tall with a top ornament) but differ by crown vs pennant."
+      ],
       "notes": ""
     },
     {
@@ -654,11 +661,15 @@
       "milestone": "M7",
       "title": "Mascot and lesson illustrations",
       "user_visible_behavior": "Lessons and celebration screens feature the in-house mascot and illustrations.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Mascot poses (idle, happy, thinking, sad, celebrate) used across lesson flow."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/art.spec.ts (art-002) passed: in the Met lesson the mascot is idle on the explanation, thinking on the tap-squares task, sad after a wrong answer, happy after the right answer, and celebrating on the completion screen; the guided game's coach tip shows the mascot too.",
+        "2026-09-13: mascot-sad.png and mascot-celebrate.png reviewed; the sad brows read as angry and were flipped (inner ends raised) in Mascot.tsx.",
+        "apps/web/src/features/learn/Mascot.tsx — 'ขุนน้อย' (Little Khun), inline SVG with 5 poses (eyes, mouth, arms and props change per pose: thought bubbles, sweat drop, confetti)."
+      ],
       "notes": ""
     },
     {
