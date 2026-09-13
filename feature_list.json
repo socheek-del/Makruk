@@ -370,7 +370,7 @@
         "Automated match: each level beats the level below in a majority of 20 games."
       ],
       "evidence": [],
-      "notes": "2026-09-13 attempt (not accepted): from the start position L2>L1 +19-0=1, L3>L2 +13-1=6, L4>L3 +17-0=3, L5>L4 +11-1=8, L6 vs L5 +10-0=10 (GitHub Actions run 34748376992). L5 and L6 have no noise, so all 20 L6-L5 games were copies of 2 games (L6 White: win in 161 plies; L6 Black: 400-ply draw) — the ladder was not measuring anything for deterministic bots. Methodology fixed: each pair of games starts from a seeded random 6-ply opening played once with each colour; all pairs re-run with the new method."
+      "notes": "2026-09-13 attempt (not accepted): from the start position L2>L1 +19-0=1, L3>L2 +13-1=6, L4>L3 +17-0=3, L5>L4 +11-1=8, L6 vs L5 +10-0=10 (GitHub Actions run 34748376992). L5 and L6 have no noise, so all 20 L6-L5 games were copies of 2 games (L6 White: win in 161 plies; L6 Black: 400-ply draw) — the ladder was not measuring anything for deterministic bots. Methodology fixed: each pair of games starts from a seeded random 6-ply opening played once with each colour; all pairs re-run with the new method. With openings (search at 0b65b01): L2>L1 +17-1=2, L4>L3 +20-0=0, L5 vs L4 +6-0=14 (fail). Replaying L5-L4 game 3 showed L5 never repeated with its own move — L4 repeated, because search only checked repetition at the root. Fix 9862289: positions after the opponent's reply are checked against game history too (unit test in ai.test.ts); the replayed game became an L5 checkmate win. All pairs re-run on 9862289."
     },
     {
       "id": "ai-003",
