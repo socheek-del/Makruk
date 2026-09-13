@@ -5,7 +5,8 @@
  *
  * Resumable: every finished game is appended to strength-games.log with a signature of both bot
  * configs. Games already logged for the current configs are skipped, so an interrupted run
- * continues where it stopped. Delete the log (or change a bot) to start over.
+ * continues where it stopped. Delete the log (or change a bot) to start over. With STRENGTH_SHARD,
+ * run n shards in parallel, then run once more without it to record the verdict from the log.
  */
 import { appendFileSync, existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -16,6 +17,10 @@ import { BOTS, chooseMove, mulberry32, positionKey } from './index';
 
 const GAMES = Number(process.env.STRENGTH_GAMES ?? 20);
 const ONLY_PAIR = process.env.STRENGTH_PAIR ? Number(process.env.STRENGTH_PAIR) : null;
+/** STRENGTH_SHARD=k/n plays only games with index % n === k, so one pair can use several processes. */
+const SHARD = process.env.STRENGTH_SHARD
+  ? (([index, count]) => ({ index: Number(index), count: Number(count) }))(process.env.STRENGTH_SHARD.split('/'))
+  : null;
 const MAX_PLIES = 400;
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GAMES_LOG = join(ROOT, 'strength-games.log');
@@ -57,15 +62,18 @@ describe('bot strength ladder (ai-002)', () => {
       { timeout: 6 * 3_600_000 },
       () => {
         const signature = JSON.stringify({ strong, weak, maxPlies: MAX_PLIES });
-        const done = loggedGames(signature);
         for (let g = 0; g < GAMES; g++) {
-          if (done.has(g)) continue;
+          if (SHARD && g % SHARD.count !== SHARD.index) continue;
+          // Re-read before each game: parallel shards and earlier runs share the log.
+          if (loggedGames(signature).has(g)) continue;
           const strongIsWhite = g % 2 === 0;
           const { winner, plies } = playGame(strongIsWhite ? strong.id : weak.id, strongIsWhite ? weak.id : strong.id, 1_000 * i + g);
           const outcome: Outcome = winner === 'draw' ? 'draw' : winner === (strongIsWhite ? 'w' : 'b') ? 'win' : 'loss';
-          done.set(g, outcome);
           appendFileSync(GAMES_LOG, `${JSON.stringify({ at: new Date().toISOString(), pair: `L${strong.id}-L${weak.id}`, game: g, outcome, plies, signature })}\n`);
         }
+        const done = loggedGames(signature);
+        // A shard only plays its own games; the verdict needs every game.
+        if (SHARD && [...Array(GAMES).keys()].some((g) => !done.has(g))) return;
         const results = [...done].filter(([g]) => g < GAMES).map(([, outcome]) => outcome);
         const wins = results.filter((o) => o === 'win').length;
         const losses = results.filter((o) => o === 'loss').length;
