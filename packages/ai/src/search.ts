@@ -11,6 +11,8 @@ export function positionKey(fen: string): string {
 export const MATE = 100_000;
 const MAX_PLY = 64;
 const QUIESCENCE_DEPTH = 6;
+/** Ply (after the opponent's reply) at which positions are checked against the game history. */
+const REPETITION_PLY = 2;
 
 export interface SearchOptions {
   maxDepth: number;
@@ -92,8 +94,16 @@ export function search(position: { board: core.Board; turn: core.ColorIndex }, o
     return alpha;
   };
 
+  const seen = new Set(options.history ?? []);
+  const contempt = options.contempt ?? 0;
+
   const negamax = (depth: number, alpha: number, beta: number, side: core.ColorIndex, ply: number): number => {
     if (shouldStop()) return 0;
+    // The opponent's reply recreating an earlier position is a draw too: without this, a stronger bot walks
+    // into lines where the weaker side can repeat. Only near the root, where the key's string cost is small.
+    if (ply === REPETITION_PLY && seen.size > 0 && seen.has(`${placementOf(board)} ${side === 0 ? 'w' : 'b'}`)) {
+      return side === root ? -contempt : contempt;
+    }
     const checked = inCheck(board, side);
     if (checked && ply < MAX_PLY) depth++; // check extension: don't stop the search in the middle of a mating attack
     if (depth <= 0) return quiesce(alpha, beta, side, QUIESCENCE_DEPTH);
@@ -117,8 +127,7 @@ export function search(position: { board: core.Board; turn: core.ColorIndex }, o
     return { move: -1, score: inCheck(board, root) ? -MATE : 0, depth: 0, nodes: 0, rootMoves: [] };
   }
 
-  const seen = new Set(options.history ?? []);
-  const repetitionScore = -(options.contempt ?? 0);
+  const repetitionScore = -contempt;
   const afterKey = () => `${placementOf(board)} ${root === 0 ? 'b' : 'w'}`;
 
   let completedDepth = 0;

@@ -46,6 +46,21 @@ describe('search', () => {
     expect(result.rootMoves.filter((r) => r.score === -200)).toHaveLength(moves.length - 1);
   });
 
+  it("avoids moves that let the opponent's reply repeat an earlier position", () => {
+    // After h1h2, the lone Khun can step a8b8 into a position seen before; the losing side takes that draw.
+    const fen = 'k7/8/8/8/8/8/8/K6R w - - 0 1';
+    const g = new Game(fen);
+    g.move('h1h2');
+    g.move('a8b8');
+    const history = [positionKey(fen), positionKey(g.fen())];
+    const result = search(core.parseFen(fen), { maxDepth: 2, history, contempt: 200 });
+    const scoreOf = (uci: string) =>
+      result.rootMoves.find((r) => moveToUci({ from: core.moveFrom(r.move), to: core.moveTo(r.move), promotion: false }) === uci)!.score;
+    expect(scoreOf('h1h2')).toBe(-200);
+    expect(scoreOf('h1g1')).toBeGreaterThan(0);
+    expect(moveToUci({ from: core.moveFrom(result.move), to: core.moveTo(result.move), promotion: false })).not.toBe('h1h2');
+  });
+
   it('still repeats when every other move loses', () => {
     // Only legal moves: the Khun can step back and forth; repeating is fine when nothing else exists.
     const fen = '7k/8/8/8/8/8/r7/K7 w - - 0 1';
