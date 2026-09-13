@@ -18,7 +18,7 @@ handoff; no agent updates it automatically.
 - D1 database `makruk` (id 9e084ac6-9749-411d-867d-c89e8421ed78); migrations in `apps/worker/migrations`, applied by `npm run deploy` (CI) and by the Playwright wrangler command locally
 - Remaining: `ai-002` (ladder evidence), `acct-002` (production verification), `polish-002` (human review)
 - Current blockers (owner action needed):
-  - `acct-002`: create a Google OAuth web client (redirect URI `https://th-chess.beanroti.com/api/auth/google/callback`) and a Resend key with beanroti.com verified; set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM` with `wrangler secret put` in `apps/worker`
+  - `acct-002`: username/password accounts with email confirmation and password reset are implemented and verified locally (Google sign-in removed at the owner's request). Production email needs a Resend key with beanroti.com verified; set `RESEND_API_KEY`, `EMAIL_FROM` with `wrangler secret put` in `apps/worker`, then verify emails arrive
   - `polish-002`: native Thai reviewer completes `docs/i18n-review.md`
 
 ## Session Log
@@ -42,4 +42,5 @@ handoff; no agent updates it automatically.
   - npm 10 crashes on this dependency tree → use npm 11 (`init.sh`, CI).
   - ffish needs `globalThis.fetch` hidden in Node 22 (`packages/engine/src/testing/ffish.ts`).
   - Vitest swallows console output of passing tests: slow tests write results to files (`packages/ai/strength-results.log`, gitignored).
-- Next best step: finish `ai-002` evidence, then `acct-003`/`acct-002` (D1 accounts, magic link, Google OAuth, Glicko-2 ratings, history).
+- Later in session: accounts reworked to username + password (PBKDF2), email confirmation before sign-in, email password reset, lockout after 10 failures; `DEV_EMAIL_OUTBOX=1` lets tests and local dev read emails from D1.
+- Next best step: finish `ai-002` evidence; owner configures Resend for `acct-002` production email; native Thai review for `polish-002`.

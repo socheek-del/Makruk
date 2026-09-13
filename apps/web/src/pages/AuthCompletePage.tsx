@@ -7,7 +7,7 @@ import { buttonClasses } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { setIdentity } from '../features/online/identity';
 
-/** Landing page after magic-link or Google sign-in: the token arrives in the URL fragment. */
+/** Landing page after following the email confirmation link: the token arrives in the URL fragment. */
 export function AuthCompletePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();

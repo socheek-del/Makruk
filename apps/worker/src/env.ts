@@ -11,14 +11,11 @@ export interface Env {
   AUTH_SECRET: string;
   /** How long a disconnected player has to come back before losing by abandonment. */
   RECONNECT_GRACE_MS?: string;
-  /** Public site origin used in sign-in links and OAuth redirects, e.g. https://th-chess.beanroti.com */
+  /** Public site origin used in emailed links, e.g. https://th-chess.beanroti.com */
   PUBLIC_ORIGIN?: string;
-  /** Google OAuth web client (acct-002). Sign-in with Google is disabled until both are set. */
-  GOOGLE_CLIENT_ID?: string;
-  GOOGLE_CLIENT_SECRET?: string;
-  /** Resend API key and verified sender for magic-link emails. Email sign-in is disabled until set. */
+  /** Resend API key and verified sender for confirmation and reset emails. Registration is disabled until set. */
   RESEND_API_KEY?: string;
   EMAIL_FROM?: string;
-  /** "1" enables POST /api/auth/test-login for local development and E2E tests only. */
-  ALLOW_TEST_LOGIN?: string;
+  /** "1" stores emails in the dev_outbox table and exposes GET /api/dev/outbox — local dev and tests only. */
+  DEV_EMAIL_OUTBOX?: string;
 }

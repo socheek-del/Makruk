@@ -14,7 +14,7 @@ Status: draft for review · Date: 2026-09-13
 | Deploy | `th-chess.beanroti.com` — Worker custom domain on existing `beanroti.com` zone |
 | Source control | GitHub `socheek-del/Makruk` via SSH alias → `git@github-socheek-del:socheek-del/Makruk.git` |
 | Design direction | Duolingo-style playful, gamified learning UI + Chess.com-style clean game/board UI; all illustrations & piece art made in-house |
-| Sign-in | Google OAuth + email magic link (both optional; guest by default) |
+| Sign-in | Username + password, email confirmation, email password reset (optional; guest by default). No Google sign-in. |
 | Chat | None — no free text, no chat of any kind in online games |
 | Time controls | Quick match: 3+2, 5+0, 10+0 · Custom games: common presets (see §3) |
 | Agent harness | walkinglabs learn-harness-engineering templates (see §7) |
@@ -91,7 +91,7 @@ Status: draft for review · Date: 2026-09-13
 ### Platform & account
 - PWA install, offline play (local + AI + tutorials work offline)
 - i18n: **Thai default**, English switchable (persisted setting; `<html lang>` updates). Thai piece names primary (ขุน, เม็ด, โคน, ม้า, เรือ, เบี้ย). Thai-capable font (e.g. Noto Sans Thai / IBM Plex Sans Thai). All UI strings via i18next keys from first UI commit.
-- Guest ID (signed token in localStorage) → optional sign-in with **Google OAuth or email magic link** merges guest history (magic-link email via Cloudflare Email Sending or Resend)
+- Guest ID (signed token in localStorage) → optional account (**username + password**, confirmed by email, password reset by email) merges guest history (emails via Resend)
 - Profile: rating (Glicko-2), game history, stats, tutorial progress
 - Settings: theme, piece set, sound, move confirmation, board coordinates, language
 
@@ -175,4 +175,4 @@ Draft feature ids (priority order): `infra-001` scaffold · `infra-002` CI · `i
 
 None blocking.
 
-Resolved 2026-09-13: repo `socheek-del/Makruk` **public, licensed GPL-3.0** → Fairy-Stockfish WASM allowed for hard AI levels & analysis · Duolingo + Chess.com style, in-house art · Google + email magic link · no chat · quick match 3+2/5+0/10+0 + custom presets · domain `th-chess.beanroti.com`.
+Resolved 2026-09-13: repo `socheek-del/Makruk` **public, licensed GPL-3.0** → Fairy-Stockfish WASM allowed for hard AI levels & analysis · Duolingo + Chess.com style, in-house art · ~~Google + email magic link~~ → username + password with email confirmation and reset (owner change, same day) · no chat · quick match 3+2/5+0/10+0 + custom presets · domain `th-chess.beanroti.com`.

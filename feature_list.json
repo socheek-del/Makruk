@@ -573,20 +573,22 @@
       "priority": 31,
       "area": "account",
       "milestone": "M6",
-      "title": "Optional sign-in (Google and email magic link)",
-      "user_visible_behavior": "A user signs in with Google or an emailed magic link and keeps their guest history.",
+      "title": "Optional accounts (username + password, email confirmation, password reset)",
+      "user_visible_behavior": "A user creates an account with a username and password, confirms it from an emailed link, signs in, resets a forgotten password by email, and keeps their guest history. No Google sign-in (owner decision 2026-09-13).",
       "status": "blocked",
       "verification": [
-        "Google OAuth sign-in works on production domain.",
-        "Magic link email arrives and signs the user in.",
-        "Guest games appear in the signed-in history."
+        "Registering sends a confirmation email; sign-in is refused until the link is followed.",
+        "Username (or email) + password sign-in works; wrong passwords are rejected and repeated failures lock the account.",
+        "Forgot password emails a one-time reset link; the new password works and the old one does not.",
+        "Guest games appear in the signed-in history.",
+        "Confirmation and reset emails arrive from the production domain."
       ],
       "evidence": [
-        "2026-09-13: implemented end to end (apps/worker/src/accounts/routes.ts, apps/web/src/pages/AccountPage.tsx, AuthCompletePage.tsx). Production currently reports {google:false,email:false} because no provider credentials exist yet.",
-        "2026-09-13: apps/worker/src/accounts/accounts.test.ts in workerd — magic link: POST /api/auth/magic-link sends a Thai email via the Resend API (mocked) with a one-time link; following it redirects to /auth/complete#token=…, the token opens the account, the guest's earlier game is in its history, and reusing the link gives error=expired. Google: /api/auth/google/start redirects to accounts.google.com with client_id, redirect_uri and signed state; the callback exchanges the code (token endpoint mocked), accepts a verified ID token and signs in; wrong audience → error=google, forged state → error=state.",
-        "2026-09-13: third verification step passes — apps/web/e2e/accounts.spec.ts 'a guest's games move to the account after signing in': a guest wins an online game, signs in, and the game stays in the account history; signing out returns to a new guest."
+        "2026-09-13: Google OAuth and magic link removed; replaced by apps/worker/src/accounts/{routes,password,email,store}.ts, migration 0002_password_auth.sql, apps/web/src/features/online/AuthForms.tsx, pages/PasswordPages.tsx.",
+        "2026-09-13: apps/worker/src/accounts/accounts.test.ts in workerd (worker suite 48/48): PBKDF2 hash salted and verified; register sends a Thai confirmation email, login returns 403 email_not_verified until the one-time link is followed (reuse → error=invalid_token); resend works and does not reveal unknown accounts; taken username (case-insensitive) / email → 409, invalid username / short password → 400; login by username in any case or by email, wrong password 401, 10 failures → 429 locked; forgot-password emails an English reset link (unknown email → same 202, no email), reset signs in, old password 401, new password 200, reused token → invalid_token; Resend delivery path checked with mocked fetch; guest games carried over on register and on login from another guest.",
+        "2026-09-13: apps/web/e2e/accounts.spec.ts (3/3, real wrangler dev + local D1 + DEV_EMAIL_OUTBOX): register in Thai UI (password mismatch caught), unconfirmed sign-in shows the not-confirmed alert, follow emailed link → signed in, sign out, wrong password alert, sign in; forgot password → emailed link → new password → signed in; old password rejected, email + new password works. Guest wins an online game, registers and confirms, game stays in history. Rated game between two registered players updates ratings/history/replay. Screenshot e2e-evidence/register-sent.png reviewed."
       ],
-      "notes": "BLOCKED on owner-provided credentials; code and tests are done. To unblock: (1) Google Cloud Console → OAuth client (Web) with authorized redirect URI https://th-chess.beanroti.com/api/auth/google/callback, then `wrangler secret put GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in apps/worker. (2) Resend account with beanroti.com verified as a sending domain, then `wrangler secret put RESEND_API_KEY` and `EMAIL_FROM` (e.g. `หมากรุกไทย <noreply@beanroti.com>`). Then verify both flows on the production domain and record evidence."
+      "notes": "Steps 1–4 verifiable locally with DEV_EMAIL_OUTBOX=1. Step 5 BLOCKED on owner: Resend account with beanroti.com verified as a sending domain, then `wrangler secret put RESEND_API_KEY` and `EMAIL_FROM` (e.g. `หมากรุกไทย <noreply@beanroti.com>`) in apps/worker; until then production reports accounts:false and hides registration."
     },
     {
       "id": "online-005",

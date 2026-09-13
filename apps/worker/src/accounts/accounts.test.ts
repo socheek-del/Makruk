@@ -2,6 +2,7 @@ import {
   AccountResponse,
   AuthConfigResponse,
   AuthResponse,
+  DevOutboxResponse,
   GameHistoryResponse,
   GameRecordResponse,
   GuestResponse,
@@ -11,6 +12,8 @@ import {
 import { env as providedEnv, exports as providedExports } from 'cloudflare:workers';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Env } from '../env';
+import { renderEmail, sendEmail } from './email';
+import { hashPassword, verifyPassword } from './password';
 import { recordGame } from './store';
 
 const env = providedEnv as unknown as Env;
@@ -18,6 +21,7 @@ const worker = providedExports as unknown as {
   default: { fetch: (input: string, init?: RequestInit) => Promise<Response> };
 };
 const BASE = 'https://th-chess.test';
+const PASSWORD = 'correct horse battery';
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const post = (body: unknown, token?: string): RequestInit => ({
   method: 'POST',
@@ -25,33 +29,60 @@ const post = (body: unknown, token?: string): RequestInit => ({
   body: JSON.stringify(body),
 });
 const bearer = (token: string): RequestInit => ({ headers: { authorization: `Bearer ${token}` } });
-let emails = 0;
-const uniqueEmail = (name: string) => `${name}-${Date.now()}-${emails++}@example.test`;
+let counter = 0;
+const uniqueName = (base: string) => `${base}_${Date.now() % 100000}${counter++}`.slice(0, 20);
 
 afterEach(() => {
   vi.restoreAllMocks();
 });
 
+const api = (path: string, init?: RequestInit) => worker.default.fetch(`${BASE}${path}`, init);
+
 async function guest() {
-  return GuestResponse.parse(await (await worker.default.fetch(`${BASE}/api/guest`, { method: 'POST' })).json());
+  return GuestResponse.parse(await (await api('/api/guest', { method: 'POST' })).json());
 }
 
-async function testLogin(name: string, email = uniqueEmail(name), guestToken?: string) {
-  const res = await worker.default.fetch(`${BASE}/api/auth/test-login`, post({ name, email, guestToken }));
-  expect(res.status).toBe(200);
-  return AuthResponse.parse(await res.json());
+async function outbox(email: string) {
+  return DevOutboxResponse.parse(await (await api(`/api/dev/outbox?to=${encodeURIComponent(email)}`)).json()).emails;
 }
+
+const linkIn = (html: string) => /href="([^"]+)"/.exec(html)![1]!;
+
+async function register(username: string, options: { email?: string; password?: string; guestToken?: string; lang?: 'th' | 'en' } = {}) {
+  const email = options.email ?? `${username.toLowerCase()}@example.test`;
+  const res = await api('/api/auth/register', post({ username, email, password: options.password ?? PASSWORD, guestToken: options.guestToken, lang: options.lang }));
+  return { res, email };
+}
+
+/** Follows the confirmation link and returns the signed-in token. */
+async function confirm(email: string) {
+  const [latest] = await outbox(email);
+  const follow = await worker.default.fetch(linkIn(latest!.html), { redirect: 'manual' });
+  const location = follow.headers.get('location')!;
+  expect(location.startsWith(`${BASE}/auth/complete#token=`)).toBe(true);
+  return decodeURIComponent(location.split('#token=')[1]!);
+}
+
+async function signUp(base: string, guestToken?: string) {
+  const username = uniqueName(base);
+  const { res, email } = await register(username, { guestToken });
+  expect(res.status).toBe(201);
+  const token = await confirm(email);
+  return { token, username, email, user: (await account(token)).user };
+}
+
+const login = (loginName: string, password: string, guestToken?: string) => api('/api/auth/login', post({ login: loginName, password, guestToken }));
 
 async function account(token: string) {
-  return AccountResponse.parse(await (await worker.default.fetch(`${BASE}/api/account`, bearer(token))).json());
+  return AccountResponse.parse(await (await api('/api/account', bearer(token))).json());
 }
 
 async function history(token: string) {
-  return GameHistoryResponse.parse(await (await worker.default.fetch(`${BASE}/api/account/games`, bearer(token))).json()).games;
+  return GameHistoryResponse.parse(await (await api('/api/account/games', bearer(token))).json()).games;
 }
 
 async function connect(code: string, token: string) {
-  const res = await worker.default.fetch(`${BASE}/ws/game/${code}?token=${encodeURIComponent(token)}`, { headers: { Upgrade: 'websocket' } });
+  const res = await api(`/ws/game/${code}?token=${encodeURIComponent(token)}`, { headers: { Upgrade: 'websocket' } });
   const ws = res.webSocket!;
   const inbox: ServerMessage[] = [];
   ws.accept();
@@ -72,8 +103,8 @@ async function playAndResign(
   blackToken: string,
   options: { rated?: boolean; timeControl?: TimeControl | null; loser?: 'w' | 'b' } = {},
 ) {
-  const created = await worker.default.fetch(
-    `${BASE}/api/games`,
+  const created = await api(
+    '/api/games',
     post({ color: 'w', rated: options.rated ?? true, timeControl: options.timeControl === undefined ? { initialMs: 300_000, incrementMs: 0 } : options.timeControl }, whiteToken),
   );
   const { code } = (await created.json()) as { code: string };
@@ -91,109 +122,126 @@ async function playAndResign(
   return code;
 }
 
+describe('passwords', () => {
+  it('hashes with a random salt and verifies only the right password', async () => {
+    const a = await hashPassword('s3cret-pass');
+    const b = await hashPassword('s3cret-pass');
+    expect(a).not.toBe(b);
+    expect(a.startsWith('pbkdf2-sha256$100000$')).toBe(true);
+    expect(await verifyPassword('s3cret-pass', a)).toBe(true);
+    expect(await verifyPassword('wrong-pass', a)).toBe(false);
+    expect(await verifyPassword('s3cret-pass', 'md5$garbage')).toBe(false);
+  });
+});
+
+describe('registration and email confirmation (acct-002)', () => {
+  it('reports that accounts are available', async () => {
+    expect(AuthConfigResponse.parse(await (await api('/api/auth/config')).json())).toEqual({ accounts: true, devOutbox: true });
+  });
+
+  it('registers, requires email confirmation before sign-in, and confirms with a one-time link', async () => {
+    const username = uniqueName('Somchai');
+    const { res, email } = await register(username, { lang: 'th' });
+    expect(res.status).toBe(201);
+
+    const [mail] = await outbox(email);
+    expect(mail!.subject).toBe('ยืนยันอีเมลสำหรับบัญชีหมากรุกไทย');
+    expect(linkIn(mail!.html).startsWith(`${BASE}/api/auth/verify?token=`)).toBe(true);
+
+    const early = await login(username, PASSWORD);
+    expect(early.status).toBe(403);
+    expect(await early.json()).toEqual({ error: 'email_not_verified' });
+
+    const token = await confirm(email);
+    const me = await account(token);
+    expect(me.user).toMatchObject({ name: username, kind: 'user' });
+    expect(me.email).toBe(email);
+
+    const reuse = await worker.default.fetch(linkIn(mail!.html), { redirect: 'manual' });
+    expect(reuse.headers.get('location')).toBe(`${BASE}/auth/complete#error=invalid_token`);
+  });
+
+  it('resends the confirmation email for an unconfirmed account', async () => {
+    const username = uniqueName('Resend');
+    const { email } = await register(username);
+    expect((await api('/api/auth/resend-verification', post({ login: username }))).status).toBe(202);
+    expect(await outbox(email)).toHaveLength(2);
+    expect((await api('/api/auth/resend-verification', post({ login: 'nobody_here' }))).status).toBe(202);
+  });
+
+  it('rejects taken usernames and emails, bad usernames and short passwords', async () => {
+    const username = uniqueName('Taken');
+    await register(username);
+    expect(await (await register(username.toUpperCase(), { email: `other${counter}@example.test` })).res.json()).toEqual({ error: 'username_taken' });
+    expect(await (await register(uniqueName('Other'), { email: `${username.toLowerCase()}@example.test` })).res.json()).toEqual({ error: 'email_taken' });
+    expect((await register('no spaces!')).res.status).toBe(400);
+    expect((await register(uniqueName('Short'), { password: 'short' })).res.status).toBe(400);
+  });
+});
+
 describe('sign-in (acct-002)', () => {
-  it('reports which providers are configured', async () => {
-    const config = AuthConfigResponse.parse(await (await worker.default.fetch(`${BASE}/api/auth/config`)).json());
-    expect(config).toEqual({ google: true, email: true, testLogin: true });
+  it('signs in with username (any case) or email; wrong passwords are rejected', async () => {
+    const { username, email } = await signUp('Nok');
+    for (const name of [username, username.toUpperCase(), email]) {
+      const res = await login(name, PASSWORD);
+      expect(res.status).toBe(200);
+      expect(AuthResponse.parse(await res.json()).user.name).toBe(username);
+    }
+    const wrong = await login(username, 'not the password');
+    expect(wrong.status).toBe(401);
+    expect(await wrong.json()).toEqual({ error: 'invalid_credentials' });
+    expect((await login('ghost_user', PASSWORD)).status).toBe(401);
   });
 
-  it('test sign-in creates one account per email with default provisional ratings', async () => {
-    const email = uniqueEmail('dao');
-    const first = await testLogin('Dao', email);
-    const again = await testLogin('Dao', email);
-    expect(first.user).toEqual(again.user);
-    expect(first.user.kind).toBe('user');
-    const me = await account(first.token);
-    expect(me.email).toBe(email);
-    expect(me.ratings.map((r) => [r.timeClass, r.rating, r.provisional])).toEqual([
-      ['bullet', 1500, true],
-      ['blitz', 1500, true],
-      ['rapid', 1500, true],
-      ['classical', 1500, true],
-    ]);
+  it('locks the account after 10 failed attempts', async () => {
+    const { username } = await signUp('Locky');
+    for (let i = 0; i < 10; i++) expect((await login(username, `wrong-${i}-password`)).status).toBe(401);
+    const locked = await login(username, PASSWORD);
+    expect(locked.status).toBe(429);
+    expect(await locked.json()).toEqual({ error: 'locked' });
+  });
+});
+
+describe('password reset (acct-002)', () => {
+  it('emails a reset link; the new password works, the old one and the link do not', async () => {
+    const { username, email } = await signUp('Reset');
+    expect((await api('/api/auth/forgot-password', post({ email: 'nobody@example.test' }))).status).toBe(202);
+    expect(await outbox('nobody@example.test')).toHaveLength(0);
+
+    expect((await api('/api/auth/forgot-password', post({ email, lang: 'en' }))).status).toBe(202);
+    const [mail] = await outbox(email);
+    expect(mail!.subject).toBe('Reset your Makruk password');
+    const link = new URL(linkIn(mail!.html));
+    expect(link.pathname).toBe('/reset-password');
+    const token = link.searchParams.get('token')!;
+
+    const reset = await api('/api/auth/reset-password', post({ token, password: 'brand new password' }));
+    expect(reset.status).toBe(200);
+    expect(AuthResponse.parse(await reset.json()).user.name).toBe(username);
+
+    expect((await login(username, PASSWORD)).status).toBe(401);
+    expect((await login(username, 'brand new password')).status).toBe(200);
+    const again = await api('/api/auth/reset-password', post({ token, password: 'another password' }));
+    expect(await again.json()).toEqual({ error: 'invalid_token' });
   });
 
-  it('magic link: emails a one-time link that signs the user in and keeps guest games', async () => {
-    const visitor = await guest();
-    const rival = await guest();
-    await playAndResign(rival.token, visitor.token, { rated: false });
-
-    const sent: Array<{ to: string[]; subject: string; html: string }> = [];
-    const realFetch = globalThis.fetch;
+  it('delivers real email through Resend when configured', async () => {
+    const calls: Array<{ url: string; body: { to: string[]; subject: string } }> = [];
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
-      if (String(input).startsWith('https://api.resend.com/emails')) {
-        expect(new Headers(init?.headers).get('authorization')).toBe('Bearer test-resend-key');
-        sent.push(JSON.parse(String(init?.body)));
-        return new Response('{"id":"email_1"}', { status: 200 });
-      }
-      return realFetch(input, init);
+      calls.push({ url: String(input), body: JSON.parse(String(init?.body)) });
+      return new Response('{"id":"1"}', { status: 200 });
     });
-
-    const email = uniqueEmail('nok');
-    const request = await worker.default.fetch(`${BASE}/api/auth/magic-link`, post({ email, guestToken: visitor.token, lang: 'th' }));
-    expect(request.status).toBe(202);
-    expect(sent).toHaveLength(1);
-    expect(sent[0]!.to).toEqual([email]);
-    expect(sent[0]!.subject).toBe('ลิงก์เข้าสู่ระบบหมากรุกไทย');
-    const link = /href="([^"]+)"/.exec(sent[0]!.html)![1]!;
-    expect(link.startsWith(`${BASE}/api/auth/magic?token=`)).toBe(true);
-
-    const follow = await worker.default.fetch(link, { redirect: 'manual' });
-    expect(follow.status).toBe(302);
-    const location = follow.headers.get('location')!;
-    expect(location.startsWith(`${BASE}/auth/complete#token=`)).toBe(true);
-    const token = decodeURIComponent(location.split('#token=')[1]!);
-    expect((await account(token)).email).toBe(email);
-    expect((await history(token)).map((g) => g.yourColor)).toEqual(['b']);
-
-    const reuse = await worker.default.fetch(link, { redirect: 'manual' });
-    expect(reuse.headers.get('location')).toBe(`${BASE}/auth/complete#error=expired`);
-  });
-
-  it('Google: redirects to Google and signs in from a verified ID token', async () => {
-    const start = await worker.default.fetch(`${BASE}/api/auth/google/start`, { redirect: 'manual' });
-    expect(start.status).toBe(302);
-    const google = new URL(start.headers.get('location')!);
-    expect(google.origin + google.pathname).toBe('https://accounts.google.com/o/oauth2/v2/auth');
-    expect(google.searchParams.get('client_id')).toBe('test-google-client');
-    expect(google.searchParams.get('redirect_uri')).toBe(`${BASE}/api/auth/google/callback`);
-    const state = google.searchParams.get('state')!;
-
-    const email = uniqueEmail('somchai');
-    const idToken = (claims: Record<string, unknown>) =>
-      `e30.${btoa(JSON.stringify(claims)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')}.sig`;
-    const realFetch = globalThis.fetch;
-    let audience = 'test-google-client';
-    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
-      if (String(input) === 'https://oauth2.googleapis.com/token') {
-        const form = new URLSearchParams(String(init?.body));
-        expect(form.get('client_secret')).toBe('test-google-secret');
-        expect(form.get('code')).toBe('auth-code');
-        const claims = { iss: 'https://accounts.google.com', aud: audience, email, email_verified: true, name: 'Somchai', exp: Math.floor(Date.now() / 1000) + 600 };
-        return Response.json({ id_token: idToken(claims) });
-      }
-      return realFetch(input, init);
-    });
-
-    const callback = await worker.default.fetch(`${BASE}/api/auth/google/callback?code=auth-code&state=${encodeURIComponent(state)}`, { redirect: 'manual' });
-    const location = callback.headers.get('location')!;
-    expect(location.startsWith(`${BASE}/auth/complete#token=`)).toBe(true);
-    const me = await account(decodeURIComponent(location.split('#token=')[1]!));
-    expect(me.user.name).toBe('Somchai');
-    expect(me.email).toBe(email);
-
-    audience = 'someone-else';
-    const wrongAudience = await worker.default.fetch(`${BASE}/api/auth/google/callback?code=auth-code&state=${encodeURIComponent(state)}`, { redirect: 'manual' });
-    expect(wrongAudience.headers.get('location')).toBe(`${BASE}/auth/complete#error=google`);
-    const badState = await worker.default.fetch(`${BASE}/api/auth/google/callback?code=auth-code&state=forged`, { redirect: 'manual' });
-    expect(badState.headers.get('location')).toBe(`${BASE}/auth/complete#error=state`);
+    const configured = { ...env, RESEND_API_KEY: 'key', EMAIL_FROM: 'Makruk <noreply@beanroti.com>', DEV_EMAIL_OUTBOX: undefined };
+    expect(await sendEmail(configured, renderEmail('verify', 'a@example.test', 'https://x/verify', 'en'))).toBe(true);
+    expect(calls).toEqual([{ url: 'https://api.resend.com/emails', body: expect.objectContaining({ to: ['a@example.test'], subject: 'Confirm your Makruk account' }) }]);
+    expect(await sendEmail({ ...env, DEV_EMAIL_OUTBOX: undefined }, renderEmail('reset', 'a@example.test', 'https://x', 'th'))).toBe(false);
   });
 });
 
 describe('ratings and history (acct-003)', () => {
   it('a rated game between signed-in players updates both ratings and appears in both histories', async () => {
-    const white = await testLogin('White');
-    const black = await testLogin('Black');
+    const white = await signUp('White');
+    const black = await signUp('Black');
     const code = await playAndResign(white.token, black.token);
 
     const whiteBlitz = (await account(white.token)).ratings.find((r) => r.timeClass === 'blitz')!;
@@ -207,14 +255,14 @@ describe('ratings and history (acct-003)', () => {
     expect(game!.ratingChange).toBeLessThan(0);
     expect((await history(black.token))[0]!.ratingChange).toBeGreaterThan(0);
 
-    const record = GameRecordResponse.parse(await (await worker.default.fetch(`${BASE}/api/games/record/${game!.id}`)).json());
+    const record = GameRecordResponse.parse(await (await api(`/api/games/record/${game!.id}`)).json());
     expect(record.moves).toEqual(['e3e4', 'd6d5']);
     expect(record.timeControl).toEqual({ initialMs: 300_000, incrementMs: 0 });
   });
 
   it('casual games, untimed games and games with a guest do not change ratings', async () => {
-    const a = await testLogin('Casual');
-    const b = await testLogin('Friend');
+    const a = await signUp('Casual');
+    const b = await signUp('Friend');
     await playAndResign(a.token, b.token, { rated: false });
     await playAndResign(a.token, b.token, { timeControl: null });
     const visitor = await guest();
@@ -227,21 +275,24 @@ describe('ratings and history (acct-003)', () => {
     expect(games.every((g) => !g.rated && g.ratingChange === null)).toBe(true);
   });
 
-  it('a guest who signs in keeps their earlier games', async () => {
+  it('a guest who registers keeps their earlier games; signing in from a guest links that guest too', async () => {
     const visitor = await guest();
     const rival = await guest();
     await playAndResign(visitor.token, rival.token, { loser: 'b' });
-    expect(await history(visitor.token)).toHaveLength(1);
-
-    const member = await testLogin('Member', undefined, visitor.token);
+    const member = await signUp('Member', visitor.token);
     const games = await history(member.token);
     expect(games).toHaveLength(1);
     expect(games[0]).toMatchObject({ yourColor: 'w', result: { winner: 'w' } });
+
+    const secondDevice = await guest();
+    await playAndResign(rival.token, secondDevice.token, { loser: 'w' });
+    const signedIn = AuthResponse.parse(await (await login(member.username, PASSWORD, secondDevice.token)).json());
+    expect(await history(signedIn.token)).toHaveLength(2);
   });
 
   it('recording the same finished game twice applies ratings once', async () => {
-    const white = await testLogin('Twice');
-    const black = await testLogin('Again');
+    const white = await signUp('Twice');
+    const black = await signUp('Again');
     const game = {
       id: `ONCE23-${Date.now()}`,
       code: 'ONCE23',

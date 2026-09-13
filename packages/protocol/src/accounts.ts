@@ -5,31 +5,65 @@ import { Color, GameResult, PublicUser, TimeControl } from './game';
 export const TimeClass = z.enum(['bullet', 'blitz', 'rapid', 'classical']);
 export type TimeClass = z.infer<typeof TimeClass>;
 
+/** 3–20 characters: English letters, digits and underscore. */
+export const Username = z.string().regex(/^[A-Za-z0-9_]{3,20}$/);
+export const Password = z.string().min(8).max(128);
+const Lang = z.enum(['th', 'en']).optional();
+
 export const AuthConfigResponse = z.object({
-  google: z.boolean(),
-  email: z.boolean(),
-  /** Only true in local development / E2E environments. */
-  testLogin: z.boolean(),
+  /** Registration and password reset need email delivery. */
+  accounts: z.boolean(),
+  /** Development only: emails go to /api/dev/outbox instead of being sent. */
+  devOutbox: z.boolean(),
 });
 export type AuthConfigResponse = z.infer<typeof AuthConfigResponse>;
 
 export const AuthResponse = z.object({ token: z.string(), user: PublicUser });
 export type AuthResponse = z.infer<typeof AuthResponse>;
 
-export const MagicLinkRequest = z.object({
+export const RegisterRequest = z.object({
+  username: Username,
   email: z.email(),
-  /** Current guest token so the guest's games move to the account. */
+  password: Password,
+  /** Current guest token so the guest's games move to the new account. */
   guestToken: z.string().optional(),
-  lang: z.enum(['th', 'en']).optional(),
+  lang: Lang,
 });
-export type MagicLinkRequest = z.infer<typeof MagicLinkRequest>;
+export type RegisterRequest = z.infer<typeof RegisterRequest>;
 
-export const TestLoginRequest = z.object({
-  email: z.email(),
-  name: z.string().min(1).max(40),
+export const LoginRequest = z.object({
+  /** Username or email. */
+  login: z.string().min(1).max(254),
+  password: z.string().min(1).max(128),
   guestToken: z.string().optional(),
 });
-export type TestLoginRequest = z.infer<typeof TestLoginRequest>;
+export type LoginRequest = z.infer<typeof LoginRequest>;
+
+export const ResendVerificationRequest = z.object({ login: z.string().min(1).max(254), lang: Lang });
+export type ResendVerificationRequest = z.infer<typeof ResendVerificationRequest>;
+
+export const ForgotPasswordRequest = z.object({ email: z.email(), lang: Lang });
+export type ForgotPasswordRequest = z.infer<typeof ForgotPasswordRequest>;
+
+export const ResetPasswordRequest = z.object({ token: z.string().min(16).max(128), password: Password });
+export type ResetPasswordRequest = z.infer<typeof ResetPasswordRequest>;
+
+export const AuthErrorCode = z.enum([
+  'bad_request',
+  'username_taken',
+  'email_taken',
+  'invalid_credentials',
+  'email_not_verified',
+  'locked',
+  'invalid_token',
+  'email_unavailable',
+]);
+export type AuthErrorCode = z.infer<typeof AuthErrorCode>;
+
+export const DevOutboxResponse = z.object({
+  emails: z.array(z.object({ to: z.string(), subject: z.string(), html: z.string(), createdAt: z.number() })),
+});
+export type DevOutboxResponse = z.infer<typeof DevOutboxResponse>;
 
 export const RatingInfo = z.object({
   timeClass: TimeClass,

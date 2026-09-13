@@ -13,7 +13,7 @@ it has not been reviewed.
 | Lessons | `apps/web/src/features/learn/lessons.ts` (`th:` strings) | Correct rules explanations, beginner-friendly wording |
 | Coach tips | `th.json` → `coach.*` | Short, encouraging, accurate advice |
 | Bot personas | `th.json` → `bots.*` | Names and descriptions feel fun and respectful |
-| Email | `apps/worker/src/accounts/routes.ts` → `magicLinkEmail` | Subject and body |
+| Emails | `apps/worker/src/accounts/email.ts` → `COPY` (confirmation, password reset) | Subject and body |
 | Store listing / manifest | `apps/web/vite.config.ts` → `manifest` | App name and description |
 
 Everything can also be reviewed in the running app: open https://th-chess.beanroti.com

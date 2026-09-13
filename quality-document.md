@@ -24,7 +24,7 @@ needs work.
 | Single player (AI) | B | Unit (tactics, repetition, conversion) + E2E (worker, hints, takeback) | search/evaluate/bots split | Ladder is slow (tens of minutes) | Ladder evidence pending re-run; strength tuned by node budgets | 2026-09-13 |
 | Tutorials & gamification | A | Lesson content validated against engine; E2E lesson/path/guided | Lessons are plain TS data | Fake clock for streaks | Content reviewed by engineer, not a Makruk teacher | 2026-09-13 |
 | Online play | A | Pure room logic + workerd DO tests + two-browser E2E | Thin DO over pure reducer | Real wrangler dev in E2E | No spectator UI beyond read-only banner | 2026-09-13 |
-| Accounts & ratings | B | Glicko-2 reference test, workerd tests with mocked Google/Resend, E2E rated game + guest carry-over | accounts/store.ts, accounts/routes.ts | Local D1 via wrangler in E2E | Real Google/email sign-in unverified (no credentials); no rate limiting on magic-link requests | 2026-09-13 |
+| Accounts & ratings | B | Glicko-2 reference test, workerd tests (register/confirm/login/lockout/reset, mocked Resend), E2E full account flow via dev outbox + rated game + guest carry-over | accounts/{routes,store,password,email}.ts | Local D1 via wrangler in E2E | Production email unverified (no Resend key); no per-IP rate limit on register/forgot-password | 2026-09-13 |
 | Themes & art | A | E2E + screenshot review | pieces/ folder, Mascot.tsx | — | Ruea/Khun silhouettes close at 36px | 2026-09-13 |
 | Localization (TH/EN) | B | Key parity + literal-key test; E2E in both languages | locales/*.json + lesson L10n | — | Needs native Thai review (polish-002) | 2026-09-13 |
 | PWA & polish | A | Installability via CDP, offline E2E, sound/motion E2E | vite.config.ts, sound.ts | — | — | 2026-09-13 |
@@ -37,7 +37,7 @@ needs work.
 | `packages/ai` | B | Uses `@makruk/engine/core` only | search/evaluate/bots/index | Strength ladder slow | 2026-09-13 |
 | `packages/protocol` | A | Zod schemas only | game.ts | — | 2026-09-13 |
 | `apps/web` | A | No rules logic outside engine; sessions share one interface | features/, pages/, stores/ | Bundle not code-split per route | 2026-09-13 |
-| `apps/worker` | A | All moves validated via engine; room rules are pure functions; test login only when ALLOW_TEST_LOGIN=1 | room/, match/, accounts/, ratings/ | — | 2026-09-13 |
+| `apps/worker` | A | All moves validated via engine; room rules are pure functions; dev email outbox only when DEV_EMAIL_OUTBOX=1 | room/, match/, accounts/, ratings/ | — | 2026-09-13 |
 | CI & deploy | A | verify + deploy on main; scoped token; AUTH_SECRET as secret | .github/workflows/ci.yml | E2E not run in CI (needs browsers + wrangler) | 2026-09-13 |
 
 ## Change History

@@ -16,23 +16,119 @@ export interface UserRow {
   name: string;
   provider: string;
   created_at: number;
+  username: string | null;
+  username_lower: string | null;
+  password_hash: string | null;
+  email_verified_at: number | null;
+  failed_logins: number;
+  locked_until: number | null;
 }
 
 const TIME_CLASSES: TimeClass[] = ['bullet', 'blitz', 'rapid', 'classical'];
 
-export async function upsertUserByEmail(db: D1Database, email: string, name: string, provider: string, now: number): Promise<UserRow> {
-  const existing = await db.prepare('SELECT * FROM users WHERE email = ?').bind(email).first<UserRow>();
-  if (existing) return existing;
-  const row: UserRow = { id: `u_${crypto.randomUUID()}`, email, name, provider, created_at: now };
+export function getUser(db: D1Database, id: string): Promise<UserRow | null> {
+  return db.prepare('SELECT * FROM users WHERE id = ?').bind(id).first<UserRow>();
+}
+
+/** Looks a user up by username (case-insensitive) or email. */
+export function findUserByLogin(db: D1Database, login: string): Promise<UserRow | null> {
+  const key = login.trim().toLowerCase();
+  return db.prepare('SELECT * FROM users WHERE username_lower = ? OR email = ?').bind(key, key).first<UserRow>();
+}
+
+export async function createPasswordUser(
+  db: D1Database,
+  input: { username: string; email: string; passwordHash: string; now: number },
+): Promise<UserRow | 'username_taken' | 'email_taken'> {
+  const usernameLower = input.username.toLowerCase();
+  const email = input.email.toLowerCase();
+  if (await db.prepare('SELECT 1 FROM users WHERE username_lower = ?').bind(usernameLower).first()) return 'username_taken';
+  if (await db.prepare('SELECT 1 FROM users WHERE email = ?').bind(email).first()) return 'email_taken';
+  const row: UserRow = {
+    id: `u_${crypto.randomUUID()}`,
+    email,
+    name: input.username,
+    provider: 'password',
+    created_at: input.now,
+    username: input.username,
+    username_lower: usernameLower,
+    password_hash: input.passwordHash,
+    email_verified_at: null,
+    failed_logins: 0,
+    locked_until: null,
+  };
   await db
-    .prepare('INSERT INTO users (id, email, name, provider, created_at) VALUES (?, ?, ?, ?, ?)')
-    .bind(row.id, row.email, row.name, row.provider, row.created_at)
+    .prepare(
+      `INSERT INTO users (id, email, name, provider, created_at, username, username_lower, password_hash)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+    .bind(row.id, row.email, row.name, row.provider, row.created_at, row.username, row.username_lower, row.password_hash)
     .run();
   return row;
 }
 
-export function getUser(db: D1Database, id: string): Promise<UserRow | null> {
-  return db.prepare('SELECT * FROM users WHERE id = ?').bind(id).first<UserRow>();
+async function sha256Hex(text: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/** Creates a one-time token and returns the raw value (only its hash is stored). */
+export async function createAuthToken(
+  db: D1Database,
+  input: { userId: string; purpose: 'verify' | 'reset'; ttlMs: number; guestId?: string | null; now: number },
+): Promise<string> {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  const token = btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  await db
+    .prepare('INSERT INTO auth_tokens (token_hash, user_id, purpose, guest_id, expires_at) VALUES (?, ?, ?, ?, ?)')
+    .bind(await sha256Hex(token), input.userId, input.purpose, input.guestId ?? null, input.now + input.ttlMs)
+    .run();
+  return token;
+}
+
+/** Atomically marks a valid, unused, unexpired token as used. */
+export async function consumeAuthToken(
+  db: D1Database,
+  token: string,
+  purpose: 'verify' | 'reset',
+  now: number,
+): Promise<{ userId: string; guestId: string | null } | null> {
+  const row = await db
+    .prepare(
+      `UPDATE auth_tokens SET used_at = ? WHERE token_hash = ? AND purpose = ? AND used_at IS NULL AND expires_at > ?
+       RETURNING user_id, guest_id`,
+    )
+    .bind(now, await sha256Hex(token), purpose, now)
+    .first<{ user_id: string; guest_id: string | null }>();
+  return row ? { userId: row.user_id, guestId: row.guest_id } : null;
+}
+
+export async function markEmailVerified(db: D1Database, userId: string, now: number): Promise<void> {
+  await db.prepare('UPDATE users SET email_verified_at = COALESCE(email_verified_at, ?) WHERE id = ?').bind(now, userId).run();
+}
+
+/** Sets a new password, clears lockout and invalidates any other outstanding reset links. */
+export async function setPassword(db: D1Database, userId: string, passwordHash: string, now: number): Promise<void> {
+  await db.batch([
+    db.prepare('UPDATE users SET password_hash = ?, failed_logins = 0, locked_until = NULL WHERE id = ?').bind(passwordHash, userId),
+    db.prepare("UPDATE auth_tokens SET used_at = ? WHERE user_id = ? AND purpose = 'reset' AND used_at IS NULL").bind(now, userId),
+  ]);
+}
+
+export const MAX_FAILED_LOGINS = 10;
+export const LOCKOUT_MS = 15 * 60_000;
+
+export async function recordLoginFailure(db: D1Database, user: UserRow, now: number): Promise<void> {
+  const failures = user.failed_logins + 1;
+  if (failures >= MAX_FAILED_LOGINS) {
+    await db.prepare('UPDATE users SET failed_logins = 0, locked_until = ? WHERE id = ?').bind(now + LOCKOUT_MS, user.id).run();
+  } else {
+    await db.prepare('UPDATE users SET failed_logins = ? WHERE id = ?').bind(failures, user.id).run();
+  }
+}
+
+export async function clearLoginFailures(db: D1Database, userId: string): Promise<void> {
+  await db.prepare('UPDATE users SET failed_logins = 0, locked_until = NULL WHERE id = ?').bind(userId).run();
 }
 
 /** A guest who signs in keeps their games: the guest id now belongs to the account. */
