@@ -11,6 +11,7 @@ const snapshot = (patch: Partial<GameSnapshot> = {}): GameSnapshot => ({
   moves: [],
   players: { w: { id: 'a', name: '1234', kind: 'guest', connected: true }, b: { id: 'b', name: '5678', kind: 'guest', connected: true } },
   timeControl: { initialMs: 60_000, incrementMs: 0 },
+  rated: false,
   clock: { w: 60_000, b: 60_000, running: 'w', serverTime: 1 },
   result: null,
   drawOfferBy: null,

@@ -14,6 +14,8 @@ export interface RoomState {
   moves: string[];
   players: Record<Color, PublicUser | null>;
   timeControl: TimeControl | null;
+  /** Counts for ratings when both players are signed in (acct-003). */
+  rated: boolean;
   clock: ClockState | null;
   result: GameResult | null;
   drawOfferBy: Color | null;
@@ -31,6 +33,7 @@ export function createRoom(options: {
   timeControl: TimeControl | null;
   now: number;
   opponent?: PublicUser;
+  rated?: boolean;
 }): RoomState {
   const players: Record<Color, PublicUser | null> = { w: null, b: null };
   players[options.color] = options.creator;
@@ -42,6 +45,7 @@ export function createRoom(options: {
     moves: [],
     players,
     timeControl: options.timeControl,
+    rated: options.rated ?? false,
     clock: null,
     result: null,
     drawOfferBy: null,
@@ -200,6 +204,7 @@ export function snapshot(room: RoomState, now: number, connected: Record<Color, 
     moves: room.moves,
     players: { w: seat('w'), b: seat('b') },
     timeControl: room.timeControl,
+    rated: room.rated,
     clock: room.clock && times ? { w: times.w, b: times.b, running: room.clock.running, serverTime: now } : null,
     result: room.result,
     drawOfferBy: room.drawOfferBy,

@@ -19,8 +19,17 @@
     { "tag": "v1", "new_sqlite_classes": ["GameRoom"] },
     { "tag": "v2", "new_sqlite_classes": ["Matchmaker"] }
   ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "makruk",
+      "database_id": "9e084ac6-9749-411d-867d-c89e8421ed78",
+      "migrations_dir": "migrations"
+    }
+  ],
   "vars": {
-    "RECONNECT_GRACE_MS": "60000"
+    "RECONNECT_GRACE_MS": "60000",
+    "PUBLIC_ORIGIN": "https://th-chess.beanroti.com"
   },
   "routes": [{ "pattern": "th-chess.beanroti.com", "custom_domain": true }],
   "observability": { "enabled": true }

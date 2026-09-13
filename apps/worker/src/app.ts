@@ -7,6 +7,7 @@ import {
   RoomCode,
 } from '@makruk/protocol';
 import { type Context, Hono } from 'hono';
+import { registerAccountRoutes } from './accounts/routes';
 import { newGuest, signToken, verifyToken } from './auth';
 import type { Env } from './env';
 import { generateRoomCode } from './room/code';
@@ -48,7 +49,14 @@ app.post('/api/games', async (c) => {
   if (!body.success) return c.json({ error: 'bad_request' }, 400);
   for (let attempt = 0; attempt < 5; attempt++) {
     const code = generateRoomCode();
-    if (await room(c, code).init({ code, creator: user, color: body.data.color, timeControl: body.data.timeControl })) {
+    const created = await room(c, code).init({
+      code,
+      creator: user,
+      color: body.data.color,
+      timeControl: body.data.timeControl,
+      rated: body.data.rated,
+    });
+    if (created) {
       return c.json({ code } satisfies CreateGameResponse, 201);
     }
   }
@@ -61,6 +69,8 @@ app.get('/api/games/:code', async (c) => {
   const summary = await room(c, code).summary();
   return summary ? c.json(summary) : c.json({ error: 'not_found' }, 404);
 });
+
+registerAccountRoutes(app);
 
 app.all('/api/*', (c) => c.json({ error: 'not_found' }, 404));
 

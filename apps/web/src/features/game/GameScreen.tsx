@@ -38,6 +38,8 @@ export interface GameScreenProps {
   /** Extra action buttons (e.g. hint). */
   actions?: ReactNode;
   onRematch: () => void;
+  /** Replays show the result in the banner only. */
+  showResultDialog?: boolean;
 }
 
 export function GameScreen({
@@ -54,6 +56,7 @@ export function GameScreen({
   status,
   actions,
   onRematch,
+  showResultDialog = true,
 }: GameScreenProps) {
   const { t } = useTranslation();
   const s = useSession();
@@ -179,7 +182,7 @@ export function GameScreen({
         </Button>
       </aside>
 
-      {result && (
+      {result && showResultDialog && (
         <GameOverModal
           result={result}
           open={dismissedVersion !== version}

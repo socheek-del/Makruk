@@ -23,7 +23,10 @@ export default defineConfig({
     },
     {
       // Online play needs the Worker + Durable Objects; a short reconnect grace keeps abandonment tests fast.
-      command: `mkdir -p ../web/dist && npx wrangler dev --port ${WORKER_PORT} --ip 127.0.0.1 --var RECONNECT_GRACE_MS:3000 --var AUTH_SECRET:e2e-secret`,
+      command:
+        `mkdir -p ../web/dist && npx wrangler d1 migrations apply makruk --local && ` +
+        `npx wrangler dev --port ${WORKER_PORT} --ip 127.0.0.1 --var RECONNECT_GRACE_MS:3000 --var AUTH_SECRET:e2e-secret ` +
+        `--var ALLOW_TEST_LOGIN:1 --var PUBLIC_ORIGIN:http://127.0.0.1:${PORT}`,
       cwd: '../worker',
       url: `http://127.0.0.1:${WORKER_PORT}/api/health`,
       reuseExistingServer: !process.env.CI,

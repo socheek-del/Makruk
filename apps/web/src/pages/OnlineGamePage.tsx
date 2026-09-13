@@ -143,6 +143,11 @@ function OnlineGame({ session, snapshot }: { session: OnlineStore; snapshot: Gam
           {t('online.spectating')}
         </Card>
       )}
+      {snapshot.rated && snapshot.players.w?.kind === 'user' && snapshot.players.b?.kind === 'user' && snapshot.timeControl && (
+        <p data-testid="rated-badge" className="text-center text-sm font-extrabold text-gold">
+          {t('account.rated')}
+        </p>
+      )}
       {connection !== 'open' && (
         <Card tone="warning" data-testid="connection-status" className="flex items-center gap-2 py-2 text-sm font-bold">
           <WifiOff aria-hidden className="h-4 w-4" />

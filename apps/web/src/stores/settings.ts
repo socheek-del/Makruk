@@ -21,6 +21,7 @@ export interface Settings {
   computerSide: 'w' | 'b' | 'random';
   onlineTimeControl: TimeControlChoice;
   onlineColor: 'w' | 'b' | 'random';
+  onlineRated: boolean;
 }
 
 export interface SettingsState extends Settings {
@@ -41,6 +42,7 @@ export const DEFAULT_SETTINGS: Settings = {
   computerSide: 'w',
   onlineTimeControl: { kind: 'preset', id: '5+0' },
   onlineColor: 'random',
+  onlineRated: true,
 };
 
 export const SETTINGS_STORAGE_KEY = 'makruk.settings';

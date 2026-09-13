@@ -4,6 +4,7 @@
  */
 import { z } from 'zod';
 
+export * from './accounts';
 export * from './game';
 
 export const HealthResponse = z.object({

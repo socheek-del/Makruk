@@ -1,4 +1,4 @@
-import { GraduationCap, type LucideIcon, Settings, Swords } from 'lucide-react';
+import { GraduationCap, type LucideIcon, Settings, Swords, UserRound } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink, Outlet } from 'react-router';
 import { cn } from '../lib/cn';
@@ -7,6 +7,7 @@ import { ThemeController } from './ThemeController';
 const NAV: ReadonlyArray<{ to: string; key: string; icon: LucideIcon; end?: boolean }> = [
   { to: '/', key: 'nav.play', icon: Swords, end: true },
   { to: '/learn', key: 'nav.learn', icon: GraduationCap },
+  { to: '/account', key: 'nav.account', icon: UserRound },
   { to: '/settings', key: 'nav.settings', icon: Settings },
 ];
 

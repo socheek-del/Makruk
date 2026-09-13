@@ -66,7 +66,7 @@ export class Matchmaker extends DurableObject<Env> {
     for (let attempt = 0; attempt < 5; attempt++) {
       const code = generateRoomCode();
       const room = this.env.GAME_ROOM.get(this.env.GAME_ROOM.idFromName(code));
-      if (await room.init({ code, creator: first, color, timeControl: QUICK_POOLS[pool], opponent: second })) return code;
+      if (await room.init({ code, creator: first, color, timeControl: QUICK_POOLS[pool], opponent: second, rated: true })) return code;
     }
     return null;
   }

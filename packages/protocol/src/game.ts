@@ -48,6 +48,7 @@ export const GameSnapshot = z.object({
   moves: z.array(z.string()),
   players: z.object({ w: SeatInfo.nullable(), b: SeatInfo.nullable() }),
   timeControl: TimeControl.nullable(),
+  rated: z.boolean(),
   /** Remaining ms at `serverTime`; the running side keeps counting down from there. */
   clock: z.object({ w: z.number(), b: z.number(), running: Color.nullable(), serverTime: z.number() }).nullable(),
   result: GameResult.nullable(),
@@ -119,6 +120,8 @@ export type GuestResponse = z.infer<typeof GuestResponse>;
 export const CreateGameRequest = z.object({
   timeControl: TimeControl.nullable(),
   color: z.enum(['w', 'b', 'random']),
+  /** Rated games update ratings when both players are signed in and the game is timed. */
+  rated: z.boolean().default(true),
 });
 export type CreateGameRequest = z.infer<typeof CreateGameRequest>;
 

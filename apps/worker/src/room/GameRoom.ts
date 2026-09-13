@@ -1,5 +1,6 @@
 import { ClientMessage, type Color, type PublicUser, type RoomSummary, type ServerMessage, type TimeControl } from '@makruk/protocol';
 import { DurableObject } from 'cloudflare:workers';
+import { recordGame } from '../accounts/store';
 import type { Env } from '../env';
 import { generateRoomCode } from './code';
 import { applyMessage, createRoom, join, leave, nextAlarm, type RoomState, roomStatus, settle, snapshot } from './logic';
@@ -15,6 +16,7 @@ export interface InitOptions {
   color: Color | 'random';
   timeControl: TimeControl | null;
   opponent?: PublicUser;
+  rated?: boolean;
 }
 
 const DEFAULT_GRACE_MS = 60_000;
@@ -34,11 +36,35 @@ export class GameRoom extends DurableObject<Env> {
   }
 
   private async save(room: RoomState): Promise<void> {
+    const justFinished = !this.cached?.result && !!room.result;
     this.cached = room;
     await this.ctx.storage.put('room', room);
     const at = nextAlarm(room);
     if (at === null) await this.ctx.storage.deleteAlarm();
     else await this.ctx.storage.setAlarm(at);
+    if (justFinished) await this.record(room);
+  }
+
+  /** acct-003: store the finished game (and rating changes) in D1. Never breaks the game on failure. */
+  private async record(room: RoomState): Promise<void> {
+    const { w: white, b: black } = room.players;
+    if (!white || !black || !room.result) return;
+    try {
+      await recordGame(this.env.DB, {
+        id: `${room.code}-${room.createdAt}`,
+        code: room.code,
+        white,
+        black,
+        startFen: room.startFen,
+        moves: room.moves,
+        timeControl: room.timeControl,
+        result: room.result,
+        rated: room.rated,
+        finishedAt: Date.now(),
+      });
+    } catch (err) {
+      console.error('recording finished game failed', err);
+    }
   }
 
   /** RPC: create the room. Returns false if this code is already taken. */
@@ -150,6 +176,7 @@ export class GameRoom extends DurableObject<Env> {
         color: 'w',
         timeControl: room.timeControl,
         opponent: room.players.w!,
+        rated: room.rated,
       });
       if (created) return { ...room, nextCode: code };
       code = generateRoomCode();

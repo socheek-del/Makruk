@@ -7,6 +7,7 @@ import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
+import { Switch } from '../components/ui/Switch';
 import { TimeControlPicker } from '../features/game/TimeControlPicker';
 import { toTimeControl } from '../features/game/timeControls';
 import { createRoom, fetchRoom } from '../features/online/api';
@@ -20,6 +21,7 @@ export function OnlinePage() {
   const { identity, failed } = useIdentity();
   const timeControl = useSettings((s) => s.onlineTimeControl);
   const color = useSettings((s) => s.onlineColor);
+  const rated = useSettings((s) => s.onlineRated);
   const update = useSettings((s) => s.update);
   const [code, setCode] = useState('');
   const [joinError, setJoinError] = useState<'invalid' | 'notFound' | null>(null);
@@ -31,7 +33,7 @@ export function OnlinePage() {
     setBusy('create');
     setServerError(false);
     try {
-      const room = await createRoom(identity.token, { timeControl: toTimeControl(timeControl), color });
+      const room = await createRoom(identity.token, { timeControl: toTimeControl(timeControl), color, rated });
       navigate(`/play/online/${room}`);
     } catch {
       setServerError(true);
@@ -93,6 +95,12 @@ export function OnlinePage() {
             ]}
           />
         </div>
+        {identity?.user.kind === 'user' && (
+          <div className="flex items-center justify-between gap-4 font-bold">
+            <span>{t('account.ratedToggle')}</span>
+            <Switch checked={rated} onChange={(onlineRated) => update({ onlineRated })} label={t('account.ratedToggle')} />
+          </div>
+        )}
         <Button size="lg" block onClick={create} disabled={!identity || busy !== null}>
           {busy === 'create' && <LoaderCircle aria-hidden className="h-5 w-5 animate-spin" />}
           {t('online.create')}
