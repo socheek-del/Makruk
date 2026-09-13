@@ -11,9 +11,10 @@ handoff; no agent updates it automatically.
 - Repository root: `t-chess/` (GitHub `socheek-del/Makruk`)
 - Standard startup path: `./init.sh` then `npm run dev`
 - Standard verification path: `npm run verify` (lint + typecheck + unit tests); `npm run e2e` for Playwright
-- Production: https://th-chess.beanroti.com (Worker `makruk`, deployed manually with `npm run deploy`)
-- Current highest-priority unfinished feature: `infra-003` — only the GitHub Actions deploy job remains
-- Current blocker: scoped Cloudflare API token not yet created (awaiting user approval)
+- Production: https://th-chess.beanroti.com (Worker `makruk`; auto-deployed by GitHub Actions on push to `main`; manual fallback `npm run deploy`)
+- Milestone: M0 complete (`infra-001..003` passing)
+- Current highest-priority unfinished feature: `engine-001` board model and FEN
+- Current blocker: none
 
 ## Session Log
 
@@ -28,4 +29,5 @@ handoff; no agent updates it automatically.
 - Files or artifacts updated: see above
 - Known risk or unresolved issue: npm 10.9.8 crashes on install (arborist `#loadPeerSet`) → `init.sh` and CI use npm 11. `gh` CLI logged in as another account; repo creation needs `socheek-del` auth. Wrangler needs Cloudflare auth.
 - Update (same session): repo `socheek-del/Makruk` created (public) and pushed; CI run 34736916479 green (`infra-002` passing). Deployed to th-chess.beanroti.com and verified over HTTPS (`infra-003` in progress).
-- Next best step: finish `infra-003` (API token → repo secrets → deploy job in CI), then start `engine-001`.
+- Update (same session): created scoped Cloudflare account API token (expires 2027-09-14) → repo secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`; added CI `deploy` job; run 34737557818 deployed successfully (`infra-003` passing). M0 complete.
+- Next best step: start M1 with `engine-001` (board model + FEN), cross-checking rules against Fairy-Stockfish `makruk`.

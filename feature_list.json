@@ -58,7 +58,7 @@
       "milestone": "M0",
       "title": "Deploy placeholder to th-chess.beanroti.com",
       "user_visible_behavior": "Visiting https://th-chess.beanroti.com shows the placeholder app over HTTPS, and /api/health returns ok.",
-      "status": "in_progress",
+      "status": "passing",
       "verification": [
         "Run npm run deploy.",
         "Open https://th-chess.beanroti.com and verify the placeholder page loads with valid TLS.",
@@ -69,7 +69,8 @@
         "2026-09-13: npm run deploy (local wrangler OAuth) → Worker 'makruk' version be65fdf1-1039-4292-aa6a-9193acecc648, custom domain th-chess.beanroti.com.",
         "2026-09-13: HTTPS checks → GET / 200 title 'หมากรุกไทย · Makruk'; GET /api/health 200 {ok:true}; GET /play/some-route 200 SPA index; GET /api/nope 404 JSON.",
         "2026-09-13: Chrome render → <html lang=th>, Thai UI, server status 'ออนไลน์'.",
-        "Pending: GitHub Actions deploy job (needs CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID repo secrets)."
+        "2026-09-13: scoped account API token 'makruk-github-actions-deploy' (Workers Scripts/D1 write, Account Settings/Workers Tail read; beanroti.com Workers Routes/DNS write, Zone read; expires 2027-09-14) verified active and stored as repo secret with CLOUDFLARE_ACCOUNT_ID.",
+        "2026-09-13: GitHub Actions run 34737557818 on 111699b → verify success, deploy success (version 3a0f96a1-4f19-43ad-91fc-43847c084cc0, custom domain th-chess.beanroti.com); prod /api/health 200 afterwards."
       ],
       "notes": "Worker custom domain on the beanroti.com zone; scoped API token as repo secret."
     },

@@ -37,14 +37,14 @@ needs work.
 | `packages/protocol` | - | Schemas only, no logic | - | Not started | 2026-09-13 |
 | `apps/web` | - | No rules logic outside engine | - | Not started | 2026-09-13 |
 | `apps/worker` | - | Validates all moves via engine | - | Not started | 2026-09-13 |
-| CI & deploy | - | - | - | Not started | 2026-09-13 |
+| CI & deploy | B | verify + deploy jobs on push to main; scoped token | Documented in AGENTS.md / PLAN.md | npm 11 workaround; token expires 2027-09-14; no preview environments yet | 2026-09-13 |
 
 ## Change History
 
 ### 2026-09-13
 
-- Changes: Harness files created; plan written.
-- Domains promoted: none
+- Changes: Harness files created; plan written; M0 scaffold, CI and production deploy to th-chess.beanroti.com.
+- Domains promoted: CI & deploy → B
 - Domains demoted: none
 - New gaps identified: everything not started
 - Gaps closed: none
