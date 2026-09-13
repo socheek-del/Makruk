@@ -73,6 +73,8 @@ export function chooseMove(fen: string, level: BotLevel | number, options: Choos
     now,
     history: options.history,
     contempt: DEFAULT_CONTEMPT,
+    // Only noisy bots choose among root moves by score; the rest search much deeper without exact scores.
+    exactRootScores: bot.noise > 0,
   });
 
   let pick = result.rootMoves[0]!;
@@ -98,6 +100,7 @@ export function bestMove(
     now,
     history: options.history,
     contempt: DEFAULT_CONTEMPT,
+    exactRootScores: false,
   });
   if (result.move < 0) return null;
   return { uci: toUci(result.move), score: result.score, depth: result.depth, nodes: result.nodes };

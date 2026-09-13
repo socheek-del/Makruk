@@ -20,7 +20,7 @@ export const BOTS: readonly BotLevel[] = [
   { id: 3, key: 'khon', maxDepth: 2, maxNodes: 30_000, timeMs: 700, noise: 40, blunderRate: 0.06 },
   { id: 4, key: 'ma', maxDepth: 3, maxNodes: 120_000, timeMs: 1_000, noise: 10, blunderRate: 0 },
   { id: 5, key: 'ruea', maxDepth: 4, maxNodes: 400_000, timeMs: 1_800, noise: 0, blunderRate: 0 },
-  { id: 6, key: 'khun', maxDepth: 6, maxNodes: 1_500_000, timeMs: 3_000, noise: 0, blunderRate: 0 },
+  { id: 6, key: 'khun', maxDepth: 8, maxNodes: 1_500_000, timeMs: 3_000, noise: 0, blunderRate: 0 },
 ];
 
 export function botById(id: number): BotLevel {

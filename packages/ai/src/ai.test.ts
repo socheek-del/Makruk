@@ -28,6 +28,15 @@ describe('search', () => {
     expect(() => new Game(fen).move(move!.uci)).not.toThrow();
   });
 
+  it('without exact root scores finds the same best move with fewer nodes', () => {
+    const fen = '6kr/5s2/1r1p1m1p/2nPpM~2/1pP1PpP1/1P3P1R/1S2SM2/2N3K1 w - - 10 40';
+    const exact = search(core.parseFen(fen), { maxDepth: 3 });
+    const narrow = search(core.parseFen(fen), { maxDepth: 3, exactRootScores: false });
+    expect(narrow.move).toBe(exact.move);
+    expect(narrow.score).toBe(exact.score);
+    expect(narrow.nodes).toBeLessThan(exact.nodes);
+  });
+
   it('avoids moves that repeat an earlier position when others are available', () => {
     // Every move except the safe Ruea shift h1g1 would recreate an earlier position.
     const fen = 'k7/8/8/8/8/8/8/K6R w - - 0 1';

@@ -23,6 +23,12 @@ export interface SearchOptions {
   history?: readonly string[];
   /** Centipawns a draw by repetition is worth *less* than 0 to the side to move (avoids aimless shuffling). */
   contempt?: number;
+  /**
+   * Search every root move with a full window so each gets an exact score (default; needed for bot noise).
+   * When false, later root moves only need to prove they are not better than the best so far — much
+   * faster, but only the best move's score is exact.
+   */
+  exactRootScores?: boolean;
   /** Stop after roughly this many nodes (deterministic budget). */
   maxNodes?: number;
   /** Absolute timestamp (ms) after which the search stops. */
@@ -128,6 +134,7 @@ export function search(position: { board: core.Board; turn: core.ColorIndex }, o
   }
 
   const repetitionScore = -contempt;
+  const exactRootScores = options.exactRootScores ?? true;
   const afterKey = () => `${placementOf(board)} ${root === 0 ? 'b' : 'w'}`;
 
   let completedDepth = 0;
@@ -138,11 +145,12 @@ export function search(position: { board: core.Board; turn: core.ColorIndex }, o
     for (const m of ordered) {
       const moved = board[moveFrom(m)]!;
       const captured = makeRaw(board, m);
-      // Full window at the root so every root move gets a real score (used for bot noise and hints).
+      // Exact root scores need a full window for every move (bot noise picks among them).
+      const beta = exactRootScores ? MATE + 1 : -alpha;
       const score =
         seen.size > 0 && seen.has(afterKey())
           ? repetitionScore
-          : -negamax(depth - 1, -MATE - 1, MATE + 1, opposite(root), 1);
+          : -negamax(depth - 1, -MATE - 1, beta, opposite(root), 1);
       unmakeRaw(board, m, moved, captured);
       if (stopped) break;
       scored.push({ move: m, score });
