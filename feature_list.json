@@ -575,14 +575,18 @@
       "milestone": "M6",
       "title": "Optional sign-in (Google and email magic link)",
       "user_visible_behavior": "A user signs in with Google or an emailed magic link and keeps their guest history.",
-      "status": "not_started",
+      "status": "blocked",
       "verification": [
         "Google OAuth sign-in works on production domain.",
         "Magic link email arrives and signs the user in.",
         "Guest games appear in the signed-in history."
       ],
-      "evidence": [],
-      "notes": ""
+      "evidence": [
+        "2026-09-13: implemented end to end (apps/worker/src/accounts/routes.ts, apps/web/src/pages/AccountPage.tsx, AuthCompletePage.tsx). Production currently reports {google:false,email:false} because no provider credentials exist yet.",
+        "2026-09-13: apps/worker/src/accounts/accounts.test.ts in workerd — magic link: POST /api/auth/magic-link sends a Thai email via the Resend API (mocked) with a one-time link; following it redirects to /auth/complete#token=…, the token opens the account, the guest's earlier game is in its history, and reusing the link gives error=expired. Google: /api/auth/google/start redirects to accounts.google.com with client_id, redirect_uri and signed state; the callback exchanges the code (token endpoint mocked), accepts a verified ID token and signs in; wrong audience → error=google, forged state → error=state.",
+        "2026-09-13: third verification step passes — apps/web/e2e/accounts.spec.ts 'a guest's games move to the account after signing in': a guest wins an online game, signs in, and the game stays in the account history; signing out returns to a new guest."
+      ],
+      "notes": "BLOCKED on owner-provided credentials; code and tests are done. To unblock: (1) Google Cloud Console → OAuth client (Web) with authorized redirect URI https://th-chess.beanroti.com/api/auth/google/callback, then `wrangler secret put GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in apps/worker. (2) Resend account with beanroti.com verified as a sending domain, then `wrangler secret put RESEND_API_KEY` and `EMAIL_FROM` (e.g. `หมากรุกไทย <noreply@beanroti.com>`). Then verify both flows on the production domain and record evidence."
     },
     {
       "id": "online-005",
@@ -610,12 +614,16 @@
       "milestone": "M6",
       "title": "Ratings and game history",
       "user_visible_behavior": "Signed-in users have a Glicko-2 rating per time class and a list of past games they can replay.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Unit tests for Glicko-2 updates against reference values.",
         "Finished rated game updates both ratings and appears in history."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/worker/src/ratings/glicko2.test.ts — 5 passed: Glickman's published Glicko-2 example (1500/200/0.06 vs 1400/30 win, 1550/100 loss, 1700/300 loss) → 1464.06 / 151.52 / 0.05999; symmetric win, draw between equals, upset gains more, time classes (1+0 bullet … 30+0 classical).",
+        "2026-09-13: apps/worker/src/accounts/accounts.test.ts in workerd with D1 migrations — rated 5+0 game between two signed-in players: loser blitz < 1500, winner > 1500, games 1 each; both histories list the game (rated, yourColor, negative/positive ratingChange, 2 moves); replay record returns moves and time control; casual, untimed and guest games never change ratings; recording a game twice applies ratings once.",
+        "2026-09-13: apps/web/e2e/accounts.spec.ts (vite + wrangler dev + local D1) — Alice and Bob sign in, play a rated room (rated badge shown), Alice resigns; /account shows Alice's blitz rating below 1500 with a loss and '-N' change vs Bob, Bob above 1500 with a win; clicking the history item opens /replay with moves e4 d5 and the rated label."
+      ],
       "notes": ""
     },
     {
@@ -698,12 +706,15 @@
       "milestone": "M7",
       "title": "Thai translation review",
       "user_visible_behavior": "All Thai text reads naturally and uses correct Makruk terminology.",
-      "status": "not_started",
+      "status": "blocked",
       "verification": [
         "Native Thai speaker review recorded in docs/i18n-review.md."
       ],
-      "evidence": [],
-      "notes": ""
+      "evidence": [
+        "2026-09-13: docs/i18n-review.md prepared: review scope (UI strings, lessons, coach tips, bot personas, sign-in email, PWA manifest), Makruk terminology table to confirm, correction table and sign-off table.",
+        "Automated guards already in place: locales.test.ts fails on missing/empty keys and on any literal t('key') not defined in both languages; lessons.test.ts requires th and en text for every lesson step."
+      ],
+      "notes": "BLOCKED on a human: the verification requires a native Thai speaker's review, which an AI agent cannot provide or fabricate. Hand docs/i18n-review.md to a native Thai reviewer (ideally a Makruk player); apply their corrections and record the sign-off row."
     },
     {
       "id": "polish-003",
