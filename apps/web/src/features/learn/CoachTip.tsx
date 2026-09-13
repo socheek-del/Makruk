@@ -1,7 +1,7 @@
 import type { Color, Game } from '@makruk/engine';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../components/ui/Card';
-import { PieceSvg } from '../board/PieceSvg';
+import { Mascot } from './Mascot';
 
 const GENERAL_TIPS = ['develop', 'safeKhun', 'useHint'] as const;
 
@@ -28,9 +28,10 @@ export function CoachTip({ game, humanColor, over }: { game: Game; humanColor: C
   const tip = coachTip(game, humanColor, over);
   return (
     <Card tone="secondary" data-testid="coach-tip" data-tip={tip} className="flex items-start gap-3" aria-live="polite">
-      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border-b-4 border-secondary-shadow bg-secondary">
-        <PieceSvg piece={{ color: 'w', type: 'k', promoted: false }} className="h-9 w-9" />
-      </span>
+      <Mascot
+        pose={tip === 'gameOver' ? 'celebrate' : tip === 'lostPiece' || tip === 'inCheck' ? 'sad' : tip === 'waiting' ? 'thinking' : 'idle'}
+        className="h-14 w-14 shrink-0"
+      />
       <span className="flex flex-col gap-0.5">
         <span className="text-xs font-extrabold uppercase tracking-wide text-secondary">{t('coach.title')}</span>
         <span className="font-bold">{t(`coach.${tip}`)}</span>

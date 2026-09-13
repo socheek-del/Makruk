@@ -7,7 +7,7 @@ const button = (page: Page, name: string) => page.getByRole('button', { name, ex
 
 test('lesson engine: info, wrong and right answers, completion saved locally (learn-001)', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('link', { name: 'เรียน' }).click();
+  await page.getByRole('link', { name: 'เรียน', exact: true }).click();
   await expect(page.locator('[data-lesson="board"]')).toHaveAttribute('data-status', 'unlocked');
   await expect(page.locator('[data-lesson="khun"]')).toHaveAttribute('data-status', 'locked');
   await page.locator('[data-lesson="board"] a').click();

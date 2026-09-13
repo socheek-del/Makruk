@@ -32,6 +32,13 @@ function tally(board: core.Board): Tally {
   return t;
 }
 
+/** Pure material difference (centipawns) from `side`'s point of view. */
+export function materialBalance(board: core.Board, side: core.ColorIndex): number {
+  const t = tally(board);
+  const diff = t.material[0] - t.material[1];
+  return side === 0 ? diff : -diff;
+}
+
 /**
  * Static evaluation in centipawns from the point of view of `side` (0 = White, 1 = Black).
  * Material + piece placement + endgame "mop-up" so winning sides actually drive the Khun to mate
@@ -69,14 +76,17 @@ export function evaluate(board: core.Board, side: core.ColorIndex): number {
     }
   }
 
-  // Mop-up: reward pushing the weaker Khun to the edge and bringing our Khun close.
+  // Mop-up: reward pushing the weaker Khun to the edge and bringing our Khun close. Makruk counting
+  // rules give the stronger side few moves to mate, so this is weighted heavily when the defender is bare.
   const diff = t.material[0] - t.material[1];
   if (endgame && Math.abs(diff) >= 180 && t.kings[0] >= 0 && t.kings[1] >= 0) {
     const strong = diff > 0 ? 0 : 1;
-    const weakKing = t.kings[strong === 0 ? 1 : 0];
+    const weak = strong === 0 ? 1 : 0;
+    const weakKing = t.kings[weak];
     const strongKing = t.kings[strong];
     const kingGap = Math.abs(fileOf(weakKing) - fileOf(strongKing)) + Math.abs(rankOf(weakKing) - rankOf(strongKing));
-    score[strong] += centerDistance(weakKing) * 25 + (14 - kingGap) * 6;
+    const bare = t.pieces[weak] <= 2;
+    score[strong] += centerDistance(weakKing) * (bare ? 60 : 25) + (14 - kingGap) * (bare ? 14 : 6);
   }
 
   const white = score[0] - score[1];

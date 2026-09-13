@@ -1,5 +1,6 @@
 import { type Color, type Piece, type Square, squareName } from '@makruk/engine';
-import { type PointerEvent as ReactPointerEvent, useRef, useState } from 'react';
+import type React from 'react';
+import { type PointerEvent as ReactPointerEvent, useRef, useState, useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../../lib/cn';
 import { PieceSvg } from './PieceSvg';
@@ -16,6 +17,8 @@ export interface BoardProps {
   checkSquare?: Square | null;
   /** Suggested move from the hint engine. */
   hint?: { from: Square; to: Square } | null;
+  /** Slide the piece that just moved; `key` changes once per move. */
+  animate?: { from: Square; to: Square; key: string } | null;
   onSquareClick?: (square: Square) => void;
   canDrag?: (square: Square) => boolean;
   onDrop?: (from: Square, to: Square) => boolean;
@@ -52,6 +55,20 @@ function displayOrder(orientation: Color): Square[] {
 
 export const pieceCode = (piece: Piece): string => `${piece.color}${piece.type}${piece.promoted ? '~' : ''}`;
 
+const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
+
+function usePrefersReducedMotion(): boolean {
+  return useSyncExternalStore(
+    (onChange) => {
+      const media = window.matchMedia(REDUCED_MOTION);
+      media.addEventListener('change', onChange);
+      return () => media.removeEventListener('change', onChange);
+    },
+    () => window.matchMedia(REDUCED_MOTION).matches,
+    () => false,
+  );
+}
+
 export function Board({
   pieces,
   theme,
@@ -62,6 +79,7 @@ export function Board({
   lastMove = null,
   checkSquare = null,
   hint = null,
+  animate = null,
   onSquareClick,
   canDrag,
   onDrop,
@@ -70,6 +88,19 @@ export function Board({
   const { t } = useTranslation();
   const boardRef = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState<DragState | null>(null);
+  const droppedOn = useRef<Square | null>(null);
+  const reducedMotion = usePrefersReducedMotion();
+
+  const displayPos = (square: Square) => {
+    const file = square & 7;
+    const rank = square >> 3;
+    return orientation === 'w' ? { col: file, row: 7 - rank } : { col: 7 - file, row: rank };
+  };
+  // Drag-and-drop already put the piece in place, and reduced-motion users get no sliding.
+  const slide =
+    animate && !reducedMotion && droppedOn.current !== animate.to
+      ? { to: animate.to, key: animate.key, dx: displayPos(animate.from).col - displayPos(animate.to).col, dy: displayPos(animate.from).row - displayPos(animate.to).row }
+      : null;
   const bySquare = new Map(pieces.map((p) => [p.square, p.piece]));
   const targetSet = new Set(targets);
 
@@ -119,7 +150,7 @@ export function Board({
     if (!drag || e.pointerId !== drag.pointerId) return;
     if (drag.active) {
       const to = squareAt(e.clientX, e.clientY);
-      if (to !== null && to !== drag.from) onDrop?.(drag.from, to);
+      if (to !== null && to !== drag.from && onDrop?.(drag.from, to)) droppedOn.current = to;
       if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
     }
     setDrag(null);
@@ -202,7 +233,17 @@ export function Board({
                 </span>
               )}
               {piece && (
-                <span data-piece={pieceCode(piece)} className={cn('absolute inset-[4%]', dragging && 'opacity-30')}>
+                <span
+                  key={slide?.to === square ? slide.key : 'still'}
+                  data-piece={pieceCode(piece)}
+                  data-animating={slide?.to === square || undefined}
+                  className={cn('absolute inset-[4%]', dragging && 'opacity-30', slide?.to === square && 'piece-slide z-10')}
+                  style={
+                    slide?.to === square
+                      ? ({ '--dx': `${slide.dx * 108.7}%`, '--dy': `${slide.dy * 108.7}%` } as React.CSSProperties)
+                      : undefined
+                  }
+                >
                   <PieceSvg piece={piece} className="h-full w-full drop-shadow-sm" />
                 </span>
               )}

@@ -1,15 +1,17 @@
 import { Game, parseSquare, squareName } from '@makruk/engine';
 import { Star, X } from 'lucide-react';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { ProgressBar } from '../../components/ui/ProgressBar';
 import { cn } from '../../lib/cn';
 import { useSettings } from '../../stores/settings';
+import { playSound } from '../sound/sound';
 import { Board } from '../board/Board';
 import { boardTheme } from '../board/themes';
 import { useMoveInput } from '../board/useMoveInput';
+import { Mascot, type MascotPose } from './Mascot';
 import { type L10n, type Lesson, type LessonStep, useL10n } from './types';
 
 type Feedback = null | 'correct' | 'wrong';
@@ -35,6 +37,7 @@ export function LessonPlayer({ lesson, onExit, onFinish }: LessonPlayerProps) {
 
   const answer = (correct: boolean) => {
     setFeedback(correct ? 'correct' : 'wrong');
+    playSound(correct ? 'correct' : 'wrong');
     if (!correct) setMistakes((m) => m + 1);
   };
   const next = () => {
@@ -92,13 +95,26 @@ function StepView(props: StepProps<LessonStep>) {
   }
 }
 
-function Prompt({ text }: { text: L10n }) {
+function Prompt({ text, pose }: { text: L10n; pose: MascotPose }) {
   const tr = useL10n();
   return (
-    <h1 data-testid="lesson-prompt" className="text-2xl font-extrabold leading-snug">
-      {tr(text)}
-    </h1>
+    <div className="flex items-end gap-3">
+      <Mascot pose={pose} className="h-20 w-20 shrink-0 sm:h-24 sm:w-24" />
+      <h1
+        data-testid="lesson-prompt"
+        className="relative flex-1 rounded-2xl border-2 border-line bg-surface px-4 py-3 text-xl font-extrabold leading-snug sm:text-2xl"
+      >
+        {tr(text)}
+      </h1>
+    </div>
   );
+}
+
+/** art-002: the mascot reacts to the learner: explains, thinks along, cheers or commiserates. */
+function poseFor(kind: LessonStep['kind'], feedback: Feedback): MascotPose {
+  if (feedback === 'correct') return 'happy';
+  if (feedback === 'wrong') return 'sad';
+  return kind === 'info' ? 'idle' : 'thinking';
 }
 
 function LessonBoard({ children }: { children: ReactNode }) {
@@ -166,7 +182,7 @@ function InfoStep({ step, onContinue, onRetry, feedback }: StepProps<Extract<Les
   const [game] = useState(() => (step.fen ? new Game(step.fen) : null));
   return (
     <>
-      <Prompt text={step.text} />
+      <Prompt text={step.text} pose={poseFor(step.kind, feedback)} />
       {game && (
         <LessonBoard>
           <Board pieces={game.pieces()} theme={theme} targets={(step.highlight ?? []).map(parseSquare)} />
@@ -194,7 +210,7 @@ function MoveStep({ step, feedback, onAnswer, onContinue, onRetry }: StepProps<E
   const last = game.lastMove();
   return (
     <>
-      <Prompt text={step.text} />
+      <Prompt text={step.text} pose={poseFor(step.kind, feedback)} />
       <LessonBoard>
         <Board
           pieces={game.pieces()}
@@ -230,7 +246,7 @@ function SquaresStep({ step, feedback, onAnswer, onContinue, onRetry }: StepProp
   };
   return (
     <>
-      <Prompt text={step.text} />
+      <Prompt text={step.text} pose={poseFor(step.kind, feedback)} />
       <LessonBoard>
         <Board pieces={game.pieces()} theme={theme} targets={picked.map(parseSquare)} onSquareClick={toggle} />
       </LessonBoard>
@@ -253,7 +269,7 @@ function QuizStep({ step, feedback, onAnswer, onContinue, onRetry }: StepProps<E
   const [choice, setChoice] = useState<number | null>(null);
   return (
     <>
-      <Prompt text={step.text} />
+      <Prompt text={step.text} pose={poseFor(step.kind, feedback)} />
       {game && (
         <LessonBoard>
           <Board pieces={game.pieces()} theme={theme} />
@@ -293,8 +309,10 @@ function QuizStep({ step, feedback, onAnswer, onContinue, onRetry }: StepProps<E
 function LessonComplete({ lesson, stars, onContinue }: { lesson: Lesson; stars: 1 | 2 | 3; onContinue: () => void }) {
   const { t } = useTranslation();
   const tr = useL10n();
+  useEffect(() => playSound('gameEnd'), []);
   return (
     <div data-testid="lesson-complete" data-stars={stars} className="mx-auto flex w-full max-w-md flex-col items-center gap-6 py-8 text-center">
+      <Mascot pose="celebrate" className="h-36 w-36" />
       <p className="text-lg font-bold text-muted">{tr(lesson.title)}</p>
       <h1 className="text-4xl font-extrabold text-gold">{t('learn.complete')}</h1>
       <div className="flex gap-2" role="img" aria-label={t('learn.stars', { count: stars })}>

@@ -4,10 +4,11 @@
  */
 import * as core from '@makruk/engine/core';
 import { type BotLevel, botById } from './bots';
+import { materialBalance } from './evaluate';
 import { MATE, search } from './search';
 
 export { type BotLevel, BOTS, botById } from './bots';
-export { evaluate } from './evaluate';
+export { evaluate, materialBalance } from './evaluate';
 export { MATE, positionKey, search, type SearchResult } from './search';
 
 /** Bots treat repeating a position as slightly worse than a draw, so they keep trying to make progress. */
@@ -32,12 +33,31 @@ export interface EngineMove {
 const toUci = (m: number) =>
   core.squareName(core.moveFrom(m)) + core.squareName(core.moveTo(m)) + (core.isPromotion(m) ? 'm' : '');
 
+/** Material lead (centipawns) at which a bot switches into conversion mode. */
+export const CONVERSION_MARGIN = 500;
+/** Extra search depth in conversion mode (endgames have few pieces, so this stays cheap). */
+export const CONVERSION_EXTRA_DEPTH = 2;
+
+/**
+ * A clearly winning bot (big material lead, or a counting rule already running while it is ahead) plays
+ * without noise or blunders and searches deeper: weak personas stay weak in normal play but can still
+ * finish a won endgame before the Makruk count runs out.
+ */
+export function inConversion(fen: string): boolean {
+  const pos = core.parseFen(fen);
+  const lead = materialBalance(pos.board, pos.turn);
+  return lead >= CONVERSION_MARGIN || (pos.countingLimit > 0 && lead > 0);
+}
+
 /** Picks a move for a bot level. Returns null when there is no legal move. */
 export function chooseMove(fen: string, level: BotLevel | number, options: ChooseOptions = {}): EngineMove | null {
-  const bot = typeof level === 'number' ? botById(level) : level;
+  const persona = typeof level === 'number' ? botById(level) : level;
   const rng = options.rng ?? Math.random;
   const now = options.now ?? (() => Date.now());
   const pos = core.parseFen(fen);
+  const bot = inConversion(fen)
+    ? { ...persona, noise: 0, blunderRate: 0, maxDepth: persona.maxDepth + CONVERSION_EXTRA_DEPTH }
+    : persona;
 
   const legal = core.generateLegalMoves(pos.board, pos.turn);
   if (legal.length === 0) return null;

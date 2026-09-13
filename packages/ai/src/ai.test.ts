@@ -1,7 +1,7 @@
 import { Game, moveToUci, START_FEN } from '@makruk/engine';
 import * as core from '@makruk/engine/core';
 import { describe, expect, it } from 'vitest';
-import { bestMove, BOTS, chooseMove, MATE, mulberry32, positionKey, search } from './index';
+import { bestMove, BOTS, chooseMove, inConversion, MATE, mulberry32, positionKey, search } from './index';
 
 describe('search', () => {
   it('finds mate in one', () => {
@@ -77,6 +77,37 @@ describe('bots', () => {
       expect(move).not.toBeNull();
       game.move(move!.uci);
     }
+  });
+
+  it('switches to conversion mode only when clearly winning', () => {
+    expect(inConversion(START_FEN)).toBe(false);
+    expect(inConversion('4k3/8/8/8/8/8/8/R3K3 w - - 0 1')).toBe(true);
+    expect(inConversion('4k3/8/8/8/8/8/8/R3K3 b - - 0 1')).toBe(false);
+    // A running count helps only the side that is ahead.
+    expect(inConversion('4k3/8/8/8/8/8/8/MS2K3 w - 88 10 40')).toBe(true);
+    expect(inConversion('4k3/8/8/8/8/8/8/MS2K3 b - 88 10 40')).toBe(false);
+  });
+
+  it('a weak bot never blunders randomly while converting a won endgame', () => {
+    const blunderAlways = () => 0;
+    const move = chooseMove('4k3/8/8/8/8/8/8/R3K3 w - - 0 1', 1, { rng: blunderAlways, ignoreTime: true });
+    expect(move!.depth).toBeGreaterThanOrEqual(3);
+    const normal = chooseMove(START_FEN, 1, { rng: blunderAlways, ignoreTime: true });
+    expect(normal!.depth).toBe(0);
+  });
+
+  it('level 2 mates a lone Khun with Ruea and Met within the counting limit', () => {
+    const game = new Game('8/8/3k4/8/8/8/8/R2MK3 w - - 0 1');
+    const rng = mulberry32(3);
+    const history = [positionKey(game.fen())];
+    while (!game.isGameOver() && game.moves().length < 120) {
+      const move =
+        game.turn === 'w'
+          ? chooseMove(game.fen(), 2, { rng, ignoreTime: true, history })
+          : bestMove(game.fen(), { maxDepth: 2, history });
+      history.push(positionKey(game.move(move!.uci).fenAfter));
+    }
+    expect(game.status()).toEqual({ kind: 'checkmate', winner: 'w' });
   });
 
   it('is reproducible with the same seed', () => {

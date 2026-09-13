@@ -31,6 +31,11 @@ export default defineConfig(
     rules: { '@typescript-eslint/no-require-imports': 'off' },
   },
   {
+    files: ['**/scripts/**/*.mjs'],
+    languageOptions: { globals: globals.node },
+  },
+  { ignores: ['**/dev-dist/**'] },
+  {
     files: ['packages/engine/src/**/*.ts'],
     ignores: ['packages/engine/src/**/*.test.ts', 'packages/engine/src/testing/**'],
     rules: {

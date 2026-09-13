@@ -1,5 +1,5 @@
 import { type Color, Game } from '@makruk/engine';
-import { type ReactNode, useEffect, useMemo, useState } from 'react';
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { Button } from '../../components/ui/Button';
@@ -8,6 +8,7 @@ import { Modal } from '../../components/ui/Modal';
 import { useNow } from '../../hooks/useNow';
 import type { GameSessionState } from '../../stores/localSession';
 import { useSettings } from '../../stores/settings';
+import { playSound, soundForMove } from '../sound/sound';
 import { Board } from '../board/Board';
 import { boardTheme } from '../board/themes';
 import { useMoveInput } from '../board/useMoveInput';
@@ -67,6 +68,16 @@ export function GameScreen({
     window.scrollTo({ top: 0 });
   }, []);
 
+  // polish-003: one sound per new move (not on snapshots, undo or history browsing), and one when the game ends.
+  const heard = useRef({ plies: game.moves().length, over: !!result });
+  useEffect(() => {
+    const plies = game.moves().length;
+    const last = game.lastMove();
+    if (plies > heard.current.plies && last) playSound(soundForMove(last, game.status()));
+    else if (result && !heard.current.over) playSound('gameEnd');
+    heard.current = { plies, over: !!result };
+  }, [version, game, result]);
+
   const running = !!clock?.running && !result;
   const now = useNow(running ? 100 : null);
   const tick = s.tick;
@@ -120,6 +131,7 @@ export function GameScreen({
           lastMove={last ? { from: last.from, to: last.to } : null}
           checkSquare={shown.checkedKingSquare()}
           hint={viewPly === null ? hint : null}
+          animate={viewPly === null && last ? { from: last.from, to: last.to, key: `${livePly}` } : null}
           selected={input.selected}
           targets={input.targets}
           onSquareClick={input.onSquareClick}

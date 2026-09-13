@@ -668,12 +668,16 @@
       "milestone": "M7",
       "title": "PWA install and offline play",
       "user_visible_behavior": "A user installs the app and can play locally, vs computer, and do lessons offline.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Lighthouse PWA installable check passes.",
         "Playwright offline mode: vs computer game and a lesson work."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e-pwa/offline.spec.ts against `vite build` + `vite preview` — 'the app is installable': service worker controls the page, manifest has short_name หมากรุกไทย, display standalone, start_url /, 192 and 512 PNG icons; Chrome DevTools Protocol Page.getInstallabilityErrors returns [] (same check Lighthouse's installability audit used; Lighthouse 12 removed the PWA category).",
+        "2026-09-13: offline.spec.ts 'offline: play the computer and take a lesson' — after the service worker is installed the context goes offline: /play/computer starts a game vs Little Bia, e3e4 gets a bot reply (AI worker precached), /learn/board lesson loads and advances, /play/local starts with 32 pieces.",
+        "vite-plugin-pwa (Workbox) precaches the app shell, fonts and the AI worker; /api and /ws are excluded from the navigation fallback; icons rendered by scripts/generate-icons.mjs."
+      ],
       "notes": ""
     },
     {
@@ -697,11 +701,14 @@
       "milestone": "M7",
       "title": "Sounds, animations and haptics",
       "user_visible_behavior": "Moves, captures, checks and lesson success have sounds and animations; sound can be muted.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Mute setting persists; reduced-motion preference disables heavy animation."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/polish.spec.ts — 4 passed (full suite 56/56): moves e4 d5 exd5 produce sounds [move, move, capture]; muting in Settings persists after reload (haptics switch too) and a later move plays nothing; a tapped Ma move renders one [data-animating] piece with animation-name piece-slide; with prefers-reduced-motion: reduce no piece animates; lesson answers play [wrong, correct].",
+        "Sounds are synthesized with Web Audio (wooden knock for moves/captures, two-tone check, chime for game end and lesson success, low buzz for mistakes) — no audio files, so they work offline; phones vibrate when haptics are on."
+      ],
       "notes": ""
     }
   ]

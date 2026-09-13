@@ -13,6 +13,7 @@ export interface Settings {
   boardTheme: string;
   pieceSet: string;
   sound: boolean;
+  haptics: boolean;
   showCoordinates: boolean;
   passAndPlayView: PassAndPlayView;
   timeControl: TimeControlChoice;
@@ -32,6 +33,7 @@ export const DEFAULT_SETTINGS: Settings = {
   boardTheme: 'teak',
   pieceSet: 'classic',
   sound: true,
+  haptics: true,
   showCoordinates: true,
   passAndPlayView: 'fixed',
   timeControl: { kind: 'none' },

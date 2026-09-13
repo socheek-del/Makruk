@@ -212,7 +212,15 @@
       "minimal": "Minimal",
       "contrast": "High contrast"
     },
-    "coordinates": "Show board coordinates"
+    "pieceSet": "Piece set",
+    "pieceSets": {
+      "classic": "Classic carved",
+      "flat": "Modern flat"
+    },
+    "coordinates": "Show board coordinates",
+    "soundTitle": "Sound & vibration",
+    "sound": "Sound effects",
+    "haptics": "Vibrate on moves"
   },
   "design": {
     "title": "Design system",
