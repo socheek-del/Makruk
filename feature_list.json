@@ -397,12 +397,16 @@
       "milestone": "M4",
       "title": "Lesson engine",
       "user_visible_behavior": "A user completes an interactive lesson step by step (explanation, then a task on the board) with correct/incorrect feedback.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Lesson defined in data (JSON/TS) renders; correct move advances; wrong move shows feedback.",
         "Lesson completion is saved locally."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/learn.spec.ts — 2 passed: /learn shows board unlocked and khun locked; board lesson info steps, squares step wrong answer shows red feedback with hint → retry → correct, quiz correct, completion screen 2 stars +10 XP; back on /learn board completed, khun unlocked, persists after reload; khun lesson move step: wrong move d3c3 → wrong feedback, retry resets board, d3e4 → correct with success text and advances to step 4.",
+        "2026-09-13: stores/progress.test.ts — 7 passed (completion, best stars, replay XP, localStorage persistence, streak consecutive days / same day / reset / broken / month boundary).",
+        "Lessons are TS data (features/learn/lessons.ts) with info, move, squares and quiz steps; progress persisted under makruk.progress."
+      ],
       "notes": ""
     },
     {
@@ -412,12 +416,15 @@
       "milestone": "M4",
       "title": "Board and piece lessons",
       "user_visible_behavior": "A beginner learns the board, setup and each piece's movement through mini-puzzles.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Lessons exist for setup, Khun, Met, Khon, Ma, Ruea, Bia, promotion, check and checkmate in Thai and English.",
         "Playwright completes one full lesson."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: features/learn/lessons.test.ts — all pass (84 web unit tests total): 10 lessons board, khun, met, khon, ma, ruea, bia, promotion, check, checkmate; every step has th+en text; FENs parse; move solutions are legal with at least one wrong legal move; squares answers with targetsOf equal engine legal targets; checkmate lesson solutions produce checkmate. The validation caught and fixed a Khun step where every legal move was correct.",
+        "2026-09-13: apps/web/e2e/learn.spec.ts — 'a full piece lesson can be completed start to finish': Ma lesson completed with 3 stars and marked completed on /learn; 'lessons are available in English too': English unit heading, 10 lessons, Met lesson prompt and 'Correct!' feedback in English."
+      ],
       "notes": ""
     },
     {
@@ -427,11 +434,13 @@
       "milestone": "M4",
       "title": "Counting rules lesson",
       "user_visible_behavior": "A user learns Sak Kradan and Sak Mak with interactive examples.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Lesson examples are validated by the engine's counting implementation in tests."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: features/learn/lessons.test.ts — counting lesson (6 steps, th+en) passes: every step's CountingExample is replayed through @makruk/engine and must produce the stated limit and kind (board 64, Ruea 16, two Ruea 8, one Khon 44, two Ma 32, no counting while Bia remain); positions shown to the learner equal the engine FEN after the example move; each quiz's correct answer text equals the engine limit."
+      ],
       "notes": ""
     },
     {
@@ -441,11 +450,14 @@
       "milestone": "M4",
       "title": "Guided first game",
       "user_visible_behavior": "A beginner plays a first game against the easiest bot with coach tips.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Playwright: start guided game; coach tip appears; game can be completed."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/path.spec.ts 'guided first game…' passed: /play/guided starts vs Little Bia with coach tip 'firstMove' (โค้ชขุนน้อย); after e3e4 and the bot reply the tip changes; resigning ends the game (dialog ฝ่ายดำชนะ) and the tip switches to 'gameOver'; /learn then shows the guided node completed and 20 XP.",
+        "2026-09-13: features/learn/CoachTip.test.ts covers firstMove, waiting, inCheck, capture, promote, lostPiece, gameOver. E2E caught a bug where resignation (a session result) still showed in-game tips — fixed by passing the session result to the coach."
+      ],
       "notes": ""
     },
     {
@@ -455,12 +467,16 @@
       "milestone": "M4",
       "title": "Lesson path, XP and streaks",
       "user_visible_behavior": "A user sees a Duolingo-style lesson path with locked/unlocked nodes, earns XP, and keeps a daily streak.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Completing a lesson unlocks the next node and adds XP.",
         "Streak increments on consecutive days (time mocked in tests)."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/path.spec.ts 'path unlocks the next node…' passed with Playwright fake clock: fresh /learn shows 0 XP, streak 0, 12 nodes with 11 locked; completing board → 10 XP, streak 1, khun unlocked, met locked; next day (2026-09-14) completing khun → 20 XP, streak 2, met unlocked; 2026-09-16 streak shows 0 (broken), XP kept.",
+        "2026-09-13: stores/progress.test.ts streak unit tests (consecutive, same day, reset, broken, month boundary) pass.",
+        "Duolingo-style zig-zag path with unit banners, current-node 'เริ่ม' bubble, gold completed nodes with stars, XP and flame streak header (screenshot e2e-evidence/learn-path.png)."
+      ],
       "notes": ""
     },
     {

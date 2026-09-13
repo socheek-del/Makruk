@@ -110,6 +110,37 @@
       "abandon": "Game abandoned"
     }
   },
+  "learn": {
+    "title": "Lessons",
+    "exit": "Leave lesson",
+    "progress": "Lesson progress",
+    "check": "Check",
+    "continue": "Continue",
+    "correct": "Correct!",
+    "wrong": "Not quite",
+    "tryAgain": "Try again",
+    "complete": "Lesson complete!",
+    "stars": "Stars: {{count}}",
+    "unit": "Unit {{number}}",
+    "start": "Start",
+    "locked": "Finish the previous lesson to unlock",
+    "xpLabel": "Experience points",
+    "streakLabel": "Day streak"
+  },
+  "coach": {
+    "title": "Coach Khun",
+    "gameTitle": "First game with a coach",
+    "waiting": "Waiting for your opponent… think about your next move.",
+    "firstMove": "Start by pushing a centre Bia forward, like the d- or e-Bia.",
+    "inCheck": "Your Khun is in check! Escape, block, or capture the attacker.",
+    "lostPiece": "Your opponent captured a piece. Check which of your pieces are unprotected.",
+    "promote": "You can promote a Bia! Move it to the sixth row to turn it into a Met.",
+    "capture": "You can capture one of your opponent's pieces right now — look for it.",
+    "develop": "Bring your Ma and Khon out to join the game.",
+    "safeKhun": "Keep your Khun safe early in the game.",
+    "useHint": "Not sure? Tap the Hint button.",
+    "gameOver": "Game over — well played! Start a new game or try the next lesson."
+  },
   "computer": {
     "chooseBot": "Choose your opponent",
     "level": "Level {{level}}",

@@ -3,15 +3,16 @@ import { type Color, type PieceType, parseSquare } from '@makruk/engine';
 import { Lightbulb, LoaderCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { create } from 'zustand';
+import { create, type StoreApi, type UseBoundStore } from 'zustand';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { AiCancelled, cancelAi, requestComputerMove, requestHint } from '../features/ai/aiClient';
 import { PieceSvg } from '../features/board/PieceSvg';
 import { GameScreen, undoAllowed } from '../features/game/GameScreen';
+import { CoachTip } from '../features/learn/CoachTip';
 import { cn } from '../lib/cn';
-import { useComputerSession } from '../stores/localSession';
+import { type GameSessionState, useComputerSession } from '../stores/localSession';
 import { useSettings } from '../stores/settings';
 
 /** Minimum visible "thinking" time so instant bot replies still feel like a turn. */
@@ -25,8 +26,13 @@ const opposite = (c: Color): Color => (c === 'w' ? 'b' : 'w');
 
 export function ComputerGamePage() {
   const phase = useComputerSession((s) => s.phase);
+  const { level, humanColor } = useComputerMatch();
   useEffect(() => () => cancelAi(), []);
-  return phase === 'setup' ? <ComputerSetup /> : <ComputerGame />;
+  return phase === 'setup' ? (
+    <ComputerSetup />
+  ) : (
+    <ComputerGame useSession={useComputerSession} level={level} humanColor={humanColor} />
+  );
 }
 
 function ComputerSetup() {
@@ -95,14 +101,22 @@ function ComputerSetup() {
   );
 }
 
-function ComputerGame() {
+export interface ComputerGameProps {
+  useSession: UseBoundStore<StoreApi<GameSessionState>>;
+  level: number;
+  humanColor: Color;
+  /** Show beginner coach tips (guided first game). */
+  coach?: boolean;
+  title?: string;
+}
+
+export function ComputerGame({ useSession, level, humanColor, coach = false, title }: ComputerGameProps) {
   const { t } = useTranslation();
-  const game = useComputerSession((s) => s.game);
-  const version = useComputerSession((s) => s.version);
-  const result = useComputerSession((s) => s.result);
-  const viewPly = useComputerSession((s) => s.viewPly);
-  const flipped = useComputerSession((s) => s.flipped);
-  const { level, humanColor } = useComputerMatch();
+  const game = useSession((s) => s.game);
+  const version = useSession((s) => s.version);
+  const result = useSession((s) => s.result);
+  const viewPly = useSession((s) => s.viewPly);
+  const flipped = useSession((s) => s.flipped);
   const bot = botById(level);
   const computerColor = opposite(humanColor);
   const [thinking, setThinking] = useState(false);
@@ -120,7 +134,7 @@ function ComputerGame() {
       .then(async (response) => {
         const wait = MIN_THINK_MS - (performance.now() - started);
         if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait));
-        const session = useComputerSession.getState();
+        const session = useSession.getState();
         if (cancelled || session.game.fen() !== fen || !response.uci) return;
         session.move(response.uci);
       })
@@ -141,7 +155,7 @@ function ComputerGame() {
     setHintLoading(true);
     try {
       const response = await requestHint(fen);
-      if (response.uci && useComputerSession.getState().game.fen() === fen) {
+      if (response.uci && useSession.getState().game.fen() === fen) {
         setHint({ from: parseSquare(response.uci.slice(0, 2)), to: parseSquare(response.uci.slice(2, 4)), version });
       }
     } catch (err) {
@@ -153,7 +167,7 @@ function ComputerGame() {
 
   const takeback = () => {
     cancelAi();
-    const session = useComputerSession.getState();
+    const session = useSession.getState();
     if (session.game.turn === humanColor) session.undo();
     session.undo();
     setHint(null);
@@ -164,8 +178,8 @@ function ComputerGame() {
 
   return (
     <GameScreen
-      useSession={useComputerSession}
-      title={t('modes.single')}
+      useSession={useSession}
+      title={title ?? t('modes.single')}
       orientation={flipped ? computerColor : humanColor}
       names={{ [humanColor]: t('computer.you'), [computerColor]: botName } as Record<Color, string>}
       inputEnabled={game.turn === humanColor}
@@ -174,12 +188,15 @@ function ComputerGame() {
       resignColor={humanColor}
       hint={hint && hint.version === version ? hint : null}
       status={
-        thinking && !result ? (
-          <p data-testid="thinking" className="flex items-center justify-center gap-2 text-sm font-bold text-muted">
-            <LoaderCircle aria-hidden className="h-4 w-4 animate-spin" />
-            {t('computer.thinking', { name: botName })}
-          </p>
-        ) : null
+        <>
+          {coach && <CoachTip game={game} humanColor={humanColor} over={!!result} />}
+          {thinking && !result && (
+            <p data-testid="thinking" className="flex items-center justify-center gap-2 text-sm font-bold text-muted">
+              <LoaderCircle aria-hidden className="h-4 w-4 animate-spin" />
+              {t('computer.thinking', { name: botName })}
+            </p>
+          )}
+        </>
       }
       actions={
         <Button variant="warning" onClick={askHint} disabled={!canHint}>
@@ -190,7 +207,7 @@ function ComputerGame() {
       onRematch={() => {
         cancelAi();
         setHint(null);
-        useComputerSession.getState().start(null);
+        useSession.getState().start(null);
       }}
     />
   );

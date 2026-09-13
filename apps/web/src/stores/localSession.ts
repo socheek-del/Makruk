@@ -124,3 +124,6 @@ export const useLocalSession = createGameSession();
 
 /** Game against the computer. */
 export const useComputerSession = createGameSession();
+
+/** Guided first game (lesson) against the easiest bot. */
+export const useGuidedSession = createGameSession();
