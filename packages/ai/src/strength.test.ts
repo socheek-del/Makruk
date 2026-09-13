@@ -33,7 +33,12 @@ const RESULTS_LOG = join(ROOT, 'strength-results.log');
 
 type Outcome = 'win' | 'loss' | 'draw';
 
-function playGame(whiteLevel: number, blackLevel: number, seed: number, openingSeed: number): { winner: 'w' | 'b' | 'draw'; plies: number } {
+function playGame(
+  whiteLevel: number,
+  blackLevel: number,
+  seed: number,
+  openingSeed: number,
+): { winner: 'w' | 'b' | 'draw'; plies: number; reason: string; fen: string } {
   const game = new Game();
   const rng = mulberry32(seed);
   const history = [positionKey(game.fen())];
@@ -48,7 +53,12 @@ function playGame(whiteLevel: number, blackLevel: number, seed: number, openingS
     history.push(positionKey(game.move(move.uci).fenAfter));
   }
   const status = game.status();
-  return { winner: status.kind === 'checkmate' ? status.winner : 'draw', plies: game.moves().length };
+  return {
+    winner: status.kind === 'checkmate' ? status.winner : 'draw',
+    plies: game.moves().length,
+    reason: status.kind === 'ongoing' ? 'max-plies' : status.kind,
+    fen: game.fen(),
+  };
 }
 
 /** Games already played with exactly these bot configs, by game index. */
@@ -77,9 +87,9 @@ describe('bot strength ladder (ai-002)', () => {
           // Re-read before each game: parallel shards and earlier runs share the log.
           if (loggedGames(signature).has(g)) continue;
           const strongIsWhite = g % 2 === 0;
-          const { winner, plies } = playGame(strongIsWhite ? strong.id : weak.id, strongIsWhite ? weak.id : strong.id, 1_000 * i + g, 7_919 * (Math.floor(g / 2) + 1));
+          const { winner, plies, reason, fen } = playGame(strongIsWhite ? strong.id : weak.id, strongIsWhite ? weak.id : strong.id, 1_000 * i + g, 7_919 * (Math.floor(g / 2) + 1));
           const outcome: Outcome = winner === 'draw' ? 'draw' : winner === (strongIsWhite ? 'w' : 'b') ? 'win' : 'loss';
-          appendFileSync(GAMES_LOG, `${JSON.stringify({ at: new Date().toISOString(), pair: `L${strong.id}-L${weak.id}`, game: g, outcome, plies, signature })}\n`);
+          appendFileSync(GAMES_LOG, `${JSON.stringify({ at: new Date().toISOString(), pair: `L${strong.id}-L${weak.id}`, game: g, outcome, plies, reason, fen, signature })}\n`);
         }
         const done = loggedGames(signature);
         // A shard only plays its own games; the verdict needs every game.
