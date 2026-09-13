@@ -1,0 +1,107 @@
+name: Bot strength ladder
+
+# ai-002 evidence. The ladder is CPU-heavy (L6 vs L5 ≈ 15 min per game on one core), so it runs on
+# demand across parallel runners instead of on a laptop. Games are deterministic (node-limited
+# search, fixed seeds), so results match a local `npm run test:strength -w packages/ai`.
+
+on:
+  workflow_dispatch:
+    inputs:
+      pair:
+        description: 'Pair n = level n+1 vs level n (1–5)'
+        required: true
+        default: '5'
+      games:
+        description: 'Games per pair'
+        required: true
+        default: '20'
+
+env:
+  JOBS: 5
+  SHARDS_PER_JOB: 4
+
+jobs:
+  play:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        job: [0, 1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm install -g npm@11
+      - run: npm ci
+      - name: Play this job's shards
+        working-directory: packages/ai
+        env:
+          STRENGTH_PAIR: ${{ inputs.pair }}
+          STRENGTH_GAMES: ${{ inputs.games }}
+        run: |
+          count=$((JOBS * SHARDS_PER_JOB))
+          pids=()
+          for k in $(seq 0 $((SHARDS_PER_JOB - 1))); do
+            STRENGTH_SHARD=$(( ${{ matrix.job }} * SHARDS_PER_JOB + k ))/$count \
+              npx vitest run src/strength.test.ts > "shard-$k.log" 2>&1 &
+            pids+=($!)
+          done
+          status=0
+          for i in "${!pids[@]}"; do
+            wait "${pids[$i]}" || { status=1; cat "shard-$i.log"; }
+          done
+          touch strength-games.log
+          cat strength-games.log
+          exit $status
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: strength-games-${{ matrix.job }}
+          path: packages/ai/strength-games.log
+
+  verdict:
+    needs: play
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm install -g npm@11
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: strength-games-*
+          path: games
+      - name: Record the verdict from every shard's games
+        working-directory: packages/ai
+        env:
+          STRENGTH_PAIR: ${{ inputs.pair }}
+          STRENGTH_GAMES: ${{ inputs.games }}
+        run: |
+          cat ../../games/*/strength-games.log > strength-games.log
+          npx vitest run src/strength.test.ts
+      - name: Summary
+        if: always()
+        working-directory: packages/ai
+        run: |
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat strength-results.log >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || echo 'no verdict recorded' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          python3 -c "
+          import json
+          for l in open('strength-games.log'):
+              e = json.loads(l); print(e['pair'], 'game', e['game'], e['outcome'], e['plies'], 'plies')
+          " | sort -k3 -n >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: strength-verdict
+          path: |
+            packages/ai/strength-games.log
+            packages/ai/strength-results.log
