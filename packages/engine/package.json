@@ -6,7 +6,8 @@
   "license": "GPL-3.0-or-later",
   "exports": {
     ".": "./src/index.ts",
-    "./core": "./src/core.ts"
+    "./core": "./src/core.ts",
+    "./clock": "./src/clock.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

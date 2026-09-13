@@ -4,6 +4,8 @@
  */
 import { z } from 'zod';
 
+export * from './game';
+
 export const HealthResponse = z.object({
   ok: z.literal(true),
   service: z.literal('makruk'),

@@ -1,7 +1,12 @@
 import * as core from '@makruk/engine/core';
 import { evaluate, PIECE_VALUE } from './evaluate';
 
-const { generateLegalMoves, inCheck, isPromotion, makeRaw, moveFrom, moveTo, TYPE_MASK, unmakeRaw } = core;
+const { generateLegalMoves, inCheck, isPromotion, makeRaw, moveFrom, moveTo, placementOf, TYPE_MASK, unmakeRaw } = core;
+
+/** Position identity for repetition: placement + side to move (matches the first two FEN fields). */
+export function positionKey(fen: string): string {
+  return fen.split(' ').slice(0, 2).join(' ');
+}
 
 export const MATE = 100_000;
 const MAX_PLY = 64;
@@ -9,6 +14,13 @@ const QUIESCENCE_DEPTH = 6;
 
 export interface SearchOptions {
   maxDepth: number;
+  /**
+   * Earlier positions in the game as `positionKey` strings. A root move that recreates one of them
+   * is scored as a draw (repetition) instead of being searched.
+   */
+  history?: readonly string[];
+  /** Centipawns a draw by repetition is worth *less* than 0 to the side to move (avoids aimless shuffling). */
+  contempt?: number;
   /** Stop after roughly this many nodes (deterministic budget). */
   maxNodes?: number;
   /** Absolute timestamp (ms) after which the search stops. */
@@ -105,6 +117,10 @@ export function search(position: { board: core.Board; turn: core.ColorIndex }, o
     return { move: -1, score: inCheck(board, root) ? -MATE : 0, depth: 0, nodes: 0, rootMoves: [] };
   }
 
+  const seen = new Set(options.history ?? []);
+  const repetitionScore = -(options.contempt ?? 0);
+  const afterKey = () => `${placementOf(board)} ${root === 0 ? 'b' : 'w'}`;
+
   let completedDepth = 0;
   for (let depth = 1; depth <= options.maxDepth; depth++) {
     const scored: RootMove[] = [];
@@ -114,7 +130,10 @@ export function search(position: { board: core.Board; turn: core.ColorIndex }, o
       const moved = board[moveFrom(m)]!;
       const captured = makeRaw(board, m);
       // Full window at the root so every root move gets a real score (used for bot noise and hints).
-      const score = -negamax(depth - 1, -MATE - 1, MATE + 1, opposite(root), 1);
+      const score =
+        seen.size > 0 && seen.has(afterKey())
+          ? repetitionScore
+          : -negamax(depth - 1, -MATE - 1, MATE + 1, opposite(root), 1);
       unmakeRaw(board, m, moved, captured);
       if (stopped) break;
       scored.push({ move: m, score });

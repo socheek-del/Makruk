@@ -9,6 +9,19 @@
     "not_found_handling": "single-page-application",
     "run_worker_first": ["/api/*", "/ws/*"]
   },
+  "durable_objects": {
+    "bindings": [
+      { "name": "GAME_ROOM", "class_name": "GameRoom" },
+      { "name": "MATCHMAKER", "class_name": "Matchmaker" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["GameRoom"] },
+    { "tag": "v2", "new_sqlite_classes": ["Matchmaker"] }
+  ],
+  "vars": {
+    "RECONNECT_GRACE_MS": "60000"
+  },
   "routes": [{ "pattern": "th-chess.beanroti.com", "custom_domain": true }],
   "observability": { "enabled": true }
 }

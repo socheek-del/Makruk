@@ -486,12 +486,16 @@
       "milestone": "M5",
       "title": "GameRoom Durable Object",
       "user_visible_behavior": "Two connected clients play a game where the server validates and broadcasts every move.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Worker tests: illegal move rejected; legal move broadcast to both sockets.",
         "Game state survives Durable Object hibernation."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/worker/src/room/GameRoom.test.ts in workerd (@cloudflare/vitest-plugin) — 'validates moves on the server and broadcasts legal ones': e3e5 → error illegal_move to sender, black early move → not_your_turn, e3e4 → both sockets receive state with moves [e3e4] and Black's clock running.",
+        "2026-09-13: GameRoom.test.ts 'keeps the game when the Durable Object hibernates between moves': evictDurableObject(stub, { webSockets: 'hibernate' }) after move 1, Black's move 2 is accepted and White receives moves [e3e4, d6d5] with seat w restored from the socket attachment.",
+        "2026-09-13: 'has no chat': {type:'chat'} → error bad_message; protocol ClientMessage has no chat variant (logic.test.ts asserts schema rejects it). Worker suite: 26 tests passing."
+      ],
       "notes": "No chat messages exist in the protocol."
     },
     {
@@ -501,11 +505,14 @@
       "milestone": "M5",
       "title": "Private room by link or code",
       "user_visible_behavior": "A user creates a game, shares a link, 6-character code or QR, and a friend joins and plays.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Playwright with two browser contexts: create, join by code, play 4 moves, both boards match."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/online.spec.ts against vite + wrangler dev — 'create a room, a friend joins by code…': host creates 5+0 room as White, waiting room shows 6-char code, QR image and share link; friend joins by typing the code in lower case; orientations w/b; moves e4 d5 exd5 Ne7 played alternately; both move lists equal and both boards show wp d5, bn e7; clocks visible.",
+        "2026-09-13: online.spec.ts 'an unknown code shows an error' (ไม่พบห้องนี้); rooms are Durable Objects addressed by code (idFromName), code alphabet excludes I/O/0/1."
+      ],
       "notes": ""
     },
     {
@@ -515,11 +522,14 @@
       "milestone": "M5",
       "title": "Server-authoritative clocks",
       "user_visible_behavior": "Online games use server-timed clocks with increment; running out of time loses.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Worker tests with mocked time: increment applied; flag ends the game."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/worker/src/room/logic.test.ts (explicit timestamps) — increment applied after every move (w 10000−2000+1000, b 10000−3000+1000), next alarm at flag time, settle at 5999 no result / at 6000 timeout for White, late move rejected game_over; move presses clock with increment.",
+        "2026-09-13: GameRoom.test.ts in workerd — 300ms game: after 350ms the Durable Object alarm ends the game with {winner: b, reason: timeout} broadcast to the player. Clock arithmetic shared with the browser via @makruk/engine/clock."
+      ],
       "notes": ""
     },
     {
@@ -529,13 +539,16 @@
       "milestone": "M5",
       "title": "Reconnect, resign, draw offer, rematch",
       "user_visible_behavior": "A dropped player can reconnect within a grace period; players can resign, offer/accept draws and request a rematch.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Playwright: close one context, reopen within grace period, game resumes.",
         "Abandonment past grace period awards the win.",
         "Resign, draw and rematch flows work end to end."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/online.spec.ts (wrangler dev, 3s grace) — reload: host reloads mid-game, rejoins with the same move list, friend's disconnected banner clears and play continues; abandonment: host context closed → friend sees opponent-disconnected banner, then 'ฝ่ายดำชนะ' / 'ออกจากเกม'; draw: offer declined then offer accepted → both see 'เสมอ' / 'ตกลงเสมอ'; rematch: both press เล่นอีกครั้ง → both navigate to a new room with colours swapped; resign: Black resigns → both see 'ฝ่ายขาวชนะ'. 7/7 online specs passed.",
+        "2026-09-13: GameRoom.test.ts in workerd — reconnect within grace clears disconnect; alarm after grace gives abandon to the opponent; resign + rematch opens a new room with colours swapped."
+      ],
       "notes": ""
     },
     {
@@ -545,11 +558,14 @@
       "milestone": "M5",
       "title": "Guest identity",
       "user_visible_behavior": "A new visitor gets a guest name and can play online without signing up.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "First visit issues a signed guest token; reload keeps the same guest."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/online.spec.ts 'guest identity is created once and kept after reload': /play/online shows 'คุณ: ผู้เล่น NNNN'; after reload the same guest is shown.",
+        "2026-09-13: apps/worker GameRoom.test.ts — POST /api/guest issues an HMAC-SHA256 signed token; /api/me returns the same user; missing, garbage, forged-payload and bad-signature tokens → 401; creating a game without a token → 401. Client re-issues a guest if the stored token is rejected."
+      ],
       "notes": ""
     },
     {
@@ -575,12 +591,16 @@
       "milestone": "M6",
       "title": "Quick match",
       "user_visible_behavior": "A user presses Play for 3+2, 5+0 or 10+0 and is paired with an opponent.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Playwright with two contexts in the same pool get paired into one game.",
         "Cancelling search removes the user from the queue."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/quickmatch.spec.ts (vite + wrangler dev) — 2 passed: two contexts press 3+2 → both land on the same /play/online/CODE with opposite orientations and a 3-minute clock; a player who cancels their 10+0 search is not matched, a second seeker keeps waiting (no pairing after 1.5s), and a third seeker is paired with the second while the canceller stays on the lobby.",
+        "2026-09-13: apps/worker/src/match/Matchmaker.test.ts in workerd — 4 passed: same-pool pairing creates a playing room with the pool time control (5+0 → 300000ms); different pools and the same user twice are never paired; a closed (cancelled) socket is skipped so the next two seekers pair; unknown pool → bad_pool.",
+        "Design: one Matchmaker Durable Object; the queue is the set of open hibernatable sockets tagged by pool, so cancelling is closing the socket. Rating bands are added with acct-003."
+      ],
       "notes": ""
     },
     {

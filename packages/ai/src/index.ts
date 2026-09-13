@@ -8,13 +8,18 @@ import { MATE, search } from './search';
 
 export { type BotLevel, BOTS, botById } from './bots';
 export { evaluate } from './evaluate';
-export { MATE, search, type SearchResult } from './search';
+export { MATE, positionKey, search, type SearchResult } from './search';
+
+/** Bots treat repeating a position as slightly worse than a draw, so they keep trying to make progress. */
+export const DEFAULT_CONTEMPT = 30;
 
 export interface ChooseOptions {
   rng?: () => number;
   now?: () => number;
   /** Use the node budget only (no wall clock) — for reproducible tests. */
   ignoreTime?: boolean;
+  /** Earlier positions of the game (positionKey), for repetition avoidance. */
+  history?: readonly string[];
 }
 
 export interface EngineMove {
@@ -46,6 +51,8 @@ export function chooseMove(fen: string, level: BotLevel | number, options: Choos
     maxNodes: bot.maxNodes,
     deadline: options.ignoreTime ? undefined : now() + bot.timeMs,
     now,
+    history: options.history,
+    contempt: DEFAULT_CONTEMPT,
   });
 
   let pick = result.rootMoves[0]!;
@@ -58,7 +65,10 @@ export function chooseMove(fen: string, level: BotLevel | number, options: Choos
 }
 
 /** Strongest move within a budget, for hints. */
-export function bestMove(fen: string, options: { maxDepth?: number; maxNodes?: number; timeMs?: number; now?: () => number } = {}): EngineMove | null {
+export function bestMove(
+  fen: string,
+  options: { maxDepth?: number; maxNodes?: number; timeMs?: number; now?: () => number; history?: readonly string[] } = {},
+): EngineMove | null {
   const now = options.now ?? (() => Date.now());
   const pos = core.parseFen(fen);
   const result = search(pos, {
@@ -66,6 +76,8 @@ export function bestMove(fen: string, options: { maxDepth?: number; maxNodes?: n
     maxNodes: options.maxNodes ?? 300_000,
     deadline: options.timeMs ? now() + options.timeMs : undefined,
     now,
+    history: options.history,
+    contempt: DEFAULT_CONTEMPT,
   });
   if (result.move < 0) return null;
   return { uci: toUci(result.move), score: result.score, depth: result.depth, nodes: result.nodes };

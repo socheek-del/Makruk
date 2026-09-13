@@ -1,5 +1,5 @@
-import { botById, BOTS } from '@makruk/ai';
-import { type Color, type PieceType, parseSquare } from '@makruk/engine';
+import { botById, BOTS, positionKey } from '@makruk/ai';
+import { type Color, type Game, type PieceType, parseSquare } from '@makruk/engine';
 import { Lightbulb, LoaderCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +23,11 @@ const BOT_PIECE: Record<string, PieceType> = { bia: 'p', met: 'm', khon: 's', ma
 const useComputerMatch = create<{ level: number; humanColor: Color }>(() => ({ level: 2, humanColor: 'w' }));
 
 const opposite = (c: Color): Color => (c === 'w' ? 'b' : 'w');
+
+/** Earlier positions (placement + side to move) so bots avoid pointless repetition. */
+function historyOf(game: Game, startFen: string): string[] {
+  return [positionKey(startFen), ...game.moves().map((r) => positionKey(r.fenAfter))];
+}
 
 export function ComputerGamePage() {
   const phase = useComputerSession((s) => s.phase);
@@ -130,7 +135,7 @@ export function ComputerGame({ useSession, level, humanColor, coach = false, tit
     let cancelled = false;
     setThinking(true);
     const started = performance.now();
-    requestComputerMove(fen, level)
+    requestComputerMove(fen, level, historyOf(game, useSession.getState().startFen))
       .then(async (response) => {
         const wait = MIN_THINK_MS - (performance.now() - started);
         if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait));
@@ -154,7 +159,7 @@ export function ComputerGame({ useSession, level, humanColor, coach = false, tit
     const fen = game.fen();
     setHintLoading(true);
     try {
-      const response = await requestHint(fen);
+      const response = await requestHint(fen, historyOf(game, useSession.getState().startFen));
       if (response.uci && useSession.getState().game.fen() === fen) {
         setHint({ from: parseSquare(response.uci.slice(0, 2)), to: parseSquare(response.uci.slice(2, 4)), version });
       }

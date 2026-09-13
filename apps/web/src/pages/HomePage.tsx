@@ -11,8 +11,8 @@ type ServerStatus = 'checking' | 'ok' | 'down';
 const MODES: ReadonlyArray<{ key: string; icon: LucideIcon; color: string; to?: string }> = [
   { key: 'single', icon: Bot, color: 'bg-secondary', to: '/play/computer' },
   { key: 'local', icon: Users, color: 'bg-primary', to: '/play/local' },
-  { key: 'online', icon: Globe, color: 'bg-gold' },
-  { key: 'learn', icon: GraduationCap, color: 'bg-danger' },
+  { key: 'online', icon: Globe, color: 'bg-gold', to: '/play/online' },
+  { key: 'learn', icon: GraduationCap, color: 'bg-danger', to: '/learn' },
 ];
 
 export function HomePage() {

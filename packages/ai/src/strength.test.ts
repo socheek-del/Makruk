@@ -8,7 +8,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Game } from '@makruk/engine';
 import { describe, expect, it } from 'vitest';
-import { BOTS, chooseMove, mulberry32 } from './index';
+import { BOTS, chooseMove, mulberry32, positionKey } from './index';
 
 const GAMES = Number(process.env.STRENGTH_GAMES ?? 20);
 const ONLY_PAIR = process.env.STRENGTH_PAIR ? Number(process.env.STRENGTH_PAIR) : null;
@@ -17,10 +17,11 @@ const MAX_PLIES = 400;
 function playGame(whiteLevel: number, blackLevel: number, seed: number): 'w' | 'b' | 'draw' {
   const game = new Game();
   const rng = mulberry32(seed);
+  const history = [positionKey(game.fen())];
   while (!game.isGameOver() && game.moves().length < MAX_PLIES) {
-    const move = chooseMove(game.fen(), game.turn === 'w' ? whiteLevel : blackLevel, { rng, ignoreTime: true });
+    const move = chooseMove(game.fen(), game.turn === 'w' ? whiteLevel : blackLevel, { rng, ignoreTime: true, history });
     if (!move) break;
-    game.move(move.uci);
+    history.push(positionKey(game.move(move.uci).fenAfter));
   }
   const status = game.status();
   return status.kind === 'checkmate' ? status.winner : 'draw';

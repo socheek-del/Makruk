@@ -1,6 +1,7 @@
-import { Game, START_FEN } from '@makruk/engine';
+import { Game, moveToUci, START_FEN } from '@makruk/engine';
+import * as core from '@makruk/engine/core';
 import { describe, expect, it } from 'vitest';
-import { bestMove, BOTS, chooseMove, MATE, mulberry32 } from './index';
+import { bestMove, BOTS, chooseMove, MATE, mulberry32, positionKey, search } from './index';
 
 describe('search', () => {
   it('finds mate in one', () => {
@@ -25,6 +26,36 @@ describe('search', () => {
     const legal = new Game(fen).legalMoves().length;
     expect(legal).toBe(5);
     expect(() => new Game(fen).move(move!.uci)).not.toThrow();
+  });
+
+  it('avoids moves that repeat an earlier position when others are available', () => {
+    // Every move except the safe Ruea shift h1g1 would recreate an earlier position.
+    const fen = 'k7/8/8/8/8/8/8/K6R w - - 0 1';
+    const game = new Game(fen);
+    const moves = game.legalMoves();
+    const keep = moves.find((m) => moveToUci(m) === 'h1g1')!;
+    const history = moves
+      .filter((m) => m !== keep)
+      .map((m) => {
+        const g = new Game(fen);
+        g.move(m);
+        return positionKey(g.fen());
+      });
+    const result = search(core.parseFen(fen), { maxDepth: 2, history, contempt: 200 });
+    expect(moveToUci({ from: core.moveFrom(result.move), to: core.moveTo(result.move), promotion: false })).toBe('h1g1');
+    expect(result.rootMoves.filter((r) => r.score === -200)).toHaveLength(moves.length - 1);
+  });
+
+  it('still repeats when every other move loses', () => {
+    // Only legal moves: the Khun can step back and forth; repeating is fine when nothing else exists.
+    const fen = '7k/8/8/8/8/8/r7/K7 w - - 0 1';
+    const legal = new Game(fen).legalMoves().map(moveToUci);
+    const history = legal.map((uci) => {
+      const g = new Game(fen);
+      g.move(uci);
+      return positionKey(g.fen());
+    });
+    expect(bestMove(fen, { maxDepth: 2, history })).not.toBeNull();
   });
 
   it('returns null when there is no legal move', () => {

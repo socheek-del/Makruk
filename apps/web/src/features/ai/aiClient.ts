@@ -47,10 +47,11 @@ function send(body: RequestBody): Promise<AiResponse> {
   });
 }
 
-/** Searches off the main thread so the UI never freezes. */
-export const requestComputerMove = (fen: string, level: number) => send({ kind: 'move', fen, level });
+/** Searches off the main thread so the UI never freezes. `history` holds earlier positions for repetition avoidance. */
+export const requestComputerMove = (fen: string, level: number, history: string[] = []) =>
+  send({ kind: 'move', fen, level, history });
 
-export const requestHint = (fen: string) => send({ kind: 'hint', fen });
+export const requestHint = (fen: string, history: string[] = []) => send({ kind: 'hint', fen, history });
 
 /** Stops any running search immediately (new game, takeback, leaving the page). */
 export function cancelAi(): void {
