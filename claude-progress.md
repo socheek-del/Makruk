@@ -14,9 +14,12 @@ handoff; no agent updates it automatically.
 - Standard verification path: `npm run verify` (lint + typecheck + unit tests in all workspaces, incl. workerd tests)
 - E2E: `npm run e2e` (Playwright starts vite + wrangler dev) · PWA/offline: `npm run e2e:pwa -w apps/web`
 - Deep engine checks: `npm run test:deep -w packages/engine` · Bot ladder: `npm run test:strength -w packages/ai` (slow; `STRENGTH_PAIR=n`)
-- Milestones: M0 infra ✓, M1 engine ✓, M2 local play ✓, M3 vs computer (ai-001, ai-003 ✓; ai-002 ladder re-running after conversion-mode fix), M4 learning ✓, M5 online ✓ (incl. quick match), M7 polish: PWA ✓, sounds ✓, themes/art ✓
-- Remaining: `ai-002` (ladder evidence), `acct-002` sign-in, `acct-003` ratings & history, `polish-002` native Thai review
-- Current blocker: `acct-002` needs Google OAuth credentials and an email-sending API key from the owner; `polish-002` needs a native Thai reviewer
+- Milestones: M0 infra ✓, M1 engine ✓, M2 local play ✓, M3 vs computer (ai-001, ai-003 ✓; ai-002 ladder final pairs running), M4 learning ✓, M5 online ✓ (incl. quick match), M6 accounts (acct-001, acct-003 ✓; acct-002 blocked), M7 polish (PWA, sounds, themes, art ✓; polish-002 blocked)
+- D1 database `makruk` (id 9e084ac6-9749-411d-867d-c89e8421ed78); migrations in `apps/worker/migrations`, applied by `npm run deploy` (CI) and by the Playwright wrangler command locally
+- Remaining: `ai-002` (ladder evidence), `acct-002` (production verification), `polish-002` (human review)
+- Current blockers (owner action needed):
+  - `acct-002`: create a Google OAuth web client (redirect URI `https://th-chess.beanroti.com/api/auth/google/callback`) and a Resend key with beanroti.com verified; set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `EMAIL_FROM` with `wrangler secret put` in `apps/worker`
+  - `polish-002`: native Thai reviewer completes `docs/i18n-review.md`
 
 ## Session Log
 
