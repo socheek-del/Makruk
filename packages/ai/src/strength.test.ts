@@ -22,16 +22,26 @@ const SHARD = process.env.STRENGTH_SHARD
   ? (([index, count]) => ({ index: Number(index), count: Number(count) }))(process.env.STRENGTH_SHARD.split('/'))
   : null;
 const MAX_PLIES = 400;
+/**
+ * Strong bots have no noise, so every game from the start position would repeat exactly. Each pair of
+ * games starts from its own seeded random opening, played once with each colour.
+ */
+const OPENING_PLIES = 6;
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GAMES_LOG = join(ROOT, 'strength-games.log');
 const RESULTS_LOG = join(ROOT, 'strength-results.log');
 
 type Outcome = 'win' | 'loss' | 'draw';
 
-function playGame(whiteLevel: number, blackLevel: number, seed: number): { winner: 'w' | 'b' | 'draw'; plies: number } {
+function playGame(whiteLevel: number, blackLevel: number, seed: number, openingSeed: number): { winner: 'w' | 'b' | 'draw'; plies: number } {
   const game = new Game();
   const rng = mulberry32(seed);
   const history = [positionKey(game.fen())];
+  const openingRng = mulberry32(openingSeed);
+  for (let p = 0; p < OPENING_PLIES && !game.isGameOver(); p++) {
+    const legal = game.legalMoves();
+    history.push(positionKey(game.move(legal[Math.floor(openingRng() * legal.length)]!).fenAfter));
+  }
   while (!game.isGameOver() && game.moves().length < MAX_PLIES) {
     const move = chooseMove(game.fen(), game.turn === 'w' ? whiteLevel : blackLevel, { rng, ignoreTime: true, history });
     if (!move) break;
@@ -61,13 +71,13 @@ describe('bot strength ladder (ai-002)', () => {
       `${strong.key} (L${strong.id}) beats ${weak.key} (L${weak.id}) in a majority of ${GAMES} games`,
       { timeout: 6 * 3_600_000 },
       () => {
-        const signature = JSON.stringify({ strong, weak, maxPlies: MAX_PLIES });
+        const signature = JSON.stringify({ strong, weak, maxPlies: MAX_PLIES, openingPlies: OPENING_PLIES });
         for (let g = 0; g < GAMES; g++) {
           if (SHARD && g % SHARD.count !== SHARD.index) continue;
           // Re-read before each game: parallel shards and earlier runs share the log.
           if (loggedGames(signature).has(g)) continue;
           const strongIsWhite = g % 2 === 0;
-          const { winner, plies } = playGame(strongIsWhite ? strong.id : weak.id, strongIsWhite ? weak.id : strong.id, 1_000 * i + g);
+          const { winner, plies } = playGame(strongIsWhite ? strong.id : weak.id, strongIsWhite ? weak.id : strong.id, 1_000 * i + g, 7_919 * (Math.floor(g / 2) + 1));
           const outcome: Outcome = winner === 'draw' ? 'draw' : winner === (strongIsWhite ? 'w' : 'b') ? 'win' : 'loss';
           appendFileSync(GAMES_LOG, `${JSON.stringify({ at: new Date().toISOString(), pair: `L${strong.id}-L${weak.id}`, game: g, outcome, plies, signature })}\n`);
         }
