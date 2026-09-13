@@ -190,13 +190,17 @@
       "milestone": "M2",
       "title": "Design system foundation",
       "user_visible_behavior": "The app uses consistent Duolingo-style tokens and components (chunky rounded buttons, cards, progress bars) in light and dark mode.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Component showcase page renders all base components in light and dark.",
         "Playwright screenshot of the showcase at 390px and 1280px widths.",
         "docs/design.md describes tokens, components and the illustration style guide."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/design.spec.ts — 3 passed: /design shows light + dark panels with all 6 button variants, progressbar, switch, radiogroup; panel backgrounds rgb(255,255,255) / rgb(19,31,36); no horizontal overflow at 390px and 1280px; dialog opens and closes.",
+        "2026-09-13: screenshots test-results/evidence/design-390.png and design-1280.png reviewed visually (Duolingo-style pressable buttons, Thai text in Mitr, dark palette legible).",
+        "2026-09-13: docs/design.md covers tokens, type, shape, motion, components, accessibility rules and illustration/piece-art style guide."
+      ],
       "notes": ""
     },
     {
@@ -206,14 +210,18 @@
       "milestone": "M2",
       "title": "Thai default with English toggle",
       "user_visible_behavior": "The app opens in Thai; the user can switch to English and the choice persists after reload.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Fresh load shows Thai UI and <html lang=\"th\">.",
         "Switch to English: UI updates immediately and <html lang=\"en\">.",
         "Reload: English persists.",
         "Test fails if any key is missing from th or en locale files."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/i18n.spec.ts passed — fresh load html lang=th with Thai heading; Settings → English switches UI and html lang=en immediately; reload keeps English (radio aria-checked); navigation shows English; switching back sets lang=th.",
+        "2026-09-13: apps/web/src/locales/locales.test.ts — 3 passed: th/en key sets identical, no empty strings, every literal t('key') in source exists (fails on missing keys).",
+        "Language lives in the persisted zustand settings store (localStorage key makruk.settings); i18next and <html lang> follow it."
+      ],
       "notes": ""
     },
     {

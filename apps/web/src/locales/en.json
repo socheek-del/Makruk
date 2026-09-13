@@ -4,11 +4,24 @@
     "tagline": "Learn, play and compete in Thai chess anywhere",
     "comingSoon": "Coming soon"
   },
+  "nav": {
+    "label": "Main menu",
+    "play": "Play",
+    "learn": "Learn",
+    "settings": "Settings"
+  },
+  "home": {
+    "choose": "Choose how to play"
+  },
   "modes": {
     "single": "Play the computer",
+    "singleDesc": "Practise against bots of every level",
     "online": "Play online",
+    "onlineDesc": "Get matched or invite a friend by link",
     "local": "Pass and play",
-    "learn": "Lessons"
+    "localDesc": "Take turns on the same device",
+    "learn": "Lessons",
+    "learnDesc": "Start from zero, step by step"
   },
   "status": {
     "label": "Server",
@@ -16,7 +29,66 @@
     "ok": "Online",
     "down": "Offline"
   },
-  "language": {
-    "switch": "ภาษาไทย"
+  "pieces": {
+    "k": "Khun",
+    "m": "Met",
+    "s": "Khon",
+    "n": "Ma",
+    "r": "Ruea",
+    "p": "Bia",
+    "promoted": "Promoted Bia"
+  },
+  "colors": {
+    "w": "White",
+    "b": "Black"
+  },
+  "board": {
+    "label": "Makruk board",
+    "pieceName": "{{color}} {{piece}}",
+    "squareWithPiece": "{{square}} {{piece}}",
+    "emptySquare": "{{square}} empty"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "languageTh": "ไทย",
+    "languageEn": "English"
+  },
+  "design": {
+    "title": "Design system",
+    "light": "Light mode",
+    "dark": "Dark mode",
+    "colors": "Colours",
+    "buttons": "Buttons",
+    "variant": {
+      "primary": "Primary",
+      "secondary": "Secondary",
+      "outline": "Outline",
+      "danger": "Danger",
+      "warning": "Warning",
+      "ghost": "Ghost"
+    },
+    "small": "Small",
+    "large": "Large",
+    "icon": "Icon button",
+    "disabled": "Disabled",
+    "block": "Continue",
+    "cards": "Cards",
+    "cardTitle": "Lesson 1: Meet the board",
+    "cardBody": "Learn where every piece starts",
+    "correct": "Correct!",
+    "incorrect": "Try again",
+    "progress": "Progress",
+    "controls": "Controls",
+    "switchLabel": "Sound effects",
+    "segmented": "Options",
+    "optionA": "Easy",
+    "optionB": "Medium",
+    "optionC": "Hard",
+    "badges": "Badges",
+    "openDialog": "Open dialog",
+    "dialogTitle": "Well done!",
+    "dialogBody": "You finished this lesson and earned 10 XP",
+    "close": "Close"
   }
 }

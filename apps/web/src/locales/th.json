@@ -4,11 +4,24 @@
     "tagline": "เรียน เล่น และแข่งหมากรุกไทยได้ทุกที่",
     "comingSoon": "เร็ว ๆ นี้"
   },
+  "nav": {
+    "label": "เมนูหลัก",
+    "play": "เล่น",
+    "learn": "เรียน",
+    "settings": "ตั้งค่า"
+  },
+  "home": {
+    "choose": "เลือกวิธีเล่น"
+  },
   "modes": {
     "single": "เล่นกับคอมพิวเตอร์",
+    "singleDesc": "ฝึกฝีมือกับบอทหลายระดับ",
     "online": "เล่นออนไลน์",
+    "onlineDesc": "จับคู่หรือชวนเพื่อนด้วยลิงก์",
     "local": "สองคนเครื่องเดียว",
-    "learn": "บทเรียน"
+    "localDesc": "ผลัดกันเดินบนอุปกรณ์เดียวกัน",
+    "learn": "บทเรียน",
+    "learnDesc": "เริ่มจากศูนย์ทีละขั้น"
   },
   "status": {
     "label": "เซิร์ฟเวอร์",
@@ -16,7 +29,66 @@
     "ok": "ออนไลน์",
     "down": "ออฟไลน์"
   },
-  "language": {
-    "switch": "English"
+  "pieces": {
+    "k": "ขุน",
+    "m": "เม็ด",
+    "s": "โคน",
+    "n": "ม้า",
+    "r": "เรือ",
+    "p": "เบี้ย",
+    "promoted": "เบี้ยหงาย"
+  },
+  "colors": {
+    "w": "ขาว",
+    "b": "ดำ"
+  },
+  "board": {
+    "label": "กระดานหมากรุก",
+    "pieceName": "{{piece}}{{color}}",
+    "squareWithPiece": "{{square}} {{piece}}",
+    "emptySquare": "{{square}} ว่าง"
+  },
+  "settings": {
+    "title": "ตั้งค่า",
+    "language": "ภาษา",
+    "languageTh": "ไทย",
+    "languageEn": "English"
+  },
+  "design": {
+    "title": "ระบบดีไซน์",
+    "light": "โหมดสว่าง",
+    "dark": "โหมดมืด",
+    "colors": "สี",
+    "buttons": "ปุ่ม",
+    "variant": {
+      "primary": "หลัก",
+      "secondary": "รอง",
+      "outline": "เส้นขอบ",
+      "danger": "อันตราย",
+      "warning": "เตือน",
+      "ghost": "โปร่ง"
+    },
+    "small": "เล็ก",
+    "large": "ใหญ่",
+    "icon": "ปุ่มไอคอน",
+    "disabled": "ปิดใช้งาน",
+    "block": "ดำเนินการต่อ",
+    "cards": "การ์ด",
+    "cardTitle": "บทที่ 1: รู้จักกระดาน",
+    "cardBody": "เรียนรู้ตำแหน่งเริ่มต้นของหมากทุกตัว",
+    "correct": "ถูกต้อง!",
+    "incorrect": "ลองอีกครั้ง",
+    "progress": "ความคืบหน้า",
+    "controls": "ตัวควบคุม",
+    "switchLabel": "เสียงประกอบ",
+    "segmented": "ตัวเลือก",
+    "optionA": "ง่าย",
+    "optionB": "กลาง",
+    "optionC": "ยาก",
+    "badges": "ป้าย",
+    "openDialog": "เปิดหน้าต่าง",
+    "dialogTitle": "ยินดีด้วย!",
+    "dialogBody": "คุณผ่านบทเรียนนี้แล้ว ได้รับ 10 XP",
+    "close": "ปิด"
   }
 }

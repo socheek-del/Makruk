@@ -1,18 +1,108 @@
 @import 'tailwindcss';
 
-@theme {
-  --font-sans: 'Nunito', 'Mitr', ui-sans-serif, system-ui, sans-serif;
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
-  --color-brand: #58cc02;
-  --color-brand-shadow: #58a700;
-  --color-sky: #1cb0f6;
-  --color-ink: #3c3c3c;
-  --color-muted: #777777;
-  --color-line: #e5e5e5;
-  --color-paper: #ffffff;
+/* Design tokens. Light is the default; [data-theme] may be set on <html> or any subtree. */
+:root,
+[data-theme='light'] {
+  --canvas: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f7f7f7;
+  --line: #e5e5e5;
+  --ink: #3c3c3c;
+  --muted: #777777;
+  --subtle: #afafaf;
+
+  --primary: #58cc02;
+  --primary-shadow: #58a700;
+  --primary-soft: #d7ffb8;
+  --secondary: #1cb0f6;
+  --secondary-shadow: #1899d6;
+  --secondary-soft: #ddf4ff;
+  --danger: #ff4b4b;
+  --danger-shadow: #ea2b2b;
+  --danger-soft: #ffdfe0;
+  --warning: #ffc800;
+  --warning-shadow: #e5a400;
+  --warning-soft: #fff5d3;
+  --gold: #ff9600;
+  --gold-shadow: #e08500;
+  --on-accent: #ffffff;
+
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --canvas: #131f24;
+  --surface: #131f24;
+  --surface-2: #202f36;
+  --line: #37464f;
+  --ink: #f1f7fb;
+  --muted: #8b9ca5;
+  --subtle: #52656d;
+
+  --primary: #93d333;
+  --primary-shadow: #79b933;
+  --primary-soft: #26361a;
+  --secondary: #49c0f8;
+  --secondary-shadow: #1899d6;
+  --secondary-soft: #173645;
+  --danger: #ff4b4b;
+  --danger-shadow: #d43333;
+  --danger-soft: #3d1f22;
+  --warning: #ffc800;
+  --warning-shadow: #cc9f00;
+  --warning-soft: #3a3217;
+  --gold: #ff9600;
+  --gold-shadow: #cc7800;
+  --on-accent: #131f24;
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: 'Nunito Variable', 'Mitr', ui-sans-serif, system-ui, sans-serif;
+
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-primary: var(--primary);
+  --color-primary-shadow: var(--primary-shadow);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-shadow: var(--secondary-shadow);
+  --color-secondary-soft: var(--secondary-soft);
+  --color-danger: var(--danger);
+  --color-danger-shadow: var(--danger-shadow);
+  --color-danger-soft: var(--danger-soft);
+  --color-warning: var(--warning);
+  --color-warning-shadow: var(--warning-shadow);
+  --color-warning-soft: var(--warning-soft);
+  --color-gold: var(--gold);
+  --color-gold-shadow: var(--gold-shadow);
+  --color-on-accent: var(--on-accent);
+}
+
+html,
+body {
+  background: var(--canvas);
+  color: var(--ink);
 }
 
 body {
-  background: var(--color-paper);
-  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
