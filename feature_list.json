@@ -41,12 +41,14 @@
       "milestone": "M0",
       "title": "Continuous integration",
       "user_visible_behavior": "Every push and pull request to main runs lint, typecheck, tests and build on GitHub Actions.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Push a commit to GitHub.",
         "Verify the CI workflow runs and passes (gh run list / gh run view)."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: pushed b9fc34b to socheek-del/Makruk; GitHub Actions run 34736916479 'CI' completed success (verify job 33s: npm 11 ci, verify, build) — also confirms clean-clone install path."
+      ],
       "notes": ""
     },
     {
@@ -56,14 +58,19 @@
       "milestone": "M0",
       "title": "Deploy placeholder to th-chess.beanroti.com",
       "user_visible_behavior": "Visiting https://th-chess.beanroti.com shows the placeholder app over HTTPS, and /api/health returns ok.",
-      "status": "not_started",
+      "status": "in_progress",
       "verification": [
         "Run npm run deploy.",
         "Open https://th-chess.beanroti.com and verify the placeholder page loads with valid TLS.",
         "GET https://th-chess.beanroti.com/api/health returns {\"ok\":true}.",
         "Deploy from GitHub Actions on push to main succeeds."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: npm run deploy (local wrangler OAuth) → Worker 'makruk' version be65fdf1-1039-4292-aa6a-9193acecc648, custom domain th-chess.beanroti.com.",
+        "2026-09-13: HTTPS checks → GET / 200 title 'หมากรุกไทย · Makruk'; GET /api/health 200 {ok:true}; GET /play/some-route 200 SPA index; GET /api/nope 404 JSON.",
+        "2026-09-13: Chrome render → <html lang=th>, Thai UI, server status 'ออนไลน์'.",
+        "Pending: GitHub Actions deploy job (needs CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID repo secrets)."
+      ],
       "notes": "Worker custom domain on the beanroti.com zone; scoped API token as repo secret."
     },
     {
