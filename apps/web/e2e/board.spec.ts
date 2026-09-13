@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { startLocalGame } from './helpers';
 
 const BACK_RANKS: Record<string, string> = {
   a1: 'wr', b1: 'wn', c1: 'ws', d1: 'wk', e1: 'wm', f1: 'ws', g1: 'wn', h1: 'wr',
@@ -9,8 +10,9 @@ test('home → pass and play shows the Makruk start position', async ({ page }) 
   await page.goto('/');
   await page.getByRole('link', { name: /สองคนเครื่องเดียว/ }).click();
   await expect(page).toHaveURL(/\/play\/local$/);
+  await page.getByRole('button', { name: 'เริ่มเกม' }).click();
 
-  await expect(page.locator('[data-piece]')).toHaveCount(32);
+  await expect(page.locator('[data-square] [data-piece]')).toHaveCount(32);
   for (const [square, code] of Object.entries(BACK_RANKS)) {
     await expect(page.locator(`[data-square="${square}"] [data-piece]`)).toHaveAttribute('data-piece', code);
   }
@@ -25,7 +27,7 @@ test('home → pass and play shows the Makruk start position', async ({ page }) 
 for (const width of [360, 390, 768, 1280]) {
   test(`board is square and fits the screen at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 860 });
-    await page.goto('/play/local');
+    await startLocalGame(page);
     const box = await page.getByRole('grid').boundingBox();
     expect(box).not.toBeNull();
     expect(Math.abs(box!.width - box!.height)).toBeLessThan(2);
@@ -33,6 +35,6 @@ for (const width of [360, 390, 768, 1280]) {
     expect(box!.x + box!.width).toBeLessThanOrEqual(width - 8);
     expect(box!.width).toBeGreaterThan(Math.min(width - 64, 300));
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    await page.screenshot({ path: `test-results/evidence/board-${width}.png` });
+    await page.screenshot({ path: `e2e-evidence/board-${width}.png` });
   });
 }

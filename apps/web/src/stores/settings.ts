@@ -1,8 +1,11 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import type { TimeControlChoice } from '../features/game/timeControls';
 
 export type Language = 'th' | 'en';
 export type ColorScheme = 'system' | 'light' | 'dark';
+/** Pass-and-play board view: fixed, rotate to the side to move, or tabletop (opponent's bar upside down). */
+export type PassAndPlayView = 'fixed' | 'rotate' | 'tabletop';
 
 export interface Settings {
   language: Language;
@@ -11,7 +14,8 @@ export interface Settings {
   pieceSet: string;
   sound: boolean;
   showCoordinates: boolean;
-  autoRotate: boolean;
+  passAndPlayView: PassAndPlayView;
+  timeControl: TimeControlChoice;
 }
 
 export interface SettingsState extends Settings {
@@ -25,7 +29,8 @@ export const DEFAULT_SETTINGS: Settings = {
   pieceSet: 'classic',
   sound: true,
   showCoordinates: true,
-  autoRotate: false,
+  passAndPlayView: 'fixed',
+  timeControl: { kind: 'none' },
 };
 
 export const SETTINGS_STORAGE_KEY = 'makruk.settings';

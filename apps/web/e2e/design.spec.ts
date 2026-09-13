@@ -24,7 +24,7 @@ for (const width of [390, 1280]) {
     const fitsWidth = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
     expect(fitsWidth).toBe(true);
 
-    await page.screenshot({ path: `test-results/evidence/design-${width}.png`, fullPage: true });
+    await page.screenshot({ path: `e2e-evidence/design-${width}.png`, fullPage: true });
   });
 }
 

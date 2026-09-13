@@ -231,12 +231,16 @@
       "milestone": "M2",
       "title": "Board rendering",
       "user_visible_behavior": "A user sees the Makruk start position on an un-checkered board with placeholder SVG pieces and coordinates.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Open the play screen; verify 32 pieces in the correct start squares.",
         "Board is responsive from 360px to desktop."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/board.spec.ts — home card 'สองคนเครื่องเดียว' opens /play/local; 32 [data-piece]; all 16 back-rank squares, Bia on ranks 3/6, ranks 2/4/5/7 empty; accessible name 'd1 ขุนขาว'.",
+        "2026-09-13: board.spec.ts responsive checks passed at 360/390/768/1280px — grid square (|w-h|<2), inside viewport with ≥8px margin, no horizontal overflow.",
+        "2026-09-13: screenshots board-390.png and board-1280.png reviewed: un-checkered teak board with grid lines, coordinates, distinct placeholder silhouettes for Khun/Met/Khon/Ma/Ruea/Bia."
+      ],
       "notes": "Placeholder art; final art is art-001."
     },
     {
@@ -246,13 +250,17 @@
       "milestone": "M2",
       "title": "Tap and drag to move",
       "user_visible_behavior": "A user moves pieces by tap-tap or drag; legal destinations are shown and illegal moves are rejected.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Playwright: tap a Bia, see legal dots, tap destination, piece moves.",
         "Playwright: drag a Ma to a legal square works; drag to an illegal square snaps back.",
         "Last move and check are highlighted."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/moves.spec.ts — 5 passed: tap e3 selects (aria-selected) with exactly one target e4, tap e4 moves Bia and marks e3/e4 data-last-move; tap on illegal e5 leaves Bia on e3; mouse drag b1→d2 moves Ma; drag g1→g4 snaps back (32 pieces, g1 still wn); Ruea capture on e6 sets data-check on e8.",
+        "2026-09-13: useMoveInput.test.ts — 6 passed (targets from engine legal moves, tap-to-move, illegal tap, opponent/empty not selectable, drop legality, disabled input).",
+        "Drag starts pointer capture only after 6px so taps still click; board uses touch-action:none for mobile drags."
+      ],
       "notes": ""
     },
     {
@@ -262,13 +270,16 @@
       "milestone": "M2",
       "title": "Move list, history navigation and undo",
       "user_visible_behavior": "A user sees the move list, steps back and forward through the game, and can undo in local games.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Play 6 moves; move list shows 6 entries.",
         "Step back 2 and forward 2; board matches.",
         "Undo removes the last move."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/history.spec.ts — 4 passed: 6 moves listed as e4 d5 exd5 Ne7 Nd2 Nxd5 with ply 6 current; back ×2 shows ply-4 position (wp d5, bn e7, wn b1) and blocks input; forward ×2 returns to live position; clicking ply 2 / first / latest jump correctly; undo leaves 5 moves and Black to move.",
+        "2026-09-13: stores/localSession.test.ts covers history clamping and move blocking while reviewing."
+      ],
       "notes": ""
     },
     {
@@ -278,12 +289,15 @@
       "milestone": "M2",
       "title": "Pass-and-play on one device",
       "user_visible_behavior": "Two people play on one device with a turn banner, optional auto-rotate or tabletop mode, and a game-over screen.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Playwright: play a known short mating sequence; game-over screen shows the winner.",
         "Auto-rotate flips the board after each move when enabled."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/passplay.spec.ts — 6 passed: turn banner switches ขาว→ดำ and player-b becomes active; from ?fen=k7/2R5/8/8/8/8/8/4K2R w the mating move Rh8 opens dialog 'ฝ่ายขาวชนะ' with reason 'รุกจน', review closes it and banner shows result; resign confirm gives 'ฝ่ายดำชนะ'; rotate view flips data-orientation w→b→w; tabletop view rotates Black's bar and keeps the board fixed; flip button turns board.",
+        "2026-09-13: unit tests stores/localSession.test.ts (checkmate result, resign not undoable)."
+      ],
       "notes": ""
     },
     {
@@ -293,13 +307,16 @@
       "milestone": "M2",
       "title": "Game settings and time-control presets",
       "user_visible_behavior": "Before a game the user picks a time control (bullet, blitz, rapid, classical presets, no clock, or custom) and side; the last choice is remembered.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Presets shown: 1+0, 2+1, 3+0, 3+2, 5+0, 5+3, 10+0, 10+5, 15+10, 30+0, 30+20, no clock, custom.",
         "Clock counts down with increment applied after each move; flag ends the game.",
         "Reload: last-used setting is preselected."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: apps/web/e2e/clock.spec.ts — 4 passed (Playwright fake clock): all 11 presets + none + custom visible, custom shows minutes/increment inputs; 2+1 shows 2:00, after 3s 1:57, after White's move 1:58 (increment), Black then counts 1:55 while White stays 1:58; 1+0 after 61s opens 'ฝ่ายดำชนะ' / 'หมดเวลา'; 5+3 remains aria-checked after reload.",
+        "2026-09-13: features/game/clock.test.ts — 8 passed (countdown, press + increment, flag, stop/resume, formatting, preset list, custom clamping)."
+      ],
       "notes": ""
     },
     {

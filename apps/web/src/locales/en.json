@@ -48,6 +48,68 @@
     "squareWithPiece": "{{square}} {{piece}}",
     "emptySquare": "{{square}} empty"
   },
+  "play": {
+    "timeControl": "Time control",
+    "noClock": "No clock",
+    "custom": "Custom",
+    "minutes": "Minutes",
+    "increment": "Increment (seconds)",
+    "categories": {
+      "bullet": "Bullet",
+      "blitz": "Blitz",
+      "rapid": "Rapid",
+      "classical": "Classical"
+    },
+    "view": "Board view",
+    "viewFixed": "Fixed",
+    "viewRotate": "Rotate each turn",
+    "viewTabletop": "Tabletop",
+    "start": "Start game",
+    "customPosition": "Starting from a custom position",
+    "invalidFen": "Invalid FEN position",
+    "turn": "{{color}} to move",
+    "check": "Check!",
+    "white": "White",
+    "black": "Black",
+    "captured": "Captured pieces",
+    "clockOf": "{{color}} clock",
+    "moves": "Moves",
+    "noMoves": "No moves yet",
+    "first": "First move",
+    "back": "Back",
+    "forward": "Forward",
+    "last": "Latest move",
+    "backToLive": "Back to the game",
+    "flip": "Flip board",
+    "undo": "Undo",
+    "resign": "Resign",
+    "resignConfirm": "Resign as {{color}}?",
+    "cancel": "Cancel",
+    "newGame": "New game",
+    "rematch": "Play again",
+    "review": "Review board",
+    "counting": {
+      "board": "Board's honour count",
+      "pieces": "Pieces' honour count",
+      "side": "{{color}} counting"
+    },
+    "result": {
+      "whiteWins": "White wins",
+      "blackWins": "Black wins",
+      "draw": "Draw"
+    },
+    "reason": {
+      "checkmate": "Checkmate",
+      "stalemate": "Stalemate — no legal moves",
+      "repetition": "Threefold repetition",
+      "counting": "Counting limit reached",
+      "insufficient-material": "Insufficient mating material",
+      "timeout": "Time out",
+      "resign": "Resignation",
+      "agreement": "Draw agreed",
+      "abandon": "Game abandoned"
+    }
+  },
   "settings": {
     "title": "Settings",
     "language": "Language",

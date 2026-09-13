@@ -48,6 +48,68 @@
     "squareWithPiece": "{{square}} {{piece}}",
     "emptySquare": "{{square}} ว่าง"
   },
+  "play": {
+    "timeControl": "เวลา",
+    "noClock": "ไม่จับเวลา",
+    "custom": "กำหนดเอง",
+    "minutes": "นาที",
+    "increment": "เพิ่มต่อตา (วินาที)",
+    "categories": {
+      "bullet": "บุลเล็ต",
+      "blitz": "บลิตซ์",
+      "rapid": "แรพิด",
+      "classical": "คลาสสิก"
+    },
+    "view": "มุมมองกระดาน",
+    "viewFixed": "คงที่",
+    "viewRotate": "หมุนตามตา",
+    "viewTabletop": "นั่งตรงข้าม",
+    "start": "เริ่มเกม",
+    "customPosition": "เริ่มจากตำแหน่งที่กำหนด",
+    "invalidFen": "ตำแหน่ง FEN ไม่ถูกต้อง",
+    "turn": "ตาเดินของฝ่าย{{color}}",
+    "check": "รุก!",
+    "white": "ฝ่ายขาว",
+    "black": "ฝ่ายดำ",
+    "captured": "หมากที่กินได้",
+    "clockOf": "นาฬิกาฝ่าย{{color}}",
+    "moves": "ตาเดิน",
+    "noMoves": "ยังไม่มีการเดิน",
+    "first": "ไปตาแรก",
+    "back": "ย้อนกลับ",
+    "forward": "ถัดไป",
+    "last": "ตาล่าสุด",
+    "backToLive": "กลับสู่เกมปัจจุบัน",
+    "flip": "พลิกกระดาน",
+    "undo": "ถอนตา",
+    "resign": "ยอมแพ้",
+    "resignConfirm": "ฝ่าย{{color}}ยอมแพ้?",
+    "cancel": "ยกเลิก",
+    "newGame": "เกมใหม่",
+    "rematch": "เล่นอีกครั้ง",
+    "review": "ดูกระดาน",
+    "counting": {
+      "board": "นับศักดิ์กระดาน",
+      "pieces": "นับศักดิ์หมาก",
+      "side": "ฝ่าย{{color}}นับ"
+    },
+    "result": {
+      "whiteWins": "ฝ่ายขาวชนะ",
+      "blackWins": "ฝ่ายดำชนะ",
+      "draw": "เสมอ"
+    },
+    "reason": {
+      "checkmate": "รุกจน",
+      "stalemate": "อับ — ไม่มีตาเดิน",
+      "repetition": "ตำแหน่งซ้ำสามครั้ง",
+      "counting": "ครบจำนวนการนับ",
+      "insufficient-material": "หมากไม่พอรุกจน",
+      "timeout": "หมดเวลา",
+      "resign": "ยอมแพ้",
+      "agreement": "ตกลงเสมอ",
+      "abandon": "ออกจากเกม"
+    }
+  },
   "settings": {
     "title": "ตั้งค่า",
     "language": "ภาษา",
