@@ -14,9 +14,9 @@ handoff; no agent updates it automatically.
 - Standard verification path: `npm run verify` (lint + typecheck + unit tests in all workspaces, incl. workerd tests)
 - E2E: `npm run e2e` (Playwright starts vite + wrangler dev) · PWA/offline: `npm run e2e:pwa -w apps/web`
 - Deep engine checks: `npm run test:deep -w packages/engine` · Bot ladder: `npm run test:strength -w packages/ai` (slow; `STRENGTH_PAIR=n`)
-- Milestones: M0 infra ✓, M1 engine ✓, M2 local play ✓, M3 vs computer (ai-001, ai-003 ✓; ai-002 ladder final pairs running), M4 learning ✓, M5 online ✓ (incl. quick match), M6 accounts (acct-001, acct-003 ✓; acct-002 blocked), M7 polish (PWA, sounds, themes, art ✓; polish-002 blocked)
+- Milestones: M0 infra ✓, M1 engine ✓, M2 local play ✓, M3 vs computer ✓ (ai-002 ladder verified on GitHub Actions), M4 learning ✓, M5 online ✓ (incl. quick match), M6 accounts (acct-001, acct-003 ✓; acct-002 blocked), M7 polish (PWA, sounds, themes, art ✓; polish-002 blocked)
 - D1 database `makruk` (id 9e084ac6-9749-411d-867d-c89e8421ed78); migrations in `apps/worker/migrations`, applied by `npm run deploy` (CI) and by the Playwright wrangler command locally
-- Remaining: `ai-002` (ladder evidence), `acct-002` (production verification), `polish-002` (human review)
+- Remaining: `acct-002` (production email delivery), `polish-002` (human review) — both blocked on the owner
 - Current blockers (owner action needed):
   - `acct-002`: username/password accounts with email confirmation and password reset are implemented and verified locally (Google sign-in removed at the owner's request). Production email needs a Resend key with beanroti.com verified; set `RESEND_API_KEY`, `EMAIL_FROM` with `wrangler secret put` in `apps/worker`, then verify emails arrive
   - `polish-002`: native Thai reviewer completes `docs/i18n-review.md`
@@ -43,4 +43,5 @@ handoff; no agent updates it automatically.
   - ffish needs `globalThis.fetch` hidden in Node 22 (`packages/engine/src/testing/ffish.ts`).
   - Vitest swallows console output of passing tests: slow tests write results to files (`packages/ai/strength-results.log`, gitignored).
 - Later in session: accounts reworked to username + password (PBKDF2), email confirmation before sign-in, email password reset, lockout after 10 failures; `DEV_EMAIL_OUTBOX=1` lets tests and local dev read emails from D1.
-- Next best step: finish `ai-002` evidence; owner configures Resend for `acct-002` production email; native Thai review for `polish-002`.
+- Later in session: `ai-002` verified. The local ladder kept getting killed under memory pressure, so it moved to an on-demand GitHub Actions workflow (`.github/workflows/strength.yml`: 5 runners × 4 shards, resumable per-game log, verdict job). Findings and fixes along the way: noise-free bots replayed identical games (→ seeded paired openings); weaker bots could force repetition (→ search checks the opponent's reply against history); full-window root search wasted L6's budget (→ exact root scores only for noisy bots, L6 depth cap 8); won endgames drew on the count (→ trade-down bonus); L4 too close to L5 (→ L4 noise 30, 2% random moves). Final ladder: +19-0=1, +19-1=0, +18-0=2, +17-0=3, +14-0=6.
+- Next best step: owner configures Resend for `acct-002` production email; native Thai review for `polish-002`.

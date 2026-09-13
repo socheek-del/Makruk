@@ -70,7 +70,9 @@ feature work on top of a broken starting state.
   (`npm run test:strength -w packages/ai`) is slow and writes results to `packages/ai/strength-results.log`.
   It is resumable (finished games go to `packages/ai/strength-games.log`, keyed by bot config) and can be
   split with `STRENGTH_PAIR=n STRENGTH_SHARD=k/count`; run once more without a shard to record the verdict.
-  L6 vs L5 takes ~15 min per game on one core.
+  L6 vs L5 takes ~15 min per game on one core — run it on GitHub Actions instead (`gh workflow run
+  strength.yml -f pair=5 -f games=20`; the verdict job's `strength-verdict` artifact has the per-game log).
+  Games start from seeded paired 6-ply openings because noise-free bots are deterministic.
 
 ## Required Artifacts
 
