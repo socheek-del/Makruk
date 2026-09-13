@@ -68,6 +68,9 @@ feature work on top of a broken starting state.
   `apps/worker/test/apply-migrations.ts`); `npm run e2e` starts vite + wrangler dev with local D1;
   `npm run e2e:pwa -w apps/web` checks installability/offline on a production build; the bot ladder
   (`npm run test:strength -w packages/ai`) is slow and writes results to `packages/ai/strength-results.log`.
+  It is resumable (finished games go to `packages/ai/strength-games.log`, keyed by bot config) and can be
+  split with `STRENGTH_PAIR=n STRENGTH_SHARD=k/count`; run once more without a shard to record the verdict.
+  L6 vs L5 takes ~15 min per game on one core.
 
 ## Required Artifacts
 
