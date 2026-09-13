@@ -5,6 +5,9 @@ const { BLACK, KHON, KING, KNIGHT, MET, PAWN, ROOK, TYPE_MASK, fileOf, rankOf } 
 /** Material in centipawns, indexed by piece type code. */
 export const PIECE_VALUE = [0, 100, 320, 260, 210, 520, 0] as const;
 
+/** Endgame bonus per missing defender piece for the side that is clearly ahead. */
+const TRADE_DOWN = 60;
+
 const centerDistance = (sq: number) => Math.max(3 - Math.min(fileOf(sq), 7 - fileOf(sq)), 3 - Math.min(rankOf(sq), 7 - rankOf(sq)));
 
 /** Bia advancement bonus by relative rank (0 = own back rank). Bia start on relative rank 2 and promote on 5. */
@@ -87,6 +90,9 @@ export function evaluate(board: core.Board, side: core.ColorIndex): number {
     const kingGap = Math.abs(fileOf(weakKing) - fileOf(strongKing)) + Math.abs(rankOf(weakKing) - rankOf(strongKing));
     const bare = t.pieces[weak] <= 2;
     score[strong] += centerDistance(weakKing) * (bare ? 60 : 25) + (14 - kingGap) * (bare ? 14 : 6);
+    // Trade down when ahead: every defending piece (a checking Ruea above all) delays the mate while the
+    // count runs. Worth less than a Bia, so it favours even trades but never a sacrifice.
+    score[strong] += (16 - t.pieces[weak]) * TRADE_DOWN;
   }
 
   const white = score[0] - score[1];
