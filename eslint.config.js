@@ -18,7 +18,13 @@ export default defineConfig(
     },
   },
   {
-    files: ['packages/engine/**/*.ts'],
+    files: ['**/*.cjs'],
+    languageOptions: { sourceType: 'commonjs', globals: globals.node },
+    rules: { '@typescript-eslint/no-require-imports': 'off' },
+  },
+  {
+    files: ['packages/engine/src/**/*.ts'],
+    ignores: ['packages/engine/src/**/*.test.ts', 'packages/engine/src/testing/**'],
     rules: {
       // Engine must stay pure: no DOM, network, or timers.
       'no-restricted-globals': ['error', 'window', 'document', 'fetch', 'localStorage', 'setTimeout', 'setInterval'],

@@ -81,12 +81,15 @@
       "milestone": "M1",
       "title": "Board model and FEN",
       "user_visible_behavior": "The engine can load and export Makruk positions in FEN, starting from rnsmksnr/8/pppppppp/8/8/PPPPPPPP/8/RNSKMSNR w - - 0 1.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Unit tests: parse → serialize round-trips for the start position and 10+ varied positions.",
         "Invalid FEN inputs are rejected with typed errors."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: packages/engine/src/fen.test.ts — 12 round-trip positions (start, counting fields, promoted M~, repetition clock) + missing-field defaults pass; 17 invalid FEN cases throw FenError.",
+        "2026-09-13: reference.test.ts lock-step games compare our FEN (normalized) to Fairy-Stockfish after every ply — 60 games in verify, 400 with PERFT_DEEP=1, all equal."
+      ],
       "notes": ""
     },
     {
@@ -96,12 +99,16 @@
       "milestone": "M1",
       "title": "Move generation for all pieces",
       "user_visible_behavior": "The engine lists every pseudo-legal and legal move for Khun, Met, Khon, Ma, Ruea, Bia and promoted Bia.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Unit tests per piece type from hand-built positions.",
         "Illegal moves that leave own Khun in check are excluded."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: movegen.test.ts — Khun, Met, White/Black Khon, Ma, Ruea (open + blocked), White/Black Bia (no double step, diagonal-only capture) pass.",
+        "2026-09-13: legality tests pass — start position equals Fairy-Stockfish's 23 moves, pinned Ma has no moves, Khun cannot step into check, only check escapes allowed, Khuns never adjacent, Khon front-square attack.",
+        "2026-09-13: lock-step legal move sets equal Fairy-Stockfish on every ply of 400 random games (PERFT_DEEP=1)."
+      ],
       "notes": ""
     },
     {
@@ -111,11 +118,14 @@
       "milestone": "M1",
       "title": "Check, checkmate, stalemate, repetition",
       "user_visible_behavior": "The engine reports check, checkmate (win), stalemate (draw) and threefold repetition (draw).",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Unit tests with known mate, stalemate and repetition positions."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: rules.test.ts — checkmate (status + SAN '#'), check SAN '+', stalemate draw, threefold repetition after 8 knight plies (FEN matches Fairy-Stockfish 'w - - 8 5'), undo restores FEN, IllegalMoveError on bad input.",
+        "2026-09-13: insufficient-material draws mirror Fairy-Stockfish has_insufficient_material (5 draw + 4 playable cases); found and fixed via lock-step game seed 1 mismatch; game-over flag now equals ffish isGameOver(claimDraw) on every ply of 400 games."
+      ],
       "notes": ""
     },
     {
@@ -125,11 +135,14 @@
       "milestone": "M1",
       "title": "Bia promotion",
       "user_visible_behavior": "A Bia reaching the opponent's third rank becomes a promoted Bia that moves like a Met.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Unit tests for promotion by push and by capture, for both colors."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: rules.test.ts — White push (a6=M) and capture promotion, Black push and capture promotion, promoted Bia moves like a Met, undo reverts to Bia; all pass.",
+        "2026-09-13: perft fixtures 'pawn race with promotions' (depth 6 = 124748) and 'promoted met present' (depth 5 = 21334) match Fairy-Stockfish."
+      ],
       "notes": ""
     },
     {
@@ -139,14 +152,17 @@
       "milestone": "M1",
       "title": "Counting rules (Sak Kradan and Sak Mak)",
       "user_visible_behavior": "When counting rules apply, the engine tracks the count and declares a draw when the limit is reached.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Scenario tests for board's-honour counting (no Bia left, limit 64).",
         "Scenario tests for pieces'-honour limits: 2 Ruea 8, 1 Ruea 16, 2 Khon 22, 2 Ma 32, 1 Khon 44, otherwise 64.",
         "Results cross-checked against Fairy-Stockfish makruk for the same move sequences."
       ],
-      "evidence": [],
-      "notes": "Document edge cases in docs/rules.md."
+      "evidence": [
+        "2026-09-13: rules.test.ts counting suite passes — K+R vs K FENs '32 6' → '32 7', board's honour '128 0', promotion start '128 6' (all identical to ffish probe output), 7 pieces'-honour limit cases, no counting with Bia, draw when count exceeds limit, mate on limit move still wins, lone Khun capturing last Bia starts at 2n-1.",
+        "2026-09-13: lock-step random games (captures preferred so endgames are reached) compare counting FEN fields and game-over with Fairy-Stockfish on every ply; test asserts counting plies > 0; 400 games pass with PERFT_DEEP=1."
+      ],
+      "notes": "Edge cases documented in docs/rules.md."
     },
     {
       "id": "engine-006",
@@ -155,13 +171,16 @@
       "milestone": "M1",
       "title": "Perft verification against Fairy-Stockfish",
       "user_visible_behavior": "Engine move counts match the reference engine, so rules cannot silently drift.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Perft depth 1-5 from the start position matches Fairy-Stockfish.",
         "Perft depth 1-4 from 5+ tricky positions matches Fairy-Stockfish.",
         "Perft tests run in npm run verify (fast depths) and a slower script (deep depths)."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-13: reference counts generated by scripts/perft-reference.cjs from ffish@0.7.10 into src/testing/perft-reference.json: start 23 / 529 / 12012 / 273026 / 6223994.",
+        "2026-09-13: npm test -w packages/engine → 129 passed (fast depths ≤150k nodes), 9 deep skipped; npm run test:deep → 138 passed in 12s incl. start depth 5 and 11 other positions (check block, khon/met, counting endgame, promotions, 6 random midgames) at depth 4-6."
+      ],
       "notes": ""
     },
     {

@@ -9,6 +9,11 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:deep": "PERFT_DEEP=1 vitest run",
+    "perft:reference": "node scripts/perft-reference.cjs"
+  },
+  "devDependencies": {
+    "ffish": "^0.7.10"
   }
 }

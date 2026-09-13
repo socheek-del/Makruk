@@ -19,7 +19,7 @@ needs work.
 
 | Domain | Grade | Verification | Agent Legibility | Test Stability | Key Gaps | Last Updated |
 |--------|-------|-------------|-----------------|---------------|----------|-------------|
-| Rules engine (Makruk) | - | - | - | - | Not started | 2026-09-13 |
+| Rules engine (Makruk) | A | Unit + perft + lock-step vs Fairy-Stockfish | docs/rules.md, typed API | Deterministic seeds | Perft uses array scan (fine for AI depth ≤6, may need bitboards later) | 2026-09-13 |
 | Local play & pass-and-play | - | - | - | - | Not started | 2026-09-13 |
 | Single player (AI) | - | - | - | - | Not started | 2026-09-13 |
 | Tutorials & gamification | - | - | - | - | Not started | 2026-09-13 |
@@ -32,7 +32,7 @@ needs work.
 
 | Layer | Grade | Boundary Enforcement | Agent Legibility | Key Gaps | Last Updated |
 |-------|-------|---------------------|-----------------|----------|-------------|
-| `packages/engine` | - | Must stay pure (no DOM/network) | - | Not started | 2026-09-13 |
+| `packages/engine` | A | ESLint no-restricted-globals for src (tests/testing excluded) | Small files: board, movegen, fen, game, perft | ffish is devDependency only | 2026-09-13 |
 | `packages/ai` | - | Depends only on engine | - | Not started | 2026-09-13 |
 | `packages/protocol` | - | Schemas only, no logic | - | Not started | 2026-09-13 |
 | `apps/web` | - | No rules logic outside engine | - | Not started | 2026-09-13 |
