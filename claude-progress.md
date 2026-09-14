@@ -183,8 +183,32 @@ handoff; no agent updates it automatically.
   but `apps/sittuyin/docs/PLAN.md` — which the owner approved — puts it in step 10, after Sittuyin
   exists. The plan wins: a "more games" link cannot be verified against a site that is not built. Do
   plat-006 after sit-009.
+### Session 005
+
+- Date: 2026-09-14
+- Goal: implement everything left in `feature_list.json`, asking the owner only where the answer is
+  genuinely theirs.
+- Baseline on entry: `./init.sh` and `npm run verify` both green. A complete, uncommitted Sittuyin web app
+  was already on disk from session 004 (router, pages, GameScreen, AI client, session stores, 18 e2e
+  specs) but had never been recorded as verified.
+- `sit-006` is now `passing`. What this session added on top of what was on disk:
+  - PWA icons and favicon for the product (`scripts/generate-icons.mjs`, a Sit-ke shield on peacock
+    teal), and the icon links in `index.html`. Without them the app was not installable.
+  - `playwright.pwa.config.ts` and `e2e-pwa/offline.spec.ts`: installability (0 Chrome installability
+    errors) and offline play on a production build.
+  - The missing in-place promotion test the feature's own verification asks for. It seeds a saved game
+    through the same localStorage shape a refresh restores (`seedSavedGame` in `e2e/helpers.ts`), so no
+    new product surface was needed to reach a promotion position.
+  - `scripts/capture-evidence.mjs` (`npm run capture`), so the screenshots a reviewer looks at are
+    reproducible. The seven app screenshots are in `apps/sittuyin/docs/evidence/`.
+  - `dev:sittuyin` at the root, and `test-results-pwa/` in `.gitignore`.
+- Verification: sittuyin e2e 19/19, e2e:pwa 2/2, `npm run verify` exit 0, build OK, and Makruk e2e 65/65
+  as a regression check on the shared packages.
+- First promotion test position drew immediately (K+F vs K is insufficient material); it now keeps a
+  black Ne on the board so the game stays ongoing. Worth remembering when writing Sittuyin fixtures.
+
 - Next best step:
-  - Owner: approve or redirect the Sittuyin design direction (the four screenshots above), and say
-    whether to push the four waiting commits.
-  - `sit-006`: the Sittuyin web app on top of the shared packages — setup phase with hand trays and
-    Auto-arrange, pass-and-play, vs computer, refresh restore, PWA.
+  - Owner (three questions, none of them blocking local work): approve or redirect the Sittuyin design
+    direction (`apps/sittuyin/docs/evidence/`); say whether to push the waiting commits, which deploy
+    Makruk; and name the Sittuyin subdomain for `sit-009`.
+  - `sit-007`: Sittuyin lessons.

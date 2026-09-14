@@ -4,7 +4,7 @@ import { type FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Button, Card, SegmentedControl } from '@chaturanga/ui';
-import { TimeControlPicker } from '../features/game/TimeControlPicker';
+import { TimeControlPicker } from '@chaturanga/game-shell/ui';
 import { toTimeControl } from '../features/game/timeControls';
 import { createRoom, fetchRoom } from '../features/online/api';
 import { useIdentity } from '../features/online/identity';

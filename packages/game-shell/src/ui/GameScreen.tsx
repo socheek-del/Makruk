@@ -50,6 +50,8 @@ export interface GameScreenProps<G extends VariantGame> {
   /** Required when the variant has hands: names a tray and a piece type in it. */
   handLabel?: (color: Color) => string;
   describeHandPiece?: (type: string, count: number) => string;
+  /** Markings drawn across the board, such as the diagonals a Sittuyin Ne promotes on. */
+  boardOverlay?: ReactNode;
 }
 
 export function GameScreen<G extends VariantGame>({
@@ -78,6 +80,7 @@ export function GameScreen<G extends VariantGame>({
   renderCounting,
   handLabel,
   describeHandPiece,
+  boardOverlay,
 }: GameScreenProps<G>) {
   const { t } = useTranslation();
   const s = useSession();
@@ -195,6 +198,7 @@ export function GameScreen<G extends VariantGame>({
           canDrag={input.canDrag}
           onDrop={input.onDrop}
           handle={boardHandle}
+          overlay={boardOverlay}
         />
         {variant.hasHands && tray(orientation)}
         {bar(orientation)}

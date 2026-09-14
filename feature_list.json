@@ -1134,14 +1134,22 @@
       "milestone": "M11",
       "title": "Sittuyin web app: setup phase, pass-and-play and vs computer",
       "user_visible_behavior": "On the Sittuyin site (Burmese by default, English available) a user places pieces from hand during setup, then plays pass-and-play or against the computer with clocks, history and undo; games survive a refresh; the app installs and works offline.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Playwright: setup by tap and drag from hand (illegal drop squares refused, rooks back rank only), then moves and an in-place promotion.",
         "Playwright: vs computer game replies with legal moves; refresh restores the game; html lang=my by default, English persists after reload.",
         "PWA installability and offline play checks pass on a production build."
       ],
-      "evidence": [],
-      "notes": ""
+      "evidence": [
+        "2026-09-14: the app is apps/sittuyin/web on the shared packages — router (home, /play/local, /play/computer, /about, /settings, /design), AppShell, the Sittuyin GameScreen over @chaturanga/game-shell/ui, autoArrange, a Web Worker AI client and the localSession/computerSession stores over createGameSession(sittuyin).",
+        "2026-09-14: npm run e2e -w apps/sittuyin/web → 19/19. Setup (setup.spec.ts): the game opens in the setup phase with both hands and no clock running; a piece is placed by tapping it in hand and then a legal square; an illegal placement square is refused; a Yahhta may only go on the back rank; a piece can be dragged from the hand onto the board; Auto-arrange finishes both sides and starts play; a half-finished setup survives a reload.",
+        "2026-09-14: play.spec.ts — moves are played after the setup and the clock stays off for an untimed game; the board draws the two promotion diagonals; a Ne on a promotion diagonal promotes in place (d5=F from 4k3/8/8/3P4/8/1p6/8/4K3, the Promote chip appears once the Ne is selected, the square is marked data-promotion and the piece becomes wf~); history can be reviewed and returned from; a finished setup and its moves survive a reload; resigning ends the game.",
+        "2026-09-14: computer.spec.ts — the computer places its own pieces and then replies with legal moves (18 plies after the human's Auto-arrange and first move); a game against the computer survives a reload. i18n.spec.ts — the site is Burmese by default, ?lang=en is remembered after a reload, the settings switch changes the whole site, and the Burmese text is Unicode, not Zawgyi.",
+        "2026-09-14: npm run e2e:pwa -w apps/sittuyin/web → 2/2 on a production build (playwright.pwa.config.ts, vite preview): installable with 0 Chrome installability errors, manifest short_name စစ်တုရင် / display standalone / start_url /, icons 192 and 512; and offline (context.setOffline(true)) a computer game and a pass-and-play game are both set up and played. The icons come from scripts/generate-icons.mjs (Sit-ke shield on peacock teal) plus favicon.svg.",
+        "2026-09-14: npm run verify exit 0 and npm run build -w apps/sittuyin/web OK (455 kB js / 32 kB css, PWA precache 27 entries, Noto subsets only). Regression check for the shared packages: Makruk npm run e2e 65/65.",
+        "2026-09-14: screenshots reviewed rather than assumed — apps/sittuyin/docs/evidence/app-{home-390,home-1280,setup-390,play-1280,play-dark-1280,computer-390,settings-390}.png, captured by scripts/capture-evidence.mjs (npm run capture -w apps/sittuyin/web)."
+      ],
+      "notes": "The site has no Worker yet, so the Playwright config starts vite alone; online play is sit-008. Clocks are picked before the game and start only once the setup phase ends (game-shell's setup-aware clock)."
     },
     {
       "id": "sit-007",

@@ -1,4 +1,4 @@
-import { resolveLocale, storageKey } from '@chaturanga/game-shell';
+import { resolveLocale, storageKey, type TimeControlChoice } from '@chaturanga/game-shell';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { type Language, PRODUCT } from '../../product.config';
@@ -14,6 +14,9 @@ export interface Settings {
   sound: boolean;
   haptics: boolean;
   showCoordinates: boolean;
+  timeControl: TimeControlChoice;
+  computerLevel: number;
+  computerSide: 'w' | 'b' | 'random';
 }
 
 export interface SettingsState extends Settings {
@@ -28,6 +31,9 @@ export const DEFAULT_SETTINGS: Settings = {
   sound: true,
   haptics: true,
   showCoordinates: true,
+  timeControl: { kind: 'none' },
+  computerLevel: 2,
+  computerSide: 'w',
 };
 
 export const SETTINGS_STORAGE_KEY = storageKey(PRODUCT, 'settings');

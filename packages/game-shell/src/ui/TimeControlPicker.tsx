@@ -1,6 +1,6 @@
-import { useTranslation } from 'react-i18next';
 import { cn } from '@chaturanga/ui';
-import { CUSTOM_LIMITS, PRESETS, TIME_CATEGORIES, type TimeControlChoice } from './timeControls';
+import { useTranslation } from 'react-i18next';
+import { CUSTOM_LIMITS, PRESETS, TIME_CATEGORIES, type TimeControlChoice } from '../timeControls';
 
 export interface TimeControlPickerProps {
   value: TimeControlChoice;
