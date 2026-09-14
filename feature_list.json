@@ -1208,14 +1208,16 @@
       "milestone": "M11",
       "title": "Deploy Sittuyin on its subdomain",
       "user_visible_behavior": "The Sittuyin site is live on its own subdomain over HTTPS, deployed by CI on push to main without redeploying Makruk unnecessarily.",
-      "status": "not_started",
+      "status": "blocked",
       "verification": [
         "Owner confirms the subdomain; site address set only in apps/sittuyin config and wrangler routes.",
         "CI deploys the sittuyin worker (own D1 migrations); production /api/health ok, home loads in Burmese, computer game works.",
         "Makruk production smoke still passes."
       ],
-      "evidence": [],
-      "notes": ""
+      "evidence": [
+        "2026-09-14 (session 006) — ready for deploy, not deployed: apps/sittuyin/worker builds (wrangler deploy --dry-run 884 KiB) and passes its workerd tests; npm run build:sittuyin runs in CI; the web build emits robots.txt, sitemap.xml and og-image.png from site.config.ts."
+      ],
+      "notes": "BLOCKED on the owner: (1) the Sittuyin subdomain — apps/sittuyin/web/site.config.ts still has a placeholder default, and wrangler.jsonc has no routes; (2) approval to push, because a push to main also redeploys Makruk and the local commits since 8590056 are unpushed. Remaining steps once answered: create the D1 database 'sittuyin' and put its id in wrangler.jsonc, set the AUTH_SECRET secret on the 'sittuyin' Worker, add routes + the site address, add a path-filtered deploy:sittuyin job to ci.yml (so Makruk is only redeployed when its paths or shared packages change), push, then smoke both production sites."
     },
     {
       "id": "sit-010",
@@ -1225,13 +1227,16 @@
       "milestone": "M11",
       "title": "Sittuyin SEO, About and README",
       "user_visible_behavior": "People searching for Burmese chess (e.g. 'sittuyin', 'စစ်တုရင်') find the site; it has an About page and a showcase README with demos captured from production.",
-      "status": "not_started",
+      "status": "in_progress",
       "verification": [
         "Per-page my/en titles, descriptions, canonical + hreflang, OG image, JSON-LD, robots.txt and sitemap on production.",
         "apps/sittuyin/README.md and README.my.md with media captured from production (no domain visible)."
       ],
-      "evidence": [],
-      "notes": ""
+      "evidence": [
+        "2026-09-14 (session 006), local only: apps/sittuyin/web/src/features/seo (pageSeo for home/computer/online/room/local/learn/about/settings, SeoController in AppShell, sitemap.ts), seo.* titles and descriptions in my and en, index.html static head with canonical, hreflang my/en/x-default, Open Graph (my_MM, en_US alternate), Twitter card and JSON-LD WebSite + VideoGame (alternate names Sittuyin, Burmese Chess, Myanmar Chess, စစ်တုရင်), crawlable Burmese + English fallback text with links, vite plugin serving and emitting robots.txt and sitemap.xml, and public/og-image.png (1200x630, no domain) rendered by scripts/generate-icons.mjs with the site's own fonts. About page: what Sittuyin is, GitHub, contribute, report a bug and review-the-Burmese links.",
+        "Checks: seo.test.ts 6 (routes and indexing, my plain / en ?lang=en URLs, every page titled with စစ်တုရင် / Sittuyin|Burmese Chess, home title ≤70 and description ≤170, head tags written once, robots and a 12-URL sitemap for any domain with no beanroti). E2E seo.spec.ts (Burmese /learn title and canonical; /play/computer?lang=en English title, canonical, hreflang my/en, og:title and og:locale; room pages noindex; JSON-LD ids; robots.txt, sitemap and og-image.png served) and about.spec.ts (Burmese headings and all four GitHub links, English page). Full Sittuyin e2e 29/29, e2e:pwa 2/2, build:sittuyin emits robots.txt, sitemap.xml (12 <url>) and og-image.png, npm run verify exit 0. OG image and About page screenshots reviewed."
+      ],
+      "notes": "Waiting on sit-009: both verification steps name production (tags checked on the live site; README media captured from it), so the README files are not written yet."
     },
     {
       "id": "sit-011",
@@ -1241,12 +1246,14 @@
       "milestone": "M11",
       "title": "Burmese translation review",
       "user_visible_behavior": "All Burmese text reads naturally and uses correct Sittuyin terminology.",
-      "status": "not_started",
+      "status": "blocked",
       "verification": [
         "Native Burmese speaker review recorded in apps/sittuyin/docs/i18n-review.md."
       ],
-      "evidence": [],
-      "notes": "Needs a human reviewer; an agent cannot sign this off."
+      "evidence": [
+        "2026-09-14 (session 006): apps/sittuyin/docs/i18n-review.md prepared — review scope (my.json UI, lesson my: strings, bots, SEO and index.html, online play, family names, manifest, OG image text), Unicode-only guidance, a terminology table to confirm, a corrections table and a sign-off table. The About page links to it. Automated guard already in place: locales.test.ts fails on a missing or empty my/en key and on any literal t('key') not defined."
+      ],
+      "notes": "BLOCKED on a human: the verification requires a native Burmese speaker's review, which an agent cannot provide or fabricate. Hand apps/sittuyin/docs/i18n-review.md to a reviewer (ideally a Sittuyin player), apply their corrections and record the sign-off row."
     }
   ]
 }

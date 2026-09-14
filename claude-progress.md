@@ -260,5 +260,16 @@ handoff; no agent updates it automatically.
     - Screenshots reviewed: Makruk home at 1280px and Sittuyin home at 390px.
 - Pitfall: a Bash call that `cd`s changes the working directory for the next parallel call. Always `cd` to
   an absolute path when running a suite.
+- `sit-010` is `in_progress`: the local parts are done and verified.
+  - Search: per-page my/en titles and descriptions (`SeoController`), canonical + hreflang, robots.txt and
+    sitemap.xml (12 URLs) generated from `site.config.ts`, JSON-LD, crawlable fallback content in
+    index.html, and an OG image (`npm run icons`).
+  - About: what Sittuyin is, plus the GitHub, contribute, bug-report and review-the-Burmese links.
+  - Verification: seo.test 6, `seo.spec.ts` and `about.spec.ts`, full Sittuyin e2e 29/29, PWA 2/2,
+    `build:sittuyin`, `npm run verify` exit 0.
+  - Still open, and both need production (sit-009): check the tags on the live site, and write
+    `apps/sittuyin/README.md` and `README.my.md` with media captured from production.
+- `sit-011`: `apps/sittuyin/docs/i18n-review.md` is written (scope, terminology, sign-off). The feature stays
+  `blocked`, because a native Burmese reviewer must do the review.
 - Next: `sit-009` needs the owner to name the Sittuyin subdomain and approve pushing. Pushing also deploys
-  Makruk. `sit-010` SEO can be built locally, but its README media must come from production.
+  Makruk. After deploy, finish `sit-010`.

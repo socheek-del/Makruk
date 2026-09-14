@@ -168,10 +168,50 @@
   },
   "about": {
     "what": "This is a free site for playing Sittuyin, the traditional chess of Myanmar. No account, no ads.",
-    "free": "Play against the computer or share a device with a friend.",
+    "free": "Play the computer, play a friend online or on one device, and learn the rules with lessons.",
+    "whatTitle": "What is Sittuyin?",
+    "whatBody": "Sittuyin is the traditional chess of Myanmar, a cousin of Thai chess and international chess. Only the Ne (pawns) start on the board: each player then places their own Min-gyi, Sit-ke, two Sin, two Myin and two Yahhta behind them, so no two games open the same way. A Ne promotes to a Sit-ke on the long diagonals, and when few pieces are left a count gives the stronger side a limited number of moves to deliver checkmate.",
     "openSource": "Open source",
-    "licence": "The code is public under the GPL-3.0 licence.",
-    "source": "View the source"
+    "licence": "The code is public under the GPL-3.0 licence. Anyone can help: report bugs, improve lessons, review the Burmese text or write code.",
+    "source": "View the source",
+    "contribute": "How to contribute",
+    "reportBug": "Report a bug or suggest an idea",
+    "translate": "Help review the Burmese text",
+    "madeBy": "Made by {{name}}"
+  },
+  "seo": {
+    "home": {
+      "title": "Sittuyin Online — Play Burmese Chess Free vs Computer & Friends",
+      "description": "Play Sittuyin (Burmese chess) online for free, no sign-up. Arrange your own army, face 6 computer levels, invite a friend by code and learn the rules."
+    },
+    "computer": {
+      "title": "Play Burmese Chess vs Computer — 6 Levels | Sittuyin",
+      "description": "Practise Sittuyin against six bots from beginner to strong, with hints and takebacks. Free, instant, and works on phones and desktops."
+    },
+    "online": {
+      "title": "Play Sittuyin Online with Friends | Burmese Chess",
+      "description": "Quick-match Sittuyin at 3+2, 5+0 or 10+0, or create a room and send the code to a friend. Free, no account needed."
+    },
+    "room": {
+      "title": "Online Sittuyin Room | Burmese Chess",
+      "description": "Join an online Sittuyin (Burmese chess) game with a friend."
+    },
+    "local": {
+      "title": "Two-Player Burmese Chess on One Device | Sittuyin",
+      "description": "Take turns playing Sittuyin on one phone or tablet, from setting up both armies to checkmate, with optional clocks."
+    },
+    "learn": {
+      "title": "Learn Burmese Chess: Sittuyin Rules & Lessons",
+      "description": "Interactive Sittuyin lessons for beginners: the setup, how the Min-gyi, Sit-ke, Sin, Myin, Yahhta and Ne move, promotion, checkmate and counting."
+    },
+    "about": {
+      "title": "About Sittuyin (Burmese Chess) & This Open-Source Project",
+      "description": "What Sittuyin is, and how to contribute to this free, open-source Burmese chess site on GitHub."
+    },
+    "settings": {
+      "title": "Settings | Sittuyin Burmese Chess",
+      "description": "Choose the language, board, colours and dark mode for Sittuyin."
+    }
   },
   "design": {
     "title": "Design",

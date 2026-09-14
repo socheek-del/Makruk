@@ -5,6 +5,7 @@ import { GraduationCap, Info, type LucideIcon, Settings, Swords } from 'lucide-r
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink, Outlet } from 'react-router';
 import { PRODUCT } from '../../product.config';
+import { SeoController } from '../features/seo/SeoController';
 import { ThemeController } from './ThemeController';
 
 const NAV: ReadonlyArray<{ to: string; key: string; icon: LucideIcon; end?: boolean }> = [
@@ -19,6 +20,7 @@ export function AppShell() {
   return (
     <div className="min-h-dvh bg-canvas text-ink md:flex">
       <ThemeController />
+      <SeoController />
       <nav
         aria-label={t('nav.label')}
         className="fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-surface/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur md:sticky md:top-0 md:h-dvh md:w-64 md:flex-col md:gap-1 md:border-t-0 md:border-r md:bg-canvas md:px-4 md:py-6"
