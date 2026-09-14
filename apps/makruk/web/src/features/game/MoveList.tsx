@@ -1,7 +1,7 @@
 import type { MoveRecord } from '@chaturanga/makruk';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { cn } from '../../lib/cn';
+import { cn } from '@chaturanga/ui';
 
 export interface MoveListProps {
   records: readonly MoveRecord[];

@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes } from 'react';
-import { cn } from '../../lib/cn';
+import { cn } from './cn';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger' | 'warning' | 'ghost';
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
@@ -9,7 +9,7 @@ const VARIANTS: Record<ButtonVariant, string> = {
   secondary: 'bg-secondary text-on-accent border-transparent shadow-card hover:brightness-110',
   outline: 'bg-surface text-primary border-line hover:bg-surface-2',
   danger: 'bg-danger text-on-accent border-transparent shadow-card hover:brightness-110',
-  warning: 'bg-warning text-[#2b2006] border-transparent shadow-card hover:brightness-105',
+  warning: 'bg-warning text-on-warning border-transparent shadow-card hover:brightness-105',
   ghost: 'bg-transparent text-primary border-transparent hover:bg-surface-2',
 };
 
@@ -27,7 +27,7 @@ export interface ButtonStyleOptions {
   className?: string;
 }
 
-/** Pill button (apps/makruk/docs/design.md): soft shadow, lifts slightly on hover and settles when pressed. */
+/** Pill button: soft shadow, lifts slightly on hover and settles when pressed. */
 export function buttonClasses({ variant = 'primary', size = 'md', block, className }: ButtonStyleOptions = {}) {
   return cn(
     'inline-flex select-none items-center justify-center gap-2 rounded-full border font-semibold',

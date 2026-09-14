@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 /* Shared UI packages live outside this app folder; let Tailwind see their classes. */
 @source '../../../../packages/board-ui/src';
+@source '../../../../packages/ui/src';
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
@@ -33,6 +34,10 @@
   --gold: #b7862a;
   --gold-shadow: #8c6620;
   --on-accent: #fffdf9;
+  /* Text on saffron and on temple gold stays dark in both themes; the scrim dims the page behind a modal. */
+  --on-warning: #2b2006;
+  --on-gold: #1f1d36;
+  --scrim: #121226;
 
   --card-shadow: 0 1px 2px rgb(31 29 54 / 0.06), 0 8px 24px -12px rgb(31 29 54 / 0.18);
 
@@ -63,6 +68,9 @@
   --gold: #e2b65a;
   --gold-shadow: #c4973f;
   --on-accent: #121226;
+  --on-warning: #2b2006;
+  --on-gold: #1f1d36;
+  --scrim: #121226;
 
   --card-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 28px -14px rgb(0 0 0 / 0.6);
 
@@ -97,6 +105,9 @@
   --color-gold: var(--gold);
   --color-gold-shadow: var(--gold-shadow);
   --color-on-accent: var(--on-accent);
+  --color-on-warning: var(--on-warning);
+  --color-on-gold: var(--on-gold);
+  --color-scrim: var(--scrim);
 }
 
 html,

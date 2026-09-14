@@ -1,7 +1,6 @@
 import type { CountingState } from '@chaturanga/makruk';
 import { useTranslation } from 'react-i18next';
-import { Card } from '../../components/ui/Card';
-import { ProgressBar } from '../../components/ui/ProgressBar';
+import { Card, ProgressBar } from '@chaturanga/ui';
 
 export function CountingIndicator({ counting }: { counting: CountingState }) {
   const { t } = useTranslation();

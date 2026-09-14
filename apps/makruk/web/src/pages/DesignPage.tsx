@@ -1,13 +1,7 @@
+import { Badge, Button, type ButtonVariant, Card, Modal, ProgressBar, SegmentedControl, Switch } from '@chaturanga/ui';
 import { Sparkles, Star } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Badge } from '../components/ui/Badge';
-import { Button, type ButtonVariant } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
-import { Modal } from '../components/ui/Modal';
-import { ProgressBar } from '../components/ui/ProgressBar';
-import { SegmentedControl } from '../components/ui/SegmentedControl';
-import { Switch } from '../components/ui/Switch';
 
 const VARIANTS: ButtonVariant[] = ['primary', 'secondary', 'outline', 'danger', 'warning', 'ghost'];
 const SWATCHES = ['canvas', 'surface-2', 'line', 'ink', 'muted', 'primary', 'secondary', 'danger', 'warning', 'gold'];

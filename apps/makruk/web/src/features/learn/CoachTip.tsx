@@ -1,6 +1,6 @@
 import type { Color, Game } from '@chaturanga/makruk';
 import { useTranslation } from 'react-i18next';
-import { Card } from '../../components/ui/Card';
+import { Card } from '@chaturanga/ui';
 import { Mascot } from './Mascot';
 
 const GENERAL_TIPS = ['develop', 'safeKhun', 'useHint'] as const;

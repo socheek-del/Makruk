@@ -21,6 +21,7 @@
     "@chaturanga/makruk": "*",
     "@chaturanga/makruk-ai": "*",
     "@chaturanga/protocol": "*",
+    "@chaturanga/ui": "*",
     "clsx": "^2.1.1",
     "i18next": "^26.4.2",
     "lucide-react": "^1.45.0",

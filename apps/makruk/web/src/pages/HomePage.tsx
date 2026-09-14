@@ -3,8 +3,7 @@ import { Bot, Globe, GraduationCap, type LucideIcon, Users } from 'lucide-react'
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
-import { Badge } from '../components/ui/Badge';
-import { Card } from '../components/ui/Card';
+import { Badge, Card } from '@chaturanga/ui';
 
 type ServerStatus = 'checking' | 'ok' | 'down';
 

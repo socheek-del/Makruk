@@ -1,12 +1,9 @@
 import { useMoveInput } from '@chaturanga/board-ui';
 import { Game, parseSquare, squareName } from '@chaturanga/makruk';
+import { Button, Card, cn, ProgressBar } from '@chaturanga/ui';
 import { CheckCircle2, Star, X, XCircle } from 'lucide-react';
 import { type ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
-import { ProgressBar } from '../../components/ui/ProgressBar';
-import { cn } from '../../lib/cn';
 import { useSettings } from '../../stores/settings';
 import { playSound } from '../sound/sound';
 import { Board } from '../board/Board';

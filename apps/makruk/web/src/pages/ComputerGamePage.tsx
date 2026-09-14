@@ -5,14 +5,11 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
-import { SegmentedControl } from '../components/ui/SegmentedControl';
+import { Button, Card, cn, SegmentedControl } from '@chaturanga/ui';
 import { AiCancelled, cancelAi, requestComputerMove, requestHint } from '../features/ai/aiClient';
 import { PieceSvg } from '../features/board/PieceSvg';
 import { GameScreen, undoAllowed } from '../features/game/GameScreen';
 import { CoachTip } from '../features/learn/CoachTip';
-import { cn } from '../lib/cn';
 import { type GameSessionStore, useComputerSession } from '../stores/localSession';
 import { useSettings } from '../stores/settings';
 

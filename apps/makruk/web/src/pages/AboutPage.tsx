@@ -1,8 +1,7 @@
 import { BookOpen, Bug, Heart, Languages } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { buttonClasses } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
+import { buttonClasses, Card } from '@chaturanga/ui';
 import { Mascot } from '../features/learn/Mascot';
 
 export const REPO_URL = 'https://github.com/socheek-del/chaturanga';

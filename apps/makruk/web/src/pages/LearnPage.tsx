@@ -5,7 +5,7 @@ import { Link } from 'react-router';
 import { PieceSvg } from '../features/board/PieceSvg';
 import { UNITS } from '../features/learn/lessons';
 import { type Lesson, useL10n } from '../features/learn/types';
-import { cn } from '../lib/cn';
+import { cn } from '@chaturanga/ui';
 import { useProgress } from '../stores/progress';
 import { ALL_LESSONS } from '../features/learn/lessons';
 

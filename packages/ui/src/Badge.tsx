@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react';
-import { cn } from '../../lib/cn';
+import { cn } from './cn';
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   tone?: 'neutral' | 'primary' | 'secondary' | 'warning' | 'danger' | 'gold';
@@ -11,7 +11,7 @@ const TONES: Record<NonNullable<BadgeProps['tone']>, string> = {
   secondary: 'bg-secondary-soft text-secondary',
   warning: 'bg-warning-soft text-warning-shadow dark:text-warning',
   danger: 'bg-danger-soft text-danger',
-  gold: 'bg-gold text-[#1f1d36]',
+  gold: 'bg-gold text-on-gold',
 };
 
 export function Badge({ tone = 'neutral', className, ...props }: BadgeProps) {

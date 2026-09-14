@@ -3,8 +3,7 @@ import { LoaderCircle, Timer } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
+import { Button, Card } from '@chaturanga/ui';
 import type { Identity } from './identity';
 
 /** online-005: pick a pool, wait in the queue, jump into the game when paired. */

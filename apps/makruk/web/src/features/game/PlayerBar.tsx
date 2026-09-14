@@ -1,6 +1,6 @@
 import type { Color, Piece } from '@chaturanga/makruk';
 import { useTranslation } from 'react-i18next';
-import { cn } from '../../lib/cn';
+import { cn } from '@chaturanga/ui';
 import { PieceSvg } from '../board/PieceSvg';
 import { formatClock } from './clock';
 

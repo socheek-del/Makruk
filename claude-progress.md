@@ -17,7 +17,7 @@ handoff; no agent updates it automatically.
 - Milestones: M0 infra ✓, M1 engine ✓, M2 local play ✓, M3 vs computer ✓ (ai-002 ladder verified on GitHub Actions), M4 learning ✓, M5 online ✓ (incl. quick match), M6 accounts (acct-001 anonymous seat token ✓; acct-002/acct-003 deferred — accounts removed by the owner), M8 owner requests (play-006, about-001, docs-001 ✓; seo-001 awaiting Search Console), M7 polish (PWA, sounds, themes, art ✓; polish-002 blocked)
 - D1 database `makruk` (id 9e084ac6-9749-411d-867d-c89e8421ed78); migrations in `apps/makruk/worker/migrations`, applied by `npm run deploy` (CI) and by the Playwright wrangler command locally
 - Remaining: `polish-002` (native Thai review) and `seo-001` (Search Console submission) — both need the owner; `acct-002`/`acct-003` deferred (accounts removed from the product for now)
-- Multi-game platform (session 003): plan in `docs/PLATFORM.md` (repo → `chaturanga`, one product per game on its own subdomain, Sittuyin next in Burmese + English). `packages/sittuyin` engine complete (M9): sit-001 ✓ setup, sit-002 ✓ moves + promotion, sit-003 ✓ game end + ASEAN counting (`docs/sittuyin-rules.md`). plat-002: `packages/rules-core` holds the Variant interface and shared 8x8 code, and both engines pass its conformance suite. plat-003: the repo is renamed to chaturanga, Makruk lives in `apps/makruk`, and the scope is `@chaturanga/*`. Next: plat-004 (per-product languages).
+- Multi-game platform (session 003): plan in `docs/PLATFORM.md` (repo → `chaturanga`, one product per game on its own subdomain, Sittuyin next in Burmese + English). `packages/sittuyin` engine complete (M9): sit-001 ✓ setup, sit-002 ✓ moves + promotion, sit-003 ✓ game end + ASEAN counting (`docs/sittuyin-rules.md`). plat-002: `packages/rules-core` holds the Variant interface and shared 8x8 code, and both engines pass its conformance suite. plat-003: the repo is renamed to chaturanga, Makruk lives in `apps/makruk`, and the scope is `@chaturanga/*`. plat-004 ✓ per-product languages (`@chaturanga/game-shell`). sit-004 ✓ Sittuyin bots and the full ladder. plat-005 in progress: `@chaturanga/board-ui` ✓, game sessions in game-shell ✓, `@chaturanga/ui` primitives ✓ (`packages/ui/TOKENS.md` lists the tokens a product must define); still to do are the shared GameScreen and the server kit. Next: push and smoke, then plat-005 slice b3.
 - Shell pitfall: run npm/vitest under the `.nvmrc` Node (`. ~/.nvm/nvm.sh && nvm use`). The default shell Node 20.13 makes npm skip rolldown's native binding, and vitest then fails with "Cannot find native binding". `init.sh` already switches Node.
 - Current blockers (owner action needed):
   - `seo-001`: verify the site in Google Search Console and submit `https://th-chess.beanroti.com/sitemap.xml`
@@ -134,10 +134,35 @@ handoff; no agent updates it automatically.
   - game-shell gained results with `fifty-move`, time controls, and `createGameSession(variant)`, whose clock is setup-aware. 15 tests.
   - Makruk's session, result and time-control modules are now wrappers over game-shell.
 - plat-005 stays `in_progress`.
+
+### Session 004
+
+- Date: 2026-09-14
+- Goal: resume implementation from the session 003 next step.
+- `sit-004` is now `passing`. Actions run 34823317321 finished: all five play shards and the verdict job
+  green, L6 mingyi > L5 yahhta +11-1=8. The full ladder is +20-0=0, +16-3=1, +15-0=5, +18-0=2, +11-1=8,
+  so every level beats the one below over 20 games. L6/L5 is the narrowest margin, which matches the
+  note that Sittuyin searches about 55k nodes/s.
+- `plat-005` slice b2 (ui primitives) done.
+  - `@chaturanga/ui` holds Badge, Button, Card, Modal, ProgressBar, SegmentedControl, Switch and `cn`.
+    `apps/makruk/web/src/components/ui` and `src/lib/cn.ts` are deleted, and 15 app files import the
+    package instead. The app keeps no copy.
+  - The primitives hold no palette. Three hex values that were inlined became tokens — `text-on-gold`,
+    `text-on-warning` and `bg-scrim` — and Makruk defines them at the old values in both themes, so
+    nothing changes visually. `packages/ui/TOKENS.md` is the contract a product must satisfy.
+  - A token-contract test fails if any primitive regains a hex or rgb literal.
+  - Verification: verify green (makruk-web 109 unchanged, ui 16 new), build OK with the package's own
+    classes present in the built CSS, E2E 65/65, PWA 2/2.
+- Known risk or unresolved issue:
+  - `package-lock.json` lost the `libc` field on the linux `sharp` / `rolldown` / `rollup` /
+    `lightningcss` / `tailwindcss-oxide` entries. npm 11.19.1 — the version CI installs — rewrites the
+    lock that way on any install, so this change did not choose it. `npx npm@11 ci --dry-run` resolves
+    cleanly on macOS, but linux native-binding selection is only proven once CI runs. If CI fails with a
+    missing native binding, look here first.
+  - Nothing is pushed. A push to `main` triggers the CI deploy of Makruk, so ask the owner first.
 - Next best step:
-  - Record the sit-004 pair 5 verdict when run 34823317321 finishes.
-  - Continue plat-005 slice b in three steps, each verified by the full Makruk E2E suite:
-    - b1: clock math into rules-core; generic `result.ts` with `fifty-move`; a session factory on a Variant whose clock starts after setup.
-    - b2: `components/ui` into a shared ui package.
-    - b3: GameScreen with the board, hand trays, sounds and settings injected.
+  - Push, confirm CI verify + deploy, then smoke production. The b2 change is visual, so check a gold
+    badge, a warning button and a modal in both themes.
+  - Continue plat-005: b3 (GameScreen with the board, hand trays, sounds and settings injected), then
+    c (server-kit + protocol variant/move-string generalisation).
   - Owner decision still open for sit-005: the Sittuyin design direction.

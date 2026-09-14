@@ -17,7 +17,7 @@ export default defineConfig(
     },
   },
   {
-    files: ['apps/*/web/**/*.{ts,tsx}', 'packages/board-ui/**/*.{ts,tsx}', 'packages/game-shell/**/*.{ts,tsx}'],
+    files: ['apps/*/web/**/*.{ts,tsx}', 'packages/board-ui/**/*.{ts,tsx}', 'packages/game-shell/**/*.{ts,tsx}', 'packages/ui/**/*.{ts,tsx}'],
     languageOptions: { globals: globals.browser },
     plugins: { 'react-hooks': reactHooks },
     rules: {

@@ -87,6 +87,10 @@ broken starting state.
   - `packages/sittuyin-ai` (`@chaturanga/sittuyin-ai`): Sittuyin bots (ai-core search, evaluation, setup
     placement policy). Product plan: `apps/sittuyin/docs/PLAN.md`.
   - `packages/protocol` (`@chaturanga/protocol`): Zod schemas for REST and WebSocket messages.
+  - `packages/ui` (`@chaturanga/ui`): React primitives (Badge, Button, Card, Modal, ProgressBar,
+    SegmentedControl, Switch, `cn`). They carry shape, state and accessibility but no palette: every
+    colour is a Tailwind token the product defines, listed in `packages/ui/TOKENS.md`. Apps must list it
+    in an `@source` line in their `index.css` so Tailwind generates its classes.
   - `packages/board-ui` (`@chaturanga/board-ui`): React board of any size (piece art, colours and labels
     passed in), `HandTray` for pieces in hand, and `useMoveInput` over `legalUci()` (board moves, drops,
     diagonal and in-place promotion). Apps must list it in an `@source` line in their `index.css` so Tailwind

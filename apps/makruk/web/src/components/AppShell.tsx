@@ -2,7 +2,7 @@ import { GraduationCap, Info, type LucideIcon, Settings, Swords } from 'lucide-r
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink, Outlet } from 'react-router';
 import { SeoController } from '../features/seo/SeoController';
-import { cn } from '../lib/cn';
+import { cn } from '@chaturanga/ui';
 import { ThemeController } from './ThemeController';
 
 const NAV: ReadonlyArray<{ to: string; key: string; icon: LucideIcon; end?: boolean }> = [

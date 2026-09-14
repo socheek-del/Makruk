@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Button } from '../../components/ui/Button';
-import { Modal } from '../../components/ui/Modal';
+import { Button, Modal } from '@chaturanga/ui';
 import type { GameResult } from './result';
 
 export interface GameOverModalProps {

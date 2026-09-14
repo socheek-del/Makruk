@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react';
-import { cn } from '../../lib/cn';
+import { cn } from './cn';
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   /** Lifts on hover for clickable cards. */

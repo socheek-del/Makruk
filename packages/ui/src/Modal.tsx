@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useRef } from 'react';
-import { cn } from '../../lib/cn';
+import { cn } from './cn';
 
 export interface ModalProps {
   open: boolean;
@@ -29,7 +29,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
         if (e.target === ref.current) onClose();
       }}
       className={cn(
-        'm-auto w-[min(28rem,calc(100vw-2rem))] rounded-[1.5rem] border border-line bg-surface p-6 text-ink shadow-2xl backdrop:bg-[#121226]/60',
+        'm-auto w-[min(28rem,calc(100vw-2rem))] rounded-[1.5rem] border border-line bg-surface p-6 text-ink shadow-2xl backdrop:bg-scrim/60',
         className,
       )}
     >

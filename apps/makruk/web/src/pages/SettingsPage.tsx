@@ -1,11 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { PRODUCT } from '../../product.config';
-import { Card } from '../components/ui/Card';
-import { SegmentedControl } from '../components/ui/SegmentedControl';
-import { Switch } from '../components/ui/Switch';
+import { Card, cn, SegmentedControl, Switch } from '@chaturanga/ui';
 import { PIECE_SET_IDS, PieceSvg } from '../features/board/PieceSvg';
 import { BOARD_THEMES, type BoardTheme, boardTheme as themeById } from '../features/board/themes';
-import { cn } from '../lib/cn';
 import { type ColorScheme, type Language, useSettings } from '../stores/settings';
 
 function BoardSwatch({ theme }: { theme: BoardTheme }) {
