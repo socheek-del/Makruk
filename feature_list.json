@@ -678,14 +678,18 @@
       "milestone": "M8",
       "title": "Search engine optimisation",
       "user_visible_behavior": "People searching for Thai chess (e.g. 'thai chess play online', 'makruk', 'หมากรุกไทย') can find the site: descriptive titles and descriptions per page in Thai and English, social preview image, structured data, robots.txt and sitemap.",
-      "status": "in_progress",
+      "status": "blocked",
       "verification": [
         "Production HTML has a keyword-rich title, meta description, canonical URL, hreflang alternates, Open Graph/Twitter tags with an image, and valid JSON-LD.",
         "robots.txt and sitemap.xml are served; each main route sets its own title and description in the active language.",
         "Search Console ownership and sitemap submission (owner action) — ranking itself cannot be verified immediately."
       ],
-      "evidence": [],
-      "notes": ""
+      "evidence": [
+        "2026-09-14: apps/web/src/features/seo/seo.test.ts (route → page/canonical/noindex mapping, ?lang parsing, every page has th+en title/description naming Thai chess, English home title ≤70 and description ≤170 chars, head tags written once) — web unit 110 passed.",
+        "2026-09-14: apps/web/e2e/seo.spec.ts — /learn Thai title, description, canonical, single meta description; /play/computer?lang=en switches the UI to English with English title, canonical ?lang=en, th/en hreflang, og:title; /play/online/ABC234 noindex; JSON-LD WebSite + VideoGame/WebApplication with alternateName Thai Chess; robots.txt sitemap line; sitemap lists /, /play/computer, /play/online, /learn, /about; og-image.png served. Full E2E 65/65.",
+        "2026-09-14: production after deploy cf0272b (CI green): static HTML title 'หมากรุกไทยออนไลน์ เล่นฟรี กับคอมพิวเตอร์และเพื่อน | Makruk Thai Chess', canonical, hreflang en, og:image, JSON-LD types, crawler fallback h1; /robots.txt text/plain, /sitemap.xml application/xml, /og-image.png image/png; rendered Playwright check: / and /learn Thai titles + canonical, /play/computer?lang=en English title/canonical, /about English (language remembered), /play/online/ABC234 noindex. OG image 1200×630 reviewed."
+      ],
+      "notes": "Remaining owner action: add the site to Google Search Console (DNS TXT on beanroti.com or HTML tag), submit https://th-chess.beanroti.com/sitemap.xml, and optionally Bing Webmaster Tools. Rankings for 'thai chess', 'makruk', 'หมากรุกไทย' build over weeks and depend on links to the site."
     },
     {
       "id": "docs-001",
@@ -694,11 +698,13 @@
       "milestone": "M8",
       "title": "Project README that showcases the game",
       "user_visible_behavior": "The GitHub README presents the game like popular open-source games: hero image, animated demos, feature list, play link, tech overview and contribution pointers.",
-      "status": "not_started",
+      "status": "in_progress",
       "verification": [
         "README renders on GitHub with working images/GIFs captured from the current app and links to the live site and CONTRIBUTING.md."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-14: demos captured from production with Playwright video + ffmpeg (docs/media/play-computer.gif 760px, lesson.gif 320px, online.gif 640px two players side by side, themes.png, mobile.png); frame contact sheets reviewed — computer game with hints and bot replies, Met lesson wrong → correct → complete, room code + QR then both players moving. The review caught a real bug: Lessons unit banners rendered white-on-white (Card background overrode the unit colour) — fixed in LearnPage with an E2E background check."
+      ],
       "notes": ""
     },
     {

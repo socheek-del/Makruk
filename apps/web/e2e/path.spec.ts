@@ -46,6 +46,12 @@ test('every lesson is open from the start; finishing one marks it and adds XP; n
   await expect(page.locator('[data-lesson]')).toHaveCount(12);
   await expect(page.locator('[data-lesson] a')).toHaveCount(12);
   await expect(page.locator('[data-status="locked"]')).toHaveCount(0);
+  // Unit banners are coloured so their white titles are readable.
+  const banners = page.getByTestId('unit-banner');
+  await expect(banners).toHaveCount(3);
+  for (const background of await banners.evaluateAll((els) => els.map((el) => getComputedStyle(el).backgroundColor))) {
+    expect(background).not.toBe('rgb(255, 255, 255)');
+  }
   await page.screenshot({ path: 'e2e-evidence/learn-path.png', fullPage: true });
 
   // Skip ahead: the Khun lesson is playable without finishing the board lesson first.

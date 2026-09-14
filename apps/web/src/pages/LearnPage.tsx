@@ -2,7 +2,6 @@ import type { PieceType } from '@makruk/engine';
 import { Check, Crown, Hash, type LucideIcon, Star, Swords, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
-import { Card } from '../components/ui/Card';
 import { PieceSvg } from '../features/board/PieceSvg';
 import { ALL_LESSONS, UNITS } from '../features/learn/lessons';
 import { type Lesson, useL10n } from '../features/learn/types';
@@ -62,10 +61,11 @@ export function LearnPage() {
 
       {UNITS.map((unit, u) => (
         <section key={unit.id} className="flex flex-col items-center gap-6">
-          <Card className={cn('w-full border-b-4 text-white', UNIT_COLORS[u % UNIT_COLORS.length])}>
+          {/* A plain div: Card's surface background would override the unit colour and hide the white text. */}
+          <div data-testid="unit-banner" className={cn('w-full rounded-2xl border-2 border-b-4 p-4 text-white', UNIT_COLORS[u % UNIT_COLORS.length])}>
             <p className="text-sm font-extrabold uppercase opacity-80">{t('learn.unit', { number: u + 1 })}</p>
             <h2 className="text-xl font-extrabold">{tr(unit.title)}</h2>
-          </Card>
+          </div>
           <ol className="flex w-full flex-col items-center gap-5">
             {unit.lessons.map((lesson) => {
               const state = status(lesson);
