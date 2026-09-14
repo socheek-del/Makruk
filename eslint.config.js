@@ -36,8 +36,8 @@ export default defineConfig(
   },
   { ignores: ['**/dev-dist/**'] },
   {
-    files: ['packages/engine/src/**/*.ts'],
-    ignores: ['packages/engine/src/**/*.test.ts', 'packages/engine/src/testing/**'],
+    files: ['packages/engine/src/**/*.ts', 'packages/sittuyin/src/**/*.ts'],
+    ignores: ['packages/*/src/**/*.test.ts', 'packages/*/src/testing/**'],
     rules: {
       // Engine must stay pure: no DOM, network, or timers.
       'no-restricted-globals': ['error', 'window', 'document', 'fetch', 'localStorage', 'setTimeout', 'setInterval'],

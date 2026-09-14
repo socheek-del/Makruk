@@ -841,14 +841,19 @@
       "milestone": "M9",
       "title": "Sittuyin position, FEN with pieces in hand, and setup phase",
       "user_visible_behavior": "The Sittuyin engine loads and exports positions in Fairy-Stockfish FEN (including pieces in hand) and lists the legal setup drops, alternating White then Black, until all 16 pieces are placed.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "New pure package packages/sittuyin (no DOM, network or unseeded randomness) with unit tests.",
         "FEN parse → serialize round-trips for the start position, mid-setup positions and 10+ played positions; invalid FEN rejected with typed errors.",
         "Setup drop lists equal ffish sittuyin legalMoves on every ply of seeded random setups (drop regions, back-rank-only rooks, turn order)."
       ],
-      "evidence": [],
-      "notes": "Reuse Makruk's 8x8 helpers where the logic is identical; shared code moves to rules-core in plat-002."
+      "evidence": [
+        "2026-09-14: packages/sittuyin (@chaturanga/sittuyin) — FEN with pieces in hand written in Fairy-Stockfish order K S F R N, setup drops (own three ranks, Yahhta back rank only, must drop while a placement square is free), drop SAN with check marks, undo returns the piece to hand; square tables and attack detection imported from @makruk/engine/core. Engine purity lint rule extended to the package.",
+        "2026-09-14: src/fen.test.ts — 14 round-trip positions written by ffish 0.7.10 (start, mid-setup hands, finished setups, counting fields, promoted F~, kings only in hand) + missing trailing fields / absent hand + hand order normalised; 19 invalid FEN cases throw FenError (Makruk letter, queen or Ne in hand, king on board and in hand, two hand groups, unclosed hand, side not to move in check…).",
+        "2026-09-14: src/setup.test.ts — 88 first placements, drop regions for both colours, 16 alternating plies ending with empty hands at 'w - - 0 9', must-drop vs empty-hand side, no free square → piece moves, only check-blocking drops, 'R@d1+' SAN, drop resets the halfmove clock ('5 10' → '0 10', as ffish), undo, 6 rejected inputs.",
+        "2026-09-14: lock-step setups vs ffish sittuyin — legal move set, FEN and SAN equal on every ply: 100 seeded setups in npm test (52 tests passed), 400 with PERFT_DEEP=1 (npm run test:deep, 52 passed). Full npm run verify exit 0 (web 112, worker 48, ai 20, engine 129, protocol 2, sittuyin 52)."
+      ],
+      "notes": "Reuses Makruk's 8x8 helpers where the logic is identical; shared code moves to rules-core in plat-002. Post-setup piece moves exist but promotion and their verification belong to sit-002; game-end rules beyond checkmate/stalemate to sit-003."
     },
     {
       "id": "sit-002",

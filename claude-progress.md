@@ -17,6 +17,8 @@ handoff; no agent updates it automatically.
 - Milestones: M0 infra ✓, M1 engine ✓, M2 local play ✓, M3 vs computer ✓ (ai-002 ladder verified on GitHub Actions), M4 learning ✓, M5 online ✓ (incl. quick match), M6 accounts (acct-001 anonymous seat token ✓; acct-002/acct-003 deferred — accounts removed by the owner), M8 owner requests (play-006, about-001, docs-001 ✓; seo-001 awaiting Search Console), M7 polish (PWA, sounds, themes, art ✓; polish-002 blocked)
 - D1 database `makruk` (id 9e084ac6-9749-411d-867d-c89e8421ed78); migrations in `apps/worker/migrations`, applied by `npm run deploy` (CI) and by the Playwright wrangler command locally
 - Remaining: `polish-002` (native Thai review) and `seo-001` (Search Console submission) — both need the owner; `acct-002`/`acct-003` deferred (accounts removed from the product for now)
+- Multi-game platform (session 003): plan in `docs/PLATFORM.md` (repo → `chaturanga`, one product per game on its own subdomain, Sittuyin next in Burmese + English). `packages/sittuyin` engine started: sit-001 ✓; next sit-002 (move generation + promotion), sit-003 (game end), then plat-002..006 and the Sittuyin app.
+- Shell pitfall: run npm/vitest under the `.nvmrc` Node (`. ~/.nvm/nvm.sh && nvm use`). The default shell Node 20.13 makes npm skip rolldown's native binding, and vitest then fails with "Cannot find native binding". `init.sh` already switches Node.
 - Current blockers (owner action needed):
   - `seo-001`: verify the site in Google Search Console and submit `https://th-chess.beanroti.com/sitemap.xml`
   - `polish-002`: native Thai reviewer completes `docs/i18n-review.md`
@@ -69,3 +71,21 @@ handoff; no agent updates it automatically.
   - Search Console domain property verified by the owner; sitemap read (Success, 12 pages); IndexNow submissions accepted; GitHub repo homepage/description/topics set; crawlable Makruk intro added to the home page.
   - Domain made configurable (`apps/web/site.config.ts`); no domain in images, GIFs or README badges; README.th.md added.
   - "Wat" redesign replaced the Duolingo-like look (legal risk flagged by the owner): own palette, Prompt font, pill buttons, temple-stairway lessons, recoloured icons and mascot; docs/design.md rewritten; full E2E 65/65.
+
+### Session 003
+
+- Date: 2026-09-14
+- Goal: plan a multi-game monorepo (owner wants Sittuyin, Shogi and others without rebuilding everything or mixing products), then start Sittuyin.
+- Owner decisions:
+  - Monorepo renamed to `chaturanga`.
+  - Subdomains for now.
+  - Sittuyin first, in Burmese + English.
+  - Nothing game-specific at the root or in shared packages.
+- Completed:
+  - `plat-001`: `docs/PLATFORM.md` and features sit-001..011 / plat-002..006 (commit 7408fb1).
+  - `sit-001`: `packages/sittuyin` with FEN, pieces in hand and the setup phase, verified against ffish `sittuyin` (100 setups in verify, 400 deep).
+- Verification run: `npm run verify` exit 0 (web 112, worker 48, ai 20, engine 129, protocol 2, sittuyin 52); `npm run test:deep -w packages/sittuyin` 52 passed.
+- Known risk or unresolved issue:
+  - The shell's default Node is 20.13; use nvm (see Current Verified State).
+  - Package scope is mixed (`@makruk/*` plus `@chaturanga/sittuyin`) until plat-003.
+- Next best step: sit-002. Probe ffish for Sittuyin promotion (promotion squares, only without a Sit-ke, in place or diagonal step, check/capture restrictions, last-pawn rule), then lock-step full games.

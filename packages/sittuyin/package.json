@@ -1,0 +1,21 @@
+{
+  "name": "@chaturanga/sittuyin",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0-or-later",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:deep": "PERFT_DEEP=1 vitest run"
+  },
+  "dependencies": {
+    "@makruk/engine": "*"
+  },
+  "devDependencies": {
+    "ffish": "^0.7.10"
+  }
+}
