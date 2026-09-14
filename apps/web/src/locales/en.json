@@ -18,6 +18,40 @@
     "translate": "Help review the Thai text",
     "madeBy": "Made by {{name}}"
   },
+  "seo": {
+    "home": {
+      "title": "Thai Chess Online — Play Makruk Free vs Computer & Friends",
+      "description": "Play Makruk (Thai chess) online for free, no sign-up. Face 6 computer levels, invite a friend by link or pass-and-play, and learn the rules step by step."
+    },
+    "computer": {
+      "title": "Play Thai Chess vs Computer — 6 Levels | Makruk",
+      "description": "Practise Makruk (Thai chess) against bots from beginner to master, with hints and takebacks. Free, instant, and works on phones and desktops."
+    },
+    "online": {
+      "title": "Play Thai Chess Online with Friends | Makruk",
+      "description": "Quick-match Makruk games at 3+2, 5+0 or 10+0, or create a room and send a link to a friend. Free, no account needed."
+    },
+    "room": {
+      "title": "Online Thai Chess Room | Makruk",
+      "description": "Join an online Makruk (Thai chess) game with a friend."
+    },
+    "local": {
+      "title": "Two-Player Thai Chess on One Device | Makruk",
+      "description": "Take turns playing Makruk on one phone or tablet, with auto-rotating or tabletop board views and optional clocks."
+    },
+    "learn": {
+      "title": "Learn Thai Chess: Makruk Rules & Lessons",
+      "description": "Interactive Makruk lessons for beginners: how the Khun, Met, Khon, Ma, Ruea and Bia move, checkmate and the counting rules."
+    },
+    "about": {
+      "title": "About Makruk (Thai Chess) & This Open-Source Project",
+      "description": "What Makruk is, and how to contribute to this free, open-source Thai chess app on GitHub."
+    },
+    "settings": {
+      "title": "Settings | Makruk Thai Chess",
+      "description": "Choose the language, board theme, piece set, sounds and dark mode for Makruk."
+    }
+  },
   "nav": {
     "label": "Main menu",
     "play": "Play",
