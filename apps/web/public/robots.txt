@@ -1,9 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /ws/
-Disallow: /auth/
-Disallow: /reset-password
-Disallow: /design
-
-Sitemap: https://th-chess.beanroti.com/sitemap.xml

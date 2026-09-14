@@ -1,13 +1,44 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import type { Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vitest/config';
+import { SITE_URL } from './site.config';
+import { buildRobots, buildSitemap } from './src/features/seo/sitemap';
+
+/** seo-001: puts the configured site address into index.html and serves/emits robots.txt and sitemap.xml. */
+function siteAddress(): Plugin {
+  const files: Record<string, { type: string; body: () => string }> = {
+    '/robots.txt': { type: 'text/plain; charset=utf-8', body: () => buildRobots(SITE_URL) },
+    '/sitemap.xml': { type: 'application/xml; charset=utf-8', body: () => buildSitemap(SITE_URL) },
+  };
+  // Must return nothing: Vite treats a function returned from configureServer as a post-middleware hook.
+  const serve = (server: { middlewares: { use: (fn: (req: { url?: string }, res: import('node:http').ServerResponse, next: () => void) => void) => unknown } }): void => {
+    server.middlewares.use((req, res, next) => {
+      const file = files[(req.url ?? '').split('?')[0]!];
+      if (!file) return next();
+      res.setHeader('content-type', file.type);
+      res.end(file.body());
+    });
+  };
+  return {
+    name: 'makruk-site-address',
+    transformIndexHtml: (html) => html.replaceAll('%SITE_URL%', SITE_URL),
+    configureServer: serve,
+    configurePreviewServer: serve,
+    generateBundle() {
+      for (const [path, file] of Object.entries(files)) this.emitFile({ type: 'asset', fileName: path.slice(1), source: file.body() });
+    },
+  };
+}
 
 // In dev, the Worker runs on :8787 (wrangler dev) and Vite proxies API + WebSocket traffic to it.
 export default defineConfig({
+  define: { __SITE_URL__: JSON.stringify(SITE_URL) },
   plugins: [
     react(),
     tailwindcss(),
+    siteAddress(),
     // polish-001: installable PWA; everything except online play works offline.
     VitePWA({
       registerType: 'autoUpdate',
@@ -34,7 +65,7 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff,woff2}'],
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/api\//, /^\/ws\//],
+        navigateFallbackDenylist: [/^\/api\//, /^\/ws\//, /^\/robots\.txt$/, /^\/sitemap\.xml$/],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
       },
     }),

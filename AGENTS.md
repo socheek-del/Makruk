@@ -55,7 +55,11 @@ feature work on top of a broken starting state.
 - **License:** GPL-3.0 (public repo; Fairy-Stockfish WASM is allowed).
 - **Source control:** remote `git@github-socheek-del:socheek-del/Makruk.git`.
   Branch `main`. Conventional Commits.
-- **Deploy:** production at `https://th-chess.beanroti.com` (Worker custom domain
+- **Site address:** the domain is temporary. Never hardcode it — web code reads `SITE_URL` from
+  `apps/web/site.config.ts` (injected as `__SITE_URL__`, `%SITE_URL%` in index.html; robots.txt and
+  sitemap.xml are generated). Other places: `apps/worker/wrangler.jsonc` routes/PUBLIC_ORIGIN and the
+  `[play]` link in the READMEs. Screenshots and GIFs must not show the domain.
+- **Deploy:** production currently at `https://th-chess.beanroti.com` (Worker custom domain
   on Cloudflare zone `beanroti.com`). GitHub Actions deploys on push to `main`;
   `npm run deploy` applies D1 migrations (`apps/worker/migrations`) first.
 - **Accounts:** removed from the product for now (owner decision 2026-09-14) — the site is open to

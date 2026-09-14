@@ -1,19 +1,21 @@
 <div align="center">
 
+**English** · [ภาษาไทย](README.th.md)
+
 <img src="apps/web/public/og-image.png" alt="หมากรุกไทย · Makruk — Thai chess" width="100%" />
 
 # หมากรุกไทย · Makruk
 
 **Play Thai chess online — free, no sign-up, in Thai and English.**
 
-[![Play now](https://img.shields.io/badge/%E2%96%B6%20Play%20now-th--chess.beanroti.com-58cc02?style=for-the-badge)](https://th-chess.beanroti.com)
+[![Play now](https://img.shields.io/badge/%E2%96%B6%20Play%20now-free%20in%20your%20browser-58cc02?style=for-the-badge)][play]
 
 [![CI](https://github.com/socheek-del/Makruk/actions/workflows/ci.yml/badge.svg)](https://github.com/socheek-del/Makruk/actions/workflows/ci.yml)
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-1cb0f6)](LICENSE)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-ff9600)](CONTRIBUTING.md)
-[![Installable PWA](https://img.shields.io/badge/PWA-offline%20ready-58cc02)](https://th-chess.beanroti.com)
+[![Installable PWA](https://img.shields.io/badge/PWA-offline%20ready-58cc02)][play]
 
-[**Play**](https://th-chess.beanroti.com) · [Features](#features) · [What is Makruk?](#what-is-makruk) · [Run it locally](#run-it-locally) · [Contribute](#contributing) · [ภาษาไทย](#ภาษาไทย)
+[**Play**][play] · [Features](#features) · [What is Makruk?](#what-is-makruk) · [Run it locally](#run-it-locally) · [Contribute](#contributing)
 
 </div>
 
@@ -45,7 +47,7 @@ or on one device. No ads, no accounts, and all the code is open source.
     <td width="50%" valign="top">
       <h3>📚 Learn from zero</h3>
       <img src="docs/media/lesson.gif" alt="An interactive Makruk lesson on a phone" width="45%" align="left" />
-      <p>Bite-sized, Duolingo-style lessons: the board, every piece, promotion, check and checkmate, and
+      <p>Bite-sized, game-like lessons: the board, every piece, promotion, check and checkmate, and
       Makruk's <b>counting rules</b> — then a guided first game with a coach. Every lesson is open; start
       wherever you like.</p>
     </td>
@@ -133,7 +135,8 @@ nvm use          # Node 22
 npm run dev      # web on http://localhost:5173, API + online play on :8787
 ```
 
-`npm run e2e` runs the Playwright suite against a local web app and Worker.
+`npm run e2e` runs the Playwright suite against a local web app and Worker. The public site address lives in
+one setting — see [Deploying to your own domain](CONTRIBUTING.md#deploying-to-your-own-domain).
 
 ## Contributing
 
@@ -144,19 +147,10 @@ code. Start with [**CONTRIBUTING.md**](CONTRIBUTING.md), or:
 - 🇹🇭 Native Thai speaker? Help review the wording with [`docs/i18n-review.md`](docs/i18n-review.md)
 - ♟️ Know Makruk well? Check the lessons and [`docs/rules.md`](docs/rules.md)
 
-## ภาษาไทย
-
-**หมากรุกไทยออนไลน์ เล่นฟรี ไม่ต้องสมัครสมาชิก** — [เล่นเลยที่ th-chess.beanroti.com](https://th-chess.beanroti.com)
-
-- เล่นกับคอมพิวเตอร์ 6 ระดับ ตั้งแต่ “เบี้ยน้อย” ถึง “ขุนพลใหญ่” พร้อมคำใบ้และถอนตา
-- เล่นออนไลน์กับเพื่อน จับคู่แบบเร็ว หรือสร้างห้องแล้วส่งลิงก์ชวนเพื่อน
-- เล่นสองคนบนเครื่องเดียว หมุนกระดานอัตโนมัติหรือนั่งตรงข้าม
-- บทเรียนแบบโต้ตอบสำหรับมือใหม่ ตั้งแต่วิธีเดินหมากไปจนถึงการนับศักดิ์
-- ใช้ได้ทั้งมือถือและคอมพิวเตอร์ ติดตั้งเป็นแอปและเล่นแบบออฟไลน์ได้
-
-โปรเจกต์นี้เป็นโอเพนซอร์ส ยินดีรับทุกความช่วยเหลือ ทั้งรายงานบั๊ก ตรวจภาษาไทย และเขียนโค้ด — ดู [CONTRIBUTING.md](CONTRIBUTING.md)
-
 ## License
 
 [GPL-3.0-or-later](LICENSE) © Makruk contributors. The piece art, mascot and illustrations were made for this
 project and are covered by the same license.
+
+<!-- The live site address is defined once here. -->
+[play]: https://th-chess.beanroti.com

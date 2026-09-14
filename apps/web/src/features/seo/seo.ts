@@ -4,7 +4,8 @@
  */
 import type { Language } from '../../stores/settings';
 
-export const SITE_URL = 'https://th-chess.beanroti.com';
+/** From site.config.ts (injected by Vite) — never hardcode the domain elsewhere. */
+export const SITE_URL: string = __SITE_URL__;
 
 export type SeoPage = 'home' | 'computer' | 'online' | 'room' | 'local' | 'learn' | 'about' | 'settings';
 

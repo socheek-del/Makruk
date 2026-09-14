@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test';
-
-const SITE = 'https://th-chess.beanroti.com';
+import { SITE_URL as SITE } from '../site.config';
 
 test('pages set search titles, descriptions, canonical and language alternates; ?lang=en opens English (seo-001)', async ({ page }) => {
   const canonical = page.locator('link[rel="canonical"]');

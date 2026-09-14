@@ -44,6 +44,17 @@ Project layout:
 
 Product rules: no chat of any kind in online play, and the server validates every online move.
 
+## Deploying to your own domain
+
+The public address is not hardcoded in the app. To move the site (or run your own copy):
+
+1. `apps/web/site.config.ts` — change the default `SITE_URL` (or build with `SITE_URL=https://example.com`).
+   Canonical links, language alternates, Open Graph tags, structured data, `robots.txt` and `sitemap.xml`
+   are all generated from it.
+2. `apps/worker/wrangler.jsonc` — set `routes` (custom domain) and `PUBLIC_ORIGIN`.
+3. `README.md` and `README.th.md` — update the `[play]` link definition at the bottom of each file.
+4. Deploy, then submit `https://<your-domain>/sitemap.xml` in Google Search Console.
+
 ## License
 
 By contributing you agree that your contributions are licensed under the project's
