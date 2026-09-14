@@ -678,7 +678,7 @@
       "milestone": "M8",
       "title": "Search engine optimisation",
       "user_visible_behavior": "People searching for Thai chess (e.g. 'thai chess play online', 'makruk', 'หมากรุกไทย') can find the site: descriptive titles and descriptions per page in Thai and English, social preview image, structured data, robots.txt and sitemap.",
-      "status": "blocked",
+      "status": "passing",
       "verification": [
         "Production HTML has a keyword-rich title, meta description, canonical URL, hreflang alternates, Open Graph/Twitter tags with an image, and valid JSON-LD.",
         "robots.txt and sitemap.xml are served; each main route sets its own title and description in the active language.",
@@ -689,7 +689,7 @@
         "2026-09-14: apps/web/e2e/seo.spec.ts — /learn Thai title, description, canonical, single meta description; /play/computer?lang=en switches the UI to English with English title, canonical ?lang=en, th/en hreflang, og:title; /play/online/ABC234 noindex; JSON-LD WebSite + VideoGame/WebApplication with alternateName Thai Chess; robots.txt sitemap line; sitemap lists /, /play/computer, /play/online, /learn, /about; og-image.png served. Full E2E 65/65.",
         "2026-09-14: production after deploy cf0272b (CI green): static HTML title 'หมากรุกไทยออนไลน์ เล่นฟรี กับคอมพิวเตอร์และเพื่อน | Makruk Thai Chess', canonical, hreflang en, og:image, JSON-LD types, crawler fallback h1; /robots.txt text/plain, /sitemap.xml application/xml, /og-image.png image/png; rendered Playwright check: / and /learn Thai titles + canonical, /play/computer?lang=en English title/canonical, /about English (language remembered), /play/online/ABC234 noindex. OG image 1200×630 reviewed."
       ],
-      "notes": "Remaining owner action: add the site to Google Search Console (DNS TXT on beanroti.com or HTML tag), submit https://th-chess.beanroti.com/sitemap.xml, and optionally Bing Webmaster Tools. Rankings for 'thai chess', 'makruk', 'หมากรุกไทย' build over weeks and depend on links to the site."
+      "notes": "2026-09-14: owner verified the beanroti.com domain property in Google Search Console. Checked in the owner's Chrome (remote debugging, CDP): Sitemaps page for sc-domain:beanroti.com lists https://th-chess.beanroti.com/sitemap.xml — submitted Sep 14, 2026, last read Sep 14, 2026, status Success, 12 discovered pages. IndexNow key file /84ecf1771811a11a2b2cea6e5e7e29a5.txt deployed (28b49b0) and all 12 sitemap URLs submitted to api.indexnow.org → 202 Accepted (Bing, Yandex, Seznam, Naver). Rankings for 'thai chess', 'makruk', 'หมากรุกไทย' build over weeks and depend on links to the site; check Search Console → Performance."
     },
     {
       "id": "docs-001",
