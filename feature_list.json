@@ -1108,13 +1108,23 @@
       "milestone": "M11",
       "title": "Sittuyin design identity and piece art",
       "user_visible_behavior": "The Sittuyin site has its own Burmese-inspired look (tokens, fonts, board and in-house piece art) that is clearly different from Makruk's Wat theme and from Duolingo.",
-      "status": "not_started",
+      "status": "in_progress",
       "verification": [
         "apps/sittuyin/docs/design.md describes tokens, Myanmar typography (Unicode, OFL font, line-height) and piece-art guide; owner approves the direction.",
         "Showcase page screenshots in light and dark at 390px and 1280px reviewed; all 6 piece types x 2 colours readable at 40px squares."
       ],
-      "evidence": [],
-      "notes": "Owner approval of the direction required before building sit-006."
+      "evidence": [
+        "2026-09-14: direction proposed as \"Daung\" (peacock) in apps/sittuyin/docs/design.md, and built so it can be seen rather than imagined.",
+        "The idea: the green peacock gives the interface its colour (peacock teal primary, aubergine secondary); Bagan lacquerware gives the board and pieces theirs (cinnabar over black, dull brass incision). Cool chrome, warm board, so the board does not compete with what surrounds it.",
+        "Every identity-bearing choice differs from Makruk's Wat theme: primary hue 193 deg vs 235 deg, aubergine vs jade secondary, cool ash canvas vs warm cream, lacquer vs teak board, Noto Sans Myanmar + Noto Sans vs Prompt, figurative vs abstract piece art, peacock-eye roundel vs gold lattice. No Makruk asset is reused. Nothing takes Duolingo's fonts, colours, chunky buttons or zig-zag path; the design doc records that as an owner decision about legal risk.",
+        "apps/sittuyin/web scaffolds the product: product.config.ts (my default + en, storage prefix sittuyin., Noto fonts), site.config.ts (address deliberately not final — sit-009), index.css with the full token set from packages/ui/TOKENS.md in light and dark, my/en locales, settings store and the DesignPage showcase.",
+        "The \"yun\" piece set (src/features/board/pieces/yun.tsx) draws all six types in both colours, built around the silhouette because that is all a 40px square shows: tiered umbrella (Min-gyi), pointed shield (Sit-ke), trunk (Sin), cut mane (Myin), wheel (Yahhta), small dome (Ne), with deliberate height and width differences. A promoted Ne is a Sit-ke with a brass collar.",
+        "Five board themes (lacquer default, thanaka, jade, teak-night, contrast). @chaturanga/board-ui gained a generic `overlay` prop so a product can draw markings its rules make meaningful; Sittuyin uses it for the two promotion diagonals in brass.",
+        "Found and fixed while reviewing the rendered page rather than the code: the first piece art failed its own 40px rule (small, bottom-heavy forms on a wide base) and was redrawn; the overlay first shipped as a grid item, which took part in row sizing and collapsed every square to 0px height (cell height 0 measured in the browser) and is now positioned instead; the piece row overflowed horizontally at 390px.",
+        "Verification: npm run verify green (sittuyin-web 8 new tests — locale completeness for my and en, and the piece set: every type drawn in both colours, a promoted Ne marked differently from the original Sit-ke, all six silhouettes distinct, the two colours distinct; board-ui 20, 2 new for the overlay incl. a regression test that the squares keep their height). npm run build -w apps/sittuyin/web OK, with Noto subset entrypoints only so the bundle ships no Devanagari or Cyrillic. Makruk npm run e2e 65/65 after the board change.",
+        "Screenshots for review: apps/sittuyin/docs/evidence/design-{light,dark}-{390,1280}.png, and no horizontal overflow at 390px (measured)."
+      ],
+      "notes": "Owner approval of the direction is still required before sit-006 styles the app (the feature's own verification says so). Everything else for sit-005 is done and verified; the screenshots in apps/sittuyin/docs/evidence are what needs a look."
     },
     {
       "id": "sit-006",

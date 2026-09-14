@@ -45,6 +45,24 @@ describe('Board (plat-005a)', () => {
     expect(view.getByRole('grid').style.aspectRatio).toBe('9 / 9');
   });
 
+  it('draws an overlay over the board without collapsing the squares', () => {
+    const marking = <svg data-testid="marking" />;
+    const view = render(<Board {...base} pieces={[]} overlay={marking} />);
+    const overlay = view.container.querySelector('[data-overlay]') as HTMLElement;
+    expect(overlay).toBeTruthy();
+    expect(overlay.querySelector('[data-testid="marking"]')).toBeTruthy();
+    // It must not be a grid item: as one it takes part in row sizing and flattens every square.
+    expect(overlay.style.gridArea).toBe('');
+    expect(overlay.className).toContain('absolute');
+    expect(overlay.className).toContain('pointer-events-none');
+    expect(view.getAllByRole('gridcell')).toHaveLength(64);
+  });
+
+  it('has no overlay element when no markings are passed', () => {
+    const view = render(<Board {...base} pieces={[]} />);
+    expect(view.container.querySelector('[data-overlay]')).toBeNull();
+  });
+
   it('marks a drop as the last move without a from square, plus targets, promotions, check and hint', () => {
     const view = render(
       <Board

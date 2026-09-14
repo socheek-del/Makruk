@@ -45,6 +45,12 @@ export interface BoardProps {
   canDrag?: (square: Square) => boolean;
   onDrop?: (from: Square, to: Square) => boolean;
   handle?: Ref<BoardHandle>;
+  /**
+   * Markings drawn across the whole board, over the squares — for lines the rules make meaningful, such
+   * as the diagonals a Sittuyin Ne promotes on. Keep them light: they sit above the pieces, so a heavy
+   * marking would cut through the art. Never receives pointer events.
+   */
+  overlay?: ReactNode;
   className?: string;
 }
 
@@ -102,6 +108,7 @@ export function Board({
   canDrag,
   onDrop,
   handle,
+  overlay,
   className,
 }: BoardProps) {
   const boardRef = useRef<HTMLDivElement>(null);
@@ -288,7 +295,7 @@ export function Board({
         onPointerMove={moveDrag}
         onPointerUp={endDrag}
         onPointerCancel={() => setDrag(null)}
-        className={cx('grid w-full touch-none gap-px rounded-lg border-4 p-px shadow-lg', className)}
+        className={cx('relative grid w-full touch-none gap-px rounded-lg border-4 p-px shadow-lg', className)}
         style={{
           background: theme.line,
           borderColor: theme.line,
@@ -298,6 +305,12 @@ export function Board({
         }}
       >
         {cells}
+        {/* Positioned, not a grid item: as a grid item it takes part in row sizing and collapses the squares. */}
+        {overlay && (
+          <div aria-hidden data-overlay className="pointer-events-none absolute inset-px">
+            {overlay}
+          </div>
+        )}
       </div>
       {drag?.active && (
         <div

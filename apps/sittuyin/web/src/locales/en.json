@@ -1,0 +1,37 @@
+{
+  "brand": "Sittuyin",
+  "colors": {
+    "w": "White",
+    "b": "Black"
+  },
+  "pieces": {
+    "k": "Min-gyi",
+    "f": "Sit-ke",
+    "s": "Sin",
+    "n": "Myin",
+    "r": "Yahhta",
+    "p": "Ne",
+    "promoted": "Promoted Sit-ke"
+  },
+  "design": {
+    "title": "Design",
+    "intro": "The Sittuyin site's own look: peacock colour, Bagan lacquer board and pieces.",
+    "swatches": "Colours",
+    "buttons": "Buttons",
+    "pieces": "Pieces",
+    "typography": "Typography",
+    "typographySample": "Sittuyin is the traditional chess of Myanmar.",
+    "cards": "Cards",
+    "controls": "Controls",
+    "light": "Light",
+    "dark": "Dark",
+    "boards": "Boards",
+    "sample": "Sample"
+  },
+  "board": {
+    "label": "Sittuyin board",
+    "pieceName": "{{color}} {{piece}}",
+    "squareWithPiece": "{{square}}, {{piece}}",
+    "emptySquare": "{{square}}, empty"
+  }
+}

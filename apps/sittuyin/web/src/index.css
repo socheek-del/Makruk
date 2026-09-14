@@ -1,0 +1,161 @@
+@import 'tailwindcss';
+/* Shared UI packages live outside this app folder; let Tailwind see their classes. */
+@source '../../../../packages/board-ui/src';
+@source '../../../../packages/game-shell/src/ui';
+@source '../../../../packages/ui/src';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/*
+ * "Daung" design tokens (apps/sittuyin/docs/design.md): peacock teal and aubergine for the interface,
+ * Bagan lacquer for the board and pieces. Light is the default; `-shadow` = stronger shade.
+ */
+:root,
+[data-theme='light'] {
+  --canvas: #eff2f2;
+  --surface: #ffffff;
+  --surface-2: #e2e8e9;
+  --line: #cdd7d9;
+  --ink: #12242a;
+  --muted: #4e666f;
+  --subtle: #8aa0a8;
+
+  --primary: #0f6f86;
+  --primary-shadow: #0b5568;
+  --primary-soft: #dcedf2;
+  --secondary: #6d3f6b;
+  --secondary-shadow: #54304f;
+  --secondary-soft: #f0e4ef;
+  --danger: #b3202b;
+  --danger-shadow: #8b1821;
+  --danger-soft: #f7e0e1;
+  --warning: #c08410;
+  --warning-shadow: #94660c;
+  --warning-soft: #f8ecd0;
+  --gold: #a8802f;
+  --gold-shadow: #846326;
+  --on-accent: #ffffff;
+  --on-warning: #2b2006;
+  --on-gold: #12242a;
+  --scrim: #0b161a;
+
+  --card-shadow: 0 1px 2px rgb(18 36 42 / 0.07), 0 8px 24px -12px rgb(18 36 42 / 0.2);
+
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --canvas: #0d1a1f;
+  --surface: #152329;
+  --surface-2: #1f3038;
+  --line: #2d434d;
+  --ink: #e9f1f3;
+  --muted: #a2b8c0;
+  --subtle: #6b8590;
+
+  --primary: #5cc0d6;
+  --primary-shadow: #3ba2ba;
+  --primary-soft: #123c49;
+  --secondary: #c99ac6;
+  --secondary-shadow: #a97aa6;
+  --secondary-soft: #38203a;
+  --danger: #f08a86;
+  --danger-shadow: #d16a66;
+  --danger-soft: #3d1f21;
+  --warning: #eec25c;
+  --warning-shadow: #d0a340;
+  --warning-soft: #372c13;
+  --gold: #d9b263;
+  --gold-shadow: #b89345;
+  --on-accent: #0d1a1f;
+  --on-warning: #2b2006;
+  --on-gold: #12242a;
+  --scrim: #040b0d;
+
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 10px 28px -14px rgb(0 0 0 / 0.65);
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: 'Noto Sans Myanmar', 'Noto Sans', ui-sans-serif, system-ui, sans-serif;
+  /* Burmese stacks marks above and below the baseline; headings stay at 600, never heavier. */
+  --font-weight-extrabold: 600;
+  --shadow-card: var(--card-shadow);
+
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-primary: var(--primary);
+  --color-primary-shadow: var(--primary-shadow);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-shadow: var(--secondary-shadow);
+  --color-secondary-soft: var(--secondary-soft);
+  --color-danger: var(--danger);
+  --color-danger-shadow: var(--danger-shadow);
+  --color-danger-soft: var(--danger-soft);
+  --color-warning: var(--warning);
+  --color-warning-shadow: var(--warning-shadow);
+  --color-warning-soft: var(--warning-soft);
+  --color-gold: var(--gold);
+  --color-gold-shadow: var(--gold-shadow);
+  --color-on-accent: var(--on-accent);
+  --color-on-warning: var(--on-warning);
+  --color-on-gold: var(--on-gold);
+  --color-scrim: var(--scrim);
+}
+
+html,
+body {
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  /* Burmese needs room for stacked marks; do not tighten this on Burmese text. */
+  line-height: 1.75;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Peacock-eye roundel for hero areas; the element needs `relative overflow-hidden`. */
+.motif-daung::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 55%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 70% 50%, transparent 26%, rgb(255 255 255 / 0.22) 26% 32%, transparent 32%),
+    radial-gradient(circle at 70% 50%, transparent 12%, rgb(255 255 255 / 0.16) 12% 18%, transparent 18%);
+  background-size: 58px 58px;
+  mask-image: linear-gradient(to left, black 10%, transparent);
+}
+
+/* The moved piece slides in from its origin square. */
+@keyframes piece-slide {
+  from {
+    transform: translate(var(--dx), var(--dy));
+  }
+  to {
+    transform: translate(0, 0);
+  }
+}
+
+.piece-slide {
+  animation: piece-slide 170ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
