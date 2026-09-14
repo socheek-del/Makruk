@@ -61,8 +61,8 @@ feature work on top of a broken starting state.
 - **Accounts:** username + password (PBKDF2-SHA256, 100k iterations — the Workers maximum), email
   confirmation required before sign-in, password reset by emailed one-time link (only token hashes stored).
   No Google/OAuth sign-in (owner decision).
-- **Worker config:** secrets `AUTH_SECRET` (required) and `RESEND_API_KEY`/`EMAIL_FROM` (email delivery;
-  registration is disabled until set). `DEV_EMAIL_OUTBOX=1` stores emails in D1 and exposes
+- **Worker config:** secrets `AUTH_SECRET` (required) and `RESEND_API_KEY` (email delivery via Resend;
+  registration is disabled until set). `EMAIL_FROM` is a var in `wrangler.jsonc` (beanroti.com sender). `DEV_EMAIL_OUTBOX=1` stores emails in D1 and exposes
   `/api/dev/outbox` — only for local dev, workerd tests and Playwright; never in production.
 - **Tests:** worker tests run inside workerd (`@cloudflare/vitest-plugin`, D1 migrations applied in
   `apps/worker/test/apply-migrations.ts`); `npm run e2e` starts vite + wrangler dev with local D1;

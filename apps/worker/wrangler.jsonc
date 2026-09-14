@@ -29,7 +29,10 @@
   ],
   "vars": {
     "RECONNECT_GRACE_MS": "60000",
-    "PUBLIC_ORIGIN": "https://th-chess.beanroti.com"
+    "PUBLIC_ORIGIN": "https://th-chess.beanroti.com",
+    // Sender for confirmation and reset emails (Resend, beanroti.com). Email stays off until the
+    // RESEND_API_KEY secret is set.
+    "EMAIL_FROM": "หมากรุกไทย <noreply@beanroti.com>"
   },
   "routes": [{ "pattern": "th-chess.beanroti.com", "custom_domain": true }],
   "observability": { "enabled": true }
