@@ -903,13 +903,19 @@
       "milestone": "M10",
       "title": "Variant interface in rules-core",
       "user_visible_behavior": "Makruk and Sittuyin rules implement one Variant interface, so AI, server and UI code can work with either game without knowing its rules.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "packages/rules-core exports the Variant interface and shared 8x8 helpers; both engines implement it.",
         "A shared conformance test suite runs against both variants (FEN round-trip, legal move strings playable, status after mate).",
         "npm run verify green; Makruk perft and lock-step suites unchanged and passing."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-14: packages/rules-core (@chaturanga/rules-core). src/variant.ts defines Variant<G> (id, files, ranks, startFen, pieceTypes, hasHands, createGame) and VariantGame (turn, fen, pieceAt, pieces, hand, legalUci, move, undo, moves, lastMove, status, isGameOver, inCheck, checkedKingSquare, counting); the shape comes from a survey of the Game calls in apps/web and apps/worker. Also: shared GameStatus union, FenError/IllegalMoveError, the numeric 8x8 board and move tables (FERZ = Met/Sit-ke, SILVER = Khon/Sin), attack detection, and /testing (ffish loader, mulberry32, describeVariantConformance). Engine purity lint rule covers the package.",
+        "2026-09-14: both engines implement it with compile-time proof: `export const makruk = {...} satisfies Variant<Game>` and `sittuyin` likewise. Makruk's Game gained only hand() (always []) and legalUci(); Makruk re-exports the moved code under its old names (KHON, MET, KHON_TARGETS, MET_TARGETS, findKing, isAttacked, inCheck, FenError, IllegalMoveError), so packages/ai, apps/web and apps/worker are untouched. Sittuyin now depends on rules-core instead of @makruk/engine.",
+        "2026-09-14: conformance suite in packages/engine/src/variant.test.ts (14 tests) and packages/sittuyin/src/variant.test.ts (15 tests). It checks the start position, FEN round-trips, FenError / IllegalMoveError without changing the position, pieces() vs pieceAt() with declared piece types, and 5 seeded 120-ply playouts in which each move record matches (uci, colour, fenAfter, destination square), the game is replayed from the move list to the same FEN and status, and undo walks back through every position; plus checkmate. Mutation check: a Makruk Game subclass whose undo() does nothing failed the playout test (1 failed / 4 passed), and the temporary file was deleted. rules-core board8.test.ts has 6 tests (square names, tables, attacks, missing king).",
+        "2026-09-14: npm run typecheck, npm run lint and npm run test exit 0 (web 112, worker 48, ai 20, engine 143 + 9 deep-only, protocol 2, rules-core 6, sittuyin 174 + 6 deep-only). Deep runs with perft to every reference depth and 400 lock-step games vs ffish: engine 152/152, sittuyin 180/180. npm run build exit 0 (vite built, wrangler dry-run bundle OK).",
+        "2026-09-14: full Playwright suite npm run e2e (vite + wrangler dev with local D1) — 65 passed in 1.2 min. The Makruk web app and online worker behave unchanged on the rules-core-backed engine."
+      ],
       "notes": ""
     },
     {

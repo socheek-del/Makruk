@@ -17,7 +17,7 @@ handoff; no agent updates it automatically.
 - Milestones: M0 infra ✓, M1 engine ✓, M2 local play ✓, M3 vs computer ✓ (ai-002 ladder verified on GitHub Actions), M4 learning ✓, M5 online ✓ (incl. quick match), M6 accounts (acct-001 anonymous seat token ✓; acct-002/acct-003 deferred — accounts removed by the owner), M8 owner requests (play-006, about-001, docs-001 ✓; seo-001 awaiting Search Console), M7 polish (PWA, sounds, themes, art ✓; polish-002 blocked)
 - D1 database `makruk` (id 9e084ac6-9749-411d-867d-c89e8421ed78); migrations in `apps/worker/migrations`, applied by `npm run deploy` (CI) and by the Playwright wrangler command locally
 - Remaining: `polish-002` (native Thai review) and `seo-001` (Search Console submission) — both need the owner; `acct-002`/`acct-003` deferred (accounts removed from the product for now)
-- Multi-game platform (session 003): plan in `docs/PLATFORM.md` (repo → `chaturanga`, one product per game on its own subdomain, Sittuyin next in Burmese + English). `packages/sittuyin` engine complete (M9): sit-001 ✓ setup, sit-002 ✓ moves + promotion, sit-003 ✓ game end + ASEAN counting (`docs/sittuyin-rules.md`). Next: plat-002 (Variant interface), then plat-003..006 and the Sittuyin app.
+- Multi-game platform (session 003): plan in `docs/PLATFORM.md` (repo → `chaturanga`, one product per game on its own subdomain, Sittuyin next in Burmese + English). `packages/sittuyin` engine complete (M9): sit-001 ✓ setup, sit-002 ✓ moves + promotion, sit-003 ✓ game end + ASEAN counting (`docs/sittuyin-rules.md`). plat-002: `packages/rules-core` holds the Variant interface and shared 8x8 code, and both engines pass its conformance suite. Next: plat-003 (rename to chaturanga and move Makruk into `apps/makruk`).
 - Shell pitfall: run npm/vitest under the `.nvmrc` Node (`. ~/.nvm/nvm.sh && nvm use`). The default shell Node 20.13 makes npm skip rolldown's native binding, and vitest then fails with "Cannot find native binding". `init.sh` already switches Node.
 - Current blockers (owner action needed):
   - `seo-001`: verify the site in Google Search Console and submit `https://th-chess.beanroti.com/sitemap.xml`
@@ -91,4 +91,10 @@ handoff; no agent updates it automatically.
 - Later in session: `sit-002` — move generation and Ne promotion verified against ffish (perft reference for 13 positions, lock-step full games). The promotion rules came from ffish probes; `packages/sittuyin/src/movegen.test.ts` lists each probed case.
 - Later in session: `sit-003` — Sittuyin game end, including ASEAN counting and the 50-move rule, documented in `docs/sittuyin-rules.md`. Lock-step games now compare the full FEN and game over. They found one real counting bug (a bare-king capture cleared the count); it is fixed. Deep run 165/165; verify exit 0.
 - Not pushed: commits 7408fb1..HEAD are local only. A push to `main` triggers the CI deploy (Makruk is unaffected, but ask the owner first).
-- Next best step: `plat-002`. Extract `packages/rules-core` (the Variant interface plus the shared 8x8 tables and attack detection now imported from `@makruk/engine/core`). Both engines implement it, with a shared conformance suite. Keep the Makruk perft and lock-step suites unchanged.
+- Owner approved the plan and asked to start implementation (push question still unanswered, so nothing pushed).
+- `plat-002`: `packages/rules-core` created.
+  - The Variant interface was designed from a survey of the Game calls in the web app and worker.
+  - Both engines satisfy it at compile time and pass the shared conformance suite. A mutation check (an undo that does nothing) proved the suite catches violations.
+  - Makruk re-exports the moved code under its old names, so the ai, web and worker packages did not change.
+  - Verification: verify, deep runs for both engines, build, E2E. Results are in `feature_list.json`.
+- Next best step: `plat-003`. It needs the owner for the GitHub rename, which changes the public URL: rename the repo to `chaturanga`, change the npm scope, move `apps/web` and `apps/worker` to `apps/makruk/`, and split the README and AGENTS files.

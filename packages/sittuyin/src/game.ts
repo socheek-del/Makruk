@@ -3,20 +3,21 @@ import {
   type Board,
   type ColorIndex,
   colorBits,
+  FERZ,
   fileOf,
+  IllegalMoveError,
   inCheck,
-  KHON,
   KING,
   KNIGHT,
-  MET,
   parseSquare,
   PAWN,
   rankOf,
   ROOK,
+  SILVER,
   squareName,
   toColor,
   TYPE_MASK,
-} from '@makruk/engine/core';
+} from '@chaturanga/rules-core';
 import { codeToPiece, HAND_ORDER, handCount, typeFromChar } from './board';
 import { handsOf, parseFen, placementOf, serializeFen, START_FEN } from './fen';
 import {
@@ -35,12 +36,7 @@ import {
 } from './movegen';
 import type { Color, CountingState, GameStatus, Move, MoveRecord, Piece, PieceType, Square } from './types';
 
-export class IllegalMoveError extends Error {
-  constructor(readonly move: string) {
-    super(`Illegal move: ${move}`);
-    this.name = 'IllegalMoveError';
-  }
-}
+export { IllegalMoveError };
 
 interface HistoryEntry {
   move: number;
@@ -79,7 +75,7 @@ function countLimit(board: Board, side: ColorIndex): number {
     if (type === PAWN) return 0;
     if ((p & BLACK ? 1 : 0) === side) continue;
     if (type === ROOK) rook = true;
-    else if (type === KHON) sin = true;
+    else if (type === SILVER) sin = true;
     else if (type === KNIGHT) knight = true;
   }
   if (pieceCount(board, side) !== 1) return 0;
@@ -93,10 +89,10 @@ function countLimit(board: Board, side: ColorIndex): number {
 function hasInsufficientMaterial(pos: Position, c: ColorIndex): boolean {
   if (handCount(pos.hands[c]) > 0) return false;
   const own = colorBits(c);
-  let ownMet = false;
+  let ownFerz = false;
   let ownUnbound = false;
-  let metDark = false;
-  let metLight = false;
+  let ferzDark = false;
+  let ferzLight = false;
   let unbound = 0;
   let nonKing = 0;
   for (let sq = 0; sq < 64; sq++) {
@@ -106,17 +102,17 @@ function hasInsufficientMaterial(pos: Position, c: ColorIndex): boolean {
     if (type === KING) continue;
     nonKing++;
     const mine = (p & BLACK) === own;
-    if (mine && (type === ROOK || type === KHON)) return false;
-    if (type === MET) {
-      if ((fileOf(sq) + rankOf(sq)) % 2 === 0) metDark = true;
-      else metLight = true;
-      if (mine) ownMet = true;
+    if (mine && (type === ROOK || type === SILVER)) return false;
+    if (type === FERZ) {
+      if ((fileOf(sq) + rankOf(sq)) % 2 === 0) ferzDark = true;
+      else ferzLight = true;
+      if (mine) ownFerz = true;
     } else {
       unbound++;
       if (mine) ownUnbound = true;
     }
   }
-  if (ownMet && ((metDark && metLight) || unbound > 0)) return false;
+  if (ownFerz && ((ferzDark && ferzLight) || unbound > 0)) return false;
   if (ownUnbound && nonKing >= 2) return false;
   return true;
 }
@@ -180,6 +176,11 @@ export class Game {
 
   legalMoves(): Move[] {
     return generateLegalMoves(this.pos).map(toMove);
+  }
+
+  /** Legal moves in coordinate notation (`K@h3`, `e3e4`, `h5g4f`). */
+  legalUci(): string[] {
+    return generateLegalMoves(this.pos).map((m) => moveToUci(toMove(m)));
   }
 
   legalMovesFrom(square: Square): Move[] {

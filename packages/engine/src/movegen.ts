@@ -1,7 +1,9 @@
 /**
- * Move generation and attack detection on the numeric board.
+ * Move generation on the numeric board.
  * Moves are encoded as from | to << 6 | promotion << 12.
+ * Attack detection is shared with Sittuyin in @chaturanga/rules-core.
  */
+import { inCheck } from '@chaturanga/rules-core';
 import {
   BLACK,
   type Board,
@@ -26,6 +28,8 @@ import {
 } from './board';
 import type { Square } from './types';
 
+export { findKing, inCheck, isAttacked } from '@chaturanga/rules-core';
+
 export const PROMOTION_FLAG = 1 << 12;
 
 export const encodeMove = (from: Square, to: Square, promotion: boolean): number =>
@@ -35,44 +39,6 @@ export const moveTo = (m: number): Square => (m >> 6) & 63;
 export const isPromotion = (m: number): boolean => (m & PROMOTION_FLAG) !== 0;
 
 const isOwn = (code: number, bits: number): boolean => code !== 0 && (code & BLACK) === bits;
-
-export function findKing(board: Board, c: ColorIndex): Square {
-  const code = KING | colorBits(c);
-  for (let sq = 0; sq < 64; sq++) if ((board[sq]! & ~PROMOTED) === code) return sq;
-  return -1;
-}
-
-/** True if `sq` is attacked by any piece of color `by`. */
-export function isAttacked(board: Board, sq: Square, by: ColorIndex): boolean {
-  const bits = colorBits(by);
-  const opp: ColorIndex = by === 0 ? 1 : 0;
-
-  for (const s of PAWN_CAPTURES[opp][sq]!) if (board[s] === (bits | PAWN)) return true;
-  for (const s of KNIGHT_TARGETS[sq]!) if (board[s] === (bits | KNIGHT)) return true;
-  for (const s of KING_TARGETS[sq]!) if (board[s] === (bits | KING)) return true;
-  for (const s of MET_TARGETS[sq]!) {
-    const p = board[s]!;
-    if (isOwn(p, bits) && ((p & TYPE_MASK) === MET || (p & TYPE_MASK) === KHON)) return true;
-  }
-  // A Khon also attacks the square directly in front of it.
-  const behind = by === 0 ? sq - 8 : sq + 8;
-  if (behind >= 0 && behind < 64 && board[behind] === (bits | KHON)) return true;
-
-  for (const ray of ROOK_RAYS[sq]!) {
-    for (const s of ray) {
-      const p = board[s]!;
-      if (p === 0) continue;
-      if (p === (bits | ROOK)) return true;
-      break;
-    }
-  }
-  return false;
-}
-
-export function inCheck(board: Board, c: ColorIndex): boolean {
-  const king = findKing(board, c);
-  return king >= 0 && isAttacked(board, king, c === 0 ? 1 : 0);
-}
 
 function pushLeaper(board: Board, from: Square, targets: readonly Square[], bits: number, out: number[]): void {
   for (const to of targets) if (!isOwn(board[to]!, bits)) out.push(encodeMove(from, to, false));

@@ -27,14 +27,10 @@ import {
   moveTo,
   unmakeRaw,
 } from './movegen';
-import type { Color, CountingState, GameStatus, Move, MoveRecord, Piece, Square } from './types';
+import { IllegalMoveError } from '@chaturanga/rules-core';
+import type { Color, CountingState, GameStatus, Move, MoveRecord, Piece, PieceType, Square } from './types';
 
-export class IllegalMoveError extends Error {
-  constructor(readonly move: string) {
-    super(`Illegal move: ${move}`);
-    this.name = 'IllegalMoveError';
-  }
-}
+export { IllegalMoveError };
 
 interface HistoryEntry {
   move: number;
@@ -181,8 +177,18 @@ export class Game {
     return out;
   }
 
+  /** Makruk has no pieces in hand; part of the rules-core Variant contract. */
+  hand(_color: Color): PieceType[] {
+    return [];
+  }
+
   legalMoves(): Move[] {
     return generateLegalMoves(this.board, this.turnIndex).map(toMove);
+  }
+
+  /** Legal moves in coordinate notation (`e3e4`, `a5a6m`). */
+  legalUci(): string[] {
+    return generateLegalMoves(this.board, this.turnIndex).map((m) => moveToUci(toMove(m)));
   }
 
   legalMovesFrom(square: Square): Move[] {

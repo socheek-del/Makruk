@@ -45,8 +45,12 @@ feature work on top of a broken starting state.
   Cloudflare Workers + Durable Objects + D1 · Vitest · Playwright.
 - **Node:** version in `.nvmrc` (`nvm use`).
 - **Layout:**
+  - `packages/rules-core` (`@chaturanga/rules-core`) — Variant interface, shared 8x8 board/tables/attacks,
+    rule errors; `/testing` has the ffish loader and the Variant conformance suite every engine runs.
   - `packages/engine` — pure Makruk rules. No DOM, no network, no randomness
     without an injected seed. Single source of truth used by web, AI and worker.
+  - `packages/sittuyin` (`@chaturanga/sittuyin`) — pure Sittuyin rules (`docs/sittuyin-rules.md`), not yet
+    used by any app.
   - `packages/ai` — search/eval, runs in a Web Worker (created in M3).
   - `packages/protocol` — Zod schemas for REST + WebSocket messages.
   - `apps/web` — React PWA.

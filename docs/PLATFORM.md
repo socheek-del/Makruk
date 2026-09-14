@@ -46,22 +46,38 @@ apps/
 
 The root README describes the family. Each game has its own README and translated README (`README.th.md`, `README.my.md`). The root `AGENTS.md` holds platform rules; `apps/<game>/AGENTS.md` holds game facts. `feature_list.json` features carry a `product` field (`platform`, `makruk`, `sittuyin`).
 
-## Variant interface (sketch — settled in plat-002)
+## Variant interface (settled in plat-002)
+
+`packages/rules-core/src/variant.ts` defines the interface. It is shaped by what the worker and web app
+already call on Makruk's `Game`, so it is a **stateful game** rather than pure position functions:
 
 ```ts
-export interface Variant<P = unknown> {
-  id: string;                                   // 'makruk', 'sittuyin'
-  files: number; ranks: number;
-  startFen: string;
-  parseFen(fen: string): P;                     // throws FenError
-  toFen(position: P): string;
-  legalMoves(position: P): string[];            // UCI-style: 'e3e4', 'h5g4f', 'K@h3'
-  play(position: P, move: string): P;           // throws IllegalMoveError
-  status(position: P, history: readonly string[]): GameStatus;
-  pieceAt(position: P, square: string): Piece | null;
-  hand?(position: P, color: Color): Piece[];    // Sittuyin setup, Shogi drops
+interface Variant<G extends VariantGame> {
+  id; files; ranks; startFen; pieceTypes; hasHands;
+  createGame(fen?): G;                          // throws FenError
+}
+
+interface VariantGame {
+  turn; fen(); pieceAt(sq); pieces(); hand(color);
+  legalUci(): string[];                         // 'e3e4', 'a5a6m', 'h5g4f', 'K@h3'
+  move(uci): VariantMoveRecord;                 // throws IllegalMoveError
+  undo(); moves(); lastMove();
+  status(): GameStatus;                         // union of every variant's end kinds
+  isGameOver(); inCheck(); checkedKingSquare(); counting();
 }
 ```
+
+- Each engine exports a variant object (`makruk`, `sittuyin`) declared with `satisfies Variant<Game>`, so the
+  compiler proves its `Game` class conforms. No adapter layer.
+- `@chaturanga/rules-core/testing` has `describeVariantConformance`. Every engine runs it; it covers FEN
+  round-trips, typed errors, random playouts that replay from the move list and undo to the start, and mate.
+- rules-core also owns what the Makruk-family engines share:
+  - the numeric 8x8 board and move tables (neutral names: `FERZ` = Met/Sit-ke, `SILVER` = Khon/Sin)
+  - attack detection
+  - `FenError` / `IllegalMoveError`
+  - the ffish test loader
+
+  Makruk re-exports these under its old names, so `packages/ai`, the web app and the worker are unchanged.
 
 Moves stay strings end to end (protocol, worker, stores, URLs) so no layer except the rules package parses them.
 

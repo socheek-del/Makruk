@@ -7,23 +7,23 @@ import {
   type Board,
   type ColorIndex,
   colorBits,
+  FERZ,
+  FERZ_TARGETS,
   inCheck,
-  KHON,
-  KHON_TARGETS,
   KING,
   KING_TARGETS,
   KNIGHT,
   KNIGHT_TARGETS,
-  MET,
-  MET_TARGETS,
   PAWN,
   PAWN_CAPTURES,
   parseSquare,
   PROMOTED,
   ROOK,
   ROOK_RAYS,
+  SILVER,
+  SILVER_TARGETS,
   TYPE_MASK,
-} from '@makruk/engine/core';
+} from '@chaturanga/rules-core';
 import { HAND_ORDER, type Hands, inDropRegion } from './board';
 import type { Square } from './types';
 
@@ -82,12 +82,12 @@ function pushLeaper(board: Board, from: Square, targets: readonly Square[], bits
  */
 function generatePromotions(board: Board, c: ColorIndex, pawns: readonly Square[], out: number[]): void {
   const bits = colorBits(c);
-  if (pawns.length === 0 || board.some((p) => isOwn(p, bits) && (p & TYPE_MASK) === MET)) return;
+  if (pawns.length === 0 || board.some((p) => isOwn(p, bits) && (p & TYPE_MASK) === FERZ)) return;
   const enemy = colorBits(c === 0 ? 1 : 0);
-  const attacksEnemy = (sq: Square) => MET_TARGETS[sq]!.some((s) => isOwn(board[s]!, enemy));
+  const attacksEnemy = (sq: Square) => FERZ_TARGETS[sq]!.some((s) => isOwn(board[s]!, enemy));
   for (const from of pawns) {
     if (pawns.length > 1 && !PROMOTION_SQUARES[c][from]) continue;
-    for (const to of [from, ...MET_TARGETS[from]!]) {
+    for (const to of [from, ...FERZ_TARGETS[from]!]) {
       if ((to === from || board[to] === 0) && !attacksEnemy(to)) out.push(encodeMove(from, to, PROMOTION_FLAG));
     }
   }
@@ -114,11 +114,11 @@ export function generatePieceMoves(board: Board, c: ColorIndex, out: number[] = 
       case KNIGHT:
         pushLeaper(board, from, KNIGHT_TARGETS[from]!, bits, out);
         break;
-      case KHON:
-        pushLeaper(board, from, KHON_TARGETS[c][from]!, bits, out);
+      case SILVER:
+        pushLeaper(board, from, SILVER_TARGETS[c][from]!, bits, out);
         break;
-      case MET:
-        pushLeaper(board, from, MET_TARGETS[from]!, bits, out);
+      case FERZ:
+        pushLeaper(board, from, FERZ_TARGETS[from]!, bits, out);
         break;
       case KING:
         pushLeaper(board, from, KING_TARGETS[from]!, bits, out);
@@ -162,7 +162,7 @@ export function makeRaw(pos: Position, m: number, c: ColorIndex): number {
   const piece = board[from]!;
   const captured = from === to ? 0 : board[to]!;
   board[from] = 0;
-  board[to] = isPromotion(m) ? (piece & BLACK) | MET | PROMOTED : piece;
+  board[to] = isPromotion(m) ? (piece & BLACK) | FERZ | PROMOTED : piece;
   return captured;
 }
 

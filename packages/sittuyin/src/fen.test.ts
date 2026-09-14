@@ -1,4 +1,4 @@
-import { KING, ROOK } from '@makruk/engine/core';
+import { KING, ROOK } from '@chaturanga/rules-core';
 import { describe, expect, it } from 'vitest';
 import { FenError, parseFen, serializeFen, START_FEN } from './fen';
 

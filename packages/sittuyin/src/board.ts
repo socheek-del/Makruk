@@ -1,23 +1,23 @@
 /**
- * Sittuyin letters, pieces in hand and the setup region on the shared 8x8 numeric board.
+ * Sittuyin letters, pieces in hand and the setup region on the shared numeric board.
  *
- * Pieces move exactly like their Makruk counterparts (Sit-ke = Met, Sin = Khon), so square
- * numbering, piece codes, move tables and attack detection come from @makruk/engine/core.
+ * Pieces move like their Makruk counterparts (Sit-ke = ferz, Sin = silver general), so square
+ * numbering, piece codes, move tables and attack detection come from @chaturanga/rules-core.
  */
 import {
   BLACK,
   type ColorIndex,
   colorIndexOf,
-  KHON,
+  FERZ,
   KING,
   KNIGHT,
-  MET,
   PROMOTED,
   rankOf,
   ROOK,
+  SILVER,
   toColor,
   typeOf,
-} from '@makruk/engine/core';
+} from '@chaturanga/rules-core';
 import type { Piece, PieceType, Square } from './types';
 
 /** Letter per piece code: 1 Ne, 2 Myin, 3 Sin, 4 Sit-ke, 5 Yahhta, 6 Min-gyi. */
@@ -49,7 +49,7 @@ export const emptyHands = (): Hands => [new Uint8Array(7), new Uint8Array(7)];
 export const handCount = (hand: Uint8Array): number => hand.reduce((sum, n) => sum + n, 0);
 
 /** Order in which Fairy-Stockfish lists pieces in hand. A Ne is never in hand. */
-export const HAND_ORDER: readonly number[] = [KING, KHON, MET, ROOK, KNIGHT];
+export const HAND_ORDER: readonly number[] = [KING, SILVER, FERZ, ROOK, KNIGHT];
 
 /** Setup drops go on a side's own three ranks; a Yahhta only on its back rank. */
 export function inDropRegion(sq: Square, c: ColorIndex, type: number): boolean {

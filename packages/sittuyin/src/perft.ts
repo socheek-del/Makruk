@@ -1,4 +1,4 @@
-import type { ColorIndex } from '@makruk/engine/core';
+import type { ColorIndex } from '@chaturanga/rules-core';
 import { parseFen } from './fen';
 import { generateLegalMoves, isDrop, makeRaw, moveFrom, type Position, unmakeRaw } from './movegen';
 

@@ -8,14 +8,17 @@ import {
   BLACK,
   type Board,
   type ColorIndex,
+  FenError,
+  FERZ,
   findKing,
   isAttacked,
   KING,
-  MET,
   PAWN,
   PROMOTED,
-} from '@makruk/engine/core';
+} from '@chaturanga/rules-core';
 import { codeToChar, emptyHands, HAND_ORDER, type Hands, typeFromChar } from './board';
+
+export { FenError };
 
 export const START_FEN = '8/8/4pppp/pppp4/4PPPP/PPPP4/8/8[KSSFRRNNkssfrrnn] w - - 0 1';
 
@@ -28,16 +31,6 @@ export interface PositionData {
   countingPly: number;
   rule50: number;
   fullmove: number;
-}
-
-export class FenError extends Error {
-  constructor(
-    message: string,
-    readonly fen: string,
-  ) {
-    super(message);
-    this.name = 'FenError';
-  }
 }
 
 const DIGITS = /^\d+$/;
@@ -68,7 +61,7 @@ export function parseFen(fen: string): PositionData {
       if (file > 7) throw new FenError(`Rank ${rank + 1} has more than 8 squares`, fen);
       let code = type | (ch === ch.toLowerCase() ? BLACK : 0);
       if (row[j + 1] === '~') {
-        if (type !== MET) throw new FenError("Only a Sit-ke can be marked promoted with '~'", fen);
+        if (type !== FERZ) throw new FenError("Only a Sit-ke can be marked promoted with '~'", fen);
         code |= PROMOTED;
         j++;
       }

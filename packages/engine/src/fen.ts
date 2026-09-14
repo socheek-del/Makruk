@@ -18,7 +18,10 @@ import {
   TYPE_MASK,
   typeFromChar,
 } from './board';
+import { FenError } from '@chaturanga/rules-core';
 import { findKing, isAttacked } from './movegen';
+
+export { FenError };
 
 export const START_FEN = 'rnsmksnr/8/pppppppp/8/8/PPPPPPPP/8/RNSKMSNR w - - 0 1';
 
@@ -30,16 +33,6 @@ export interface PositionData {
   countingPly: number;
   rule50: number;
   fullmove: number;
-}
-
-export class FenError extends Error {
-  constructor(
-    message: string,
-    readonly fen: string,
-  ) {
-    super(message);
-    this.name = 'FenError';
-  }
 }
 
 const DIGITS = /^\d+$/;
