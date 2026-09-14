@@ -1,5 +1,8 @@
 {
   "brand": "Sittuyin",
+  "family": {
+    "title": "More games"
+  },
   "app": {
     "name": "Sittuyin"
   },

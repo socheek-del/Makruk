@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react';
 import type { Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vitest/config';
+// Relative path on purpose: Vite bundles a config's relative imports, not workspace packages.
+import { familyLinks } from '../../../packages/family/src/sites';
 import { PRODUCT } from './product.config';
 import { SITE_URL } from './site.config';
 import { buildRobots, buildSitemap } from './src/features/seo/sitemap';
@@ -43,7 +45,8 @@ function siteAddress(): Plugin {
 
 // In dev, the Worker runs on :8787 (wrangler dev) and Vite proxies API + WebSocket traffic to it.
 export default defineConfig({
-  define: { __SITE_URL__: JSON.stringify(SITE_URL) },
+  // plat-006: sibling sites for the "more games" links, with addresses from their own site.config.ts.
+  define: { __SITE_URL__: JSON.stringify(SITE_URL), __FAMILY__: JSON.stringify(familyLinks('makruk')) },
   plugins: [
     react(),
     tailwindcss(),

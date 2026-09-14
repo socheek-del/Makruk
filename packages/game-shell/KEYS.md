@@ -83,3 +83,12 @@ screen also reads every game-screen key above.
 | `play.cancel` | Cancels a quick-match search |
 
 There is no chat key, because there is no chat.
+
+# More games
+
+Every family site shows its siblings (`MoreGames`, plat-006). The sibling names come from
+`@chaturanga/family`, so the only key is the heading.
+
+| Key | Used for |
+| --- | --- |
+| `family.title` | Heading of the home-page section, and the label of the footer line |

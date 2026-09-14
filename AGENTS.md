@@ -88,6 +88,11 @@ broken starting state.
   - `packages/sittuyin-ai` (`@chaturanga/sittuyin-ai`): Sittuyin bots (ai-core search, evaluation, setup
     placement policy). Product plan: `apps/sittuyin/docs/PLAN.md`.
   - `packages/protocol` (`@chaturanga/protocol`): Zod schemas for REST and WebSocket messages.
+  - `packages/family` (`@chaturanga/family`): the family's game list with names in every site language.
+    `src/sites.ts` reads each game's address and languages from its own `site.config.ts` and
+    `product.config.ts`, and each app's vite.config injects its siblings as `__FAMILY__` for `MoreGames`.
+    A site address is overridden per product (`MAKRUK_SITE_URL`, `SITTUYIN_SITE_URL`), never with a shared
+    variable.
   - `packages/ui` (`@chaturanga/ui`): React primitives (Badge, Button, Card, Modal, ProgressBar,
     SegmentedControl, Switch, `cn`). They carry shape, state and accessibility but no palette: every
     colour is a Tailwind token the product defines, listed in `packages/ui/TOKENS.md`. Apps must list it

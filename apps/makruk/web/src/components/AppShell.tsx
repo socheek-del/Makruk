@@ -1,6 +1,9 @@
+import { resolveLocale } from '@chaturanga/game-shell';
+import { MoreGames } from '@chaturanga/game-shell/ui';
 import { GraduationCap, Info, type LucideIcon, Settings, Swords } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink, Outlet } from 'react-router';
+import { PRODUCT } from '../../product.config';
 import { SeoController } from '../features/seo/SeoController';
 import { cn } from '@chaturanga/ui';
 import { ThemeController } from './ThemeController';
@@ -13,7 +16,7 @@ const NAV: ReadonlyArray<{ to: string; key: string; icon: LucideIcon; end?: bool
 ];
 
 export function AppShell() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   return (
     <div className="min-h-dvh bg-canvas text-ink md:flex">
       <ThemeController />
@@ -45,6 +48,7 @@ export function AppShell() {
       </nav>
       <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-6 md:pb-10">
         <Outlet />
+        <MoreGames sites={__FAMILY__} locale={resolveLocale(PRODUCT, i18n.language)} variant="footer" />
       </main>
     </div>
   );

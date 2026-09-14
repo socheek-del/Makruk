@@ -1072,13 +1072,18 @@
       "milestone": "M10",
       "title": "Links between the games",
       "user_visible_behavior": "Each game's site shows a 'more games' section and footer linking to its sibling games, in the site's language, without mixing their content.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "packages/family lists games with names in every language; URLs come from each app's config (no hardcoded domains).",
         "Playwright: the more-games link on Makruk points to the configured Sittuyin address and vice versa."
       ],
-      "evidence": [],
-      "notes": ""
+      "evidence": [
+        "2026-09-14 (session 006): packages/family — games.ts names makruk and sittuyin in th, my and en; sites.ts reads each game's SITE_URL from apps/<game>/web/site.config.ts and its languages from product.config.ts, and familyLinks(current) returns only the siblings. Each app's vite.config.ts injects familyLinks(<self>) as __FAMILY__; the shared game-shell MoreGames component renders a home-page section (data-testid more-games) and a footer on every page (family-footer), linking to the sibling's plain address, or with ?lang=<viewer's language> when the sibling declares that language. Only the sibling's name crosses over; the heading key family.title is in every locale of both products (KEYS.md).",
+        "Unit: packages/family 3 tests — every game named in every language any site declares (en, my, th); familyLinks('makruk') is exactly Sittuyin at SITTUYIN's site.config URL and vice versa, never itself; no http(s) address in the package source. game-shell MoreGames.test: en visitor keeps ?lang=en on Sittuyin, th/my visitors get the plain address.",
+        "E2E apps/makruk/web/e2e/family.spec.ts: Thai home section 'เกมอื่น ๆ' and footer link 'หมากรุกพม่า' → `${familyLinks('makruk')[0].url}/`; /learn?lang=en footer link 'Sittuyin (Burmese chess)' → `/?lang=en`; one link each, no Burmese text on the page. apps/sittuyin/web/e2e/family.spec.ts: Burmese section 'အခြား ဂိမ်းများ' and footer 'ထိုင်းစစ်တုရင်' → Makruk's configured address; English footer 'Makruk (Thai chess)' → `/?lang=en`; no Thai text. Screenshots e2e-evidence/more-games.png (Makruk 1280) and more-games-390.png (Sittuyin) reviewed.",
+        "Regression: Makruk e2e 66/66, Sittuyin e2e 27/27, both e2e:pwa 2/2, npm run build and build:sittuyin OK, lint and typecheck clean."
+      ],
+      "notes": "Site address overrides became per product (MAKRUK_SITE_URL, SITTUYIN_SITE_URL; CONTRIBUTING.md updated): packages/family reads both site configs inside one build, so a shared SITE_URL override would have given both sites the same address. Vite configs and Playwright specs import packages/family/src/sites.ts by relative path, because neither loads TypeScript from workspace packages at config/spec time. Sibling names in th/my are plain descriptions ('Burmese chess', 'Thai chess') pending the native reviews (polish-002, sit-011)."
     },
     {
       "id": "sit-004",

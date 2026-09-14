@@ -11,6 +11,7 @@ export { GameControls, type GameControlsProps } from './GameControls';
 export { GameOverModal, type GameOverModalProps, resultTitleKey } from './GameOverModal';
 export { GameScreen, type GameScreenProps, undoAllowed } from './GameScreen';
 export { LessonPlayer, type LessonMood, type LessonPlayerProps, type LessonSound } from './LessonPlayer';
+export { MoreGames, type MoreGamesProps, siblingHref, type SiblingSite } from './MoreGames';
 export { MoveList, type MoveListProps } from './MoveList';
 export { type OnlineColorChoice, OnlineLobby, type OnlineLobbyProps } from './OnlineLobby';
 export { OnlineRoom, type OnlineRoomContext, type OnlineRoomProps, type OnlineScreenProps } from './OnlineRoom';

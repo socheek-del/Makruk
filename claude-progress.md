@@ -245,5 +245,20 @@ handoff; no agent updates it automatically.
       fake-clock test this change does not touch; it passed 12/12 when re-run with `--repeat-each 3`.
     - `npm run verify` exit 0, `npm run build` and `npm run build:sittuyin` OK.
 - Known flake: Makruk `clock.spec` "clock counts down…" can fail under full-suite load, like online-004.
-- Next: `sit-009` needs the owner to name the Sittuyin subdomain. After that come `plat-006` (links
-  between the games) and `sit-010` (SEO, About and README; its media must be captured from production).
+- `plat-006` is now `passing`.
+  - `packages/family` names each game in th/my/en. `src/sites.ts` takes each game's address and languages
+    from its own `site.config.ts` / `product.config.ts`, and each vite.config injects the siblings as
+    `__FAMILY__`.
+  - The shared `MoreGames` component shows a home-page section and a footer on every page. A link keeps
+    the viewer's language only if the sibling site speaks it.
+  - Address overrides are per product now (`MAKRUK_SITE_URL`, `SITTUYIN_SITE_URL`). A shared `SITE_URL`
+    would have leaked one site's address into the other's links.
+  - Verification:
+    - family unit 3, game-shell 28.
+    - `family.spec.ts` in both apps; Makruk e2e 66/66 and Sittuyin e2e 27/27.
+    - Both PWA suites 2/2, both builds OK, lint and typecheck clean.
+    - Screenshots reviewed: Makruk home at 1280px and Sittuyin home at 390px.
+- Pitfall: a Bash call that `cd`s changes the working directory for the next parallel call. Always `cd` to
+  an absolute path when running a suite.
+- Next: `sit-009` needs the owner to name the Sittuyin subdomain and approve pushing. Pushing also deploys
+  Makruk. `sit-010` SEO can be built locally, but its README media must come from production.

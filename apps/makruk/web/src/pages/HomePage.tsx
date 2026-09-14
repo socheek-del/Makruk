@@ -1,9 +1,12 @@
+import { resolveLocale } from '@chaturanga/game-shell';
+import { MoreGames } from '@chaturanga/game-shell/ui';
 import { HealthResponse } from '@chaturanga/protocol';
 import { Bot, Globe, GraduationCap, type LucideIcon, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { Badge, Card } from '@chaturanga/ui';
+import { PRODUCT } from '../../product.config';
 
 type ServerStatus = 'checking' | 'ok' | 'down';
 
@@ -15,7 +18,7 @@ const MODES: ReadonlyArray<{ key: string; icon: LucideIcon; tile: string; to?: s
 ];
 
 export function HomePage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [status, setStatus] = useState<ServerStatus>('checking');
 
   useEffect(() => {
@@ -77,6 +80,8 @@ export function HomePage() {
         <p className="text-muted">{t('home.aboutBody1')}</p>
         <p className="text-muted">{t('home.aboutBody2')}</p>
       </section>
+
+      <MoreGames sites={__FAMILY__} locale={resolveLocale(PRODUCT, i18n.language)} />
 
       <footer className="text-center text-sm text-muted">
         {t('status.label')}:{' '}

@@ -54,8 +54,8 @@ Product rules: no chat of any kind in online play, and the server validates ever
 No site address is hardcoded in the apps. To move the Makruk site, or run your own copy:
 
 1. In `apps/makruk/web/site.config.ts`, change the default `SITE_URL` (or build with
-   `SITE_URL=https://example.com`). Canonical links, language alternates, Open Graph tags, structured
-   data, `robots.txt` and `sitemap.xml` are all generated from it.
+   `MAKRUK_SITE_URL=https://example.com`). Canonical links, language alternates, Open Graph tags, structured
+   data, `robots.txt`, `sitemap.xml` and the other family sites' "more games" links are all generated from it.
 2. In `apps/makruk/worker/wrangler.jsonc`, set `routes` (custom domain) and `PUBLIC_ORIGIN`.
 3. In `apps/makruk/README.md` and `README.th.md`, update the `[play]` link definition at the bottom of each
    file.
