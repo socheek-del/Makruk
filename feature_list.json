@@ -816,6 +816,273 @@
         "Sounds are synthesized with Web Audio (wooden knock for moves/captures, two-tone check, chime for game end and lesson success, low buzz for mistakes) — no audio files, so they work offline; phones vibrate when haptics are on."
       ],
       "notes": ""
+    },
+    {
+      "id": "plat-001",
+      "priority": 44,
+      "area": "platform",
+      "milestone": "M9",
+      "title": "Multi-game platform plan",
+      "user_visible_behavior": "The repository documents how Makruk, Sittuyin and later games share code while staying separate products (own site, brand, languages), and the phased feature list to get there.",
+      "status": "passing",
+      "verification": [
+        "docs/PLATFORM.md records the owner decisions (repo name chaturanga, subdomains, Sittuyin next with my+en), target layout, Variant interface sketch, per-product locale rule and order of work.",
+        "feature_list.json lists the Sittuyin engine, platform extraction and Sittuyin product features with verification steps."
+      ],
+      "evidence": [
+        "2026-09-14: docs/PLATFORM.md written after owner decisions in session 003; AGENTS.md points to it; features sit-001..011 and plat-002..006 added. Sittuyin start position, setup drops and promotion move formats probed with ffish 0.7.10 (200 random games, 16 setup plies each)."
+      ],
+      "notes": "Planning artifact only; no product code changed."
+    },
+    {
+      "id": "sit-001",
+      "priority": 45,
+      "area": "engine",
+      "milestone": "M9",
+      "title": "Sittuyin position, FEN with pieces in hand, and setup phase",
+      "user_visible_behavior": "The Sittuyin engine loads and exports positions in Fairy-Stockfish FEN (including pieces in hand) and lists the legal setup drops, alternating White then Black, until all 16 pieces are placed.",
+      "status": "not_started",
+      "verification": [
+        "New pure package packages/sittuyin (no DOM, network or unseeded randomness) with unit tests.",
+        "FEN parse → serialize round-trips for the start position, mid-setup positions and 10+ played positions; invalid FEN rejected with typed errors.",
+        "Setup drop lists equal ffish sittuyin legalMoves on every ply of seeded random setups (drop regions, back-rank-only rooks, turn order)."
+      ],
+      "evidence": [],
+      "notes": "Reuse Makruk's 8x8 helpers where the logic is identical; shared code moves to rules-core in plat-002."
+    },
+    {
+      "id": "sit-002",
+      "priority": 46,
+      "area": "engine",
+      "milestone": "M9",
+      "title": "Sittuyin move generation and promotion",
+      "user_visible_behavior": "After setup the engine lists every legal move for Min-gyi, Sit-ke, Sin, Myin, Yahhta and Ne, including Ne promotion to Sit-ke as a separate move (diagonal step or in place).",
+      "status": "not_started",
+      "verification": [
+        "Unit tests per piece type and for promotion conditions from hand-built positions.",
+        "Legal move sets equal ffish sittuyin on every ply of 400 seeded random games (deep run) and a fast subset in npm run verify.",
+        "Perft depth 1-4 from the first post-setup position and 5+ tricky positions match ffish."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "sit-003",
+      "priority": 47,
+      "area": "engine",
+      "milestone": "M9",
+      "title": "Sittuyin game end: checkmate, stalemate, repetition, counting and material draws",
+      "user_visible_behavior": "The engine reports check, checkmate, stalemate, repetition and any counting or insufficient-material draws exactly as Fairy-Stockfish's sittuyin variant does.",
+      "status": "not_started",
+      "verification": [
+        "docs/sittuyin-rules.md documents every end rule with the ffish probe that settles it.",
+        "Scenario unit tests for each rule.",
+        "Game-over flag, result and FEN counting fields equal ffish on every ply of 400 seeded random games."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "plat-002",
+      "priority": 48,
+      "area": "platform",
+      "milestone": "M10",
+      "title": "Variant interface in rules-core",
+      "user_visible_behavior": "Makruk and Sittuyin rules implement one Variant interface, so AI, server and UI code can work with either game without knowing its rules.",
+      "status": "not_started",
+      "verification": [
+        "packages/rules-core exports the Variant interface and shared 8x8 helpers; both engines implement it.",
+        "A shared conformance test suite runs against both variants (FEN round-trip, legal move strings playable, status after mate).",
+        "npm run verify green; Makruk perft and lock-step suites unchanged and passing."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "plat-003",
+      "priority": 49,
+      "area": "platform",
+      "milestone": "M10",
+      "title": "Rename to chaturanga and move Makruk into apps/makruk",
+      "user_visible_behavior": "The repository is the chaturanga family: a root README about the games, Makruk's README/AGENTS facts in apps/makruk, neutral package scope. The Makruk site behaves exactly as before.",
+      "status": "not_started",
+      "verification": [
+        "GitHub repository renamed to chaturanga (old URL redirects); local remote uses the github-socheek-del alias.",
+        "npm scope changed from @makruk to a neutral scope; apps/web and apps/worker live under apps/makruk/.",
+        "Root README describes the family; apps/makruk/README.md and README.th.md keep the Makruk showcase; root AGENTS.md holds platform rules and apps/makruk/AGENTS.md holds Makruk facts; features carry a product field.",
+        "npm run verify, npm run e2e and npm run e2e:pwa pass; CI deploys and production Makruk smoke checks (home, computer game, online room, /api/health) pass."
+      ],
+      "evidence": [],
+      "notes": "Worker name and D1 database stay 'makruk' (they are Makruk's)."
+    },
+    {
+      "id": "plat-004",
+      "priority": 50,
+      "area": "i18n",
+      "milestone": "M10",
+      "title": "Per-product languages",
+      "user_visible_behavior": "Each game's site offers only its own languages with its own default (Makruk: Thai + English; Sittuyin: Burmese + English) and loads only those.",
+      "status": "not_started",
+      "verification": [
+        "product.config declares locales, default locale and fonts; i18n, <html lang>, ?lang= and the settings language switch use it.",
+        "Locale test fails when any declared locale is missing a key in shared or app namespaces.",
+        "Makruk E2E i18n suite passes unchanged; the Makruk production build contains no Burmese strings."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "plat-005",
+      "priority": 51,
+      "area": "platform",
+      "milestone": "M10",
+      "title": "Shared UI, board, game shell and server kit",
+      "user_visible_behavior": "Game screen, clocks, move list, online play, lessons player and server rooms come from shared packages; the board supports other sizes and pieces in hand. Makruk still behaves exactly as before.",
+      "status": "not_started",
+      "verification": [
+        "packages ui, board-ui, game-shell, ai-core and server-kit exist; apps/makruk contains only Makruk identity and wiring.",
+        "Protocol messages and D1 games/ratings rows carry variant (migration defaults existing rows to makruk); the server validates moves with the room's Variant.",
+        "Board unit tests render a 9x9 board and a hand zone.",
+        "npm run verify and full Makruk E2E pass; production smoke after deploy."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "plat-006",
+      "priority": 52,
+      "area": "platform",
+      "milestone": "M10",
+      "title": "Links between the games",
+      "user_visible_behavior": "Each game's site shows a 'more games' section and footer linking to its sibling games, in the site's language, without mixing their content.",
+      "status": "not_started",
+      "verification": [
+        "packages/family lists games with names in every language; URLs come from each app's config (no hardcoded domains).",
+        "Playwright: the more-games link on Makruk points to the configured Sittuyin address and vice versa."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "sit-004",
+      "priority": 53,
+      "area": "ai",
+      "milestone": "M11",
+      "title": "Sittuyin computer opponent and bot ladder",
+      "user_visible_behavior": "A user plays Sittuyin against named bots of increasing strength, including sensible piece placement in the setup phase.",
+      "status": "not_started",
+      "verification": [
+        "ai-core search with a Sittuyin evaluation and setup-placement policy; unit tests (mate in one, hanging piece, legal setup).",
+        "Bot ladder: each level beats the level below in a majority of 20 games (GitHub Actions strength workflow)."
+      ],
+      "evidence": [],
+      "notes": "Fairy-Stockfish WASM may back the strongest level."
+    },
+    {
+      "id": "sit-005",
+      "priority": 54,
+      "area": "design",
+      "milestone": "M11",
+      "title": "Sittuyin design identity and piece art",
+      "user_visible_behavior": "The Sittuyin site has its own Burmese-inspired look (tokens, fonts, board and in-house piece art) that is clearly different from Makruk's Wat theme and from Duolingo.",
+      "status": "not_started",
+      "verification": [
+        "apps/sittuyin/docs/design.md describes tokens, Myanmar typography (Unicode, OFL font, line-height) and piece-art guide; owner approves the direction.",
+        "Showcase page screenshots in light and dark at 390px and 1280px reviewed; all 6 piece types x 2 colours readable at 40px squares."
+      ],
+      "evidence": [],
+      "notes": "Owner approval of the direction required before building sit-006."
+    },
+    {
+      "id": "sit-006",
+      "priority": 55,
+      "area": "play",
+      "milestone": "M11",
+      "title": "Sittuyin web app: setup phase, pass-and-play and vs computer",
+      "user_visible_behavior": "On the Sittuyin site (Burmese by default, English available) a user places pieces from hand during setup, then plays pass-and-play or against the computer with clocks, history and undo; games survive a refresh; the app installs and works offline.",
+      "status": "not_started",
+      "verification": [
+        "Playwright: setup by tap and drag from hand (illegal drop squares refused, rooks back rank only), then moves and an in-place promotion.",
+        "Playwright: vs computer game replies with legal moves; refresh restores the game; html lang=my by default, English persists after reload.",
+        "PWA installability and offline play checks pass on a production build."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "sit-007",
+      "priority": 56,
+      "area": "learn",
+      "milestone": "M11",
+      "title": "Sittuyin lessons",
+      "user_visible_behavior": "A beginner learns the Sittuyin board, setup, each piece, promotion, check and checkmate through interactive lessons in Burmese and English.",
+      "status": "not_started",
+      "verification": [
+        "Lesson data validated by the Sittuyin engine in tests (legal solutions, my+en text for every step).",
+        "Playwright completes one full lesson in each language."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "sit-008",
+      "priority": 57,
+      "area": "online",
+      "milestone": "M11",
+      "title": "Sittuyin online play",
+      "user_visible_behavior": "Two users play Sittuyin online by room code or quick match, including the setup phase, with server-validated moves and clocks. No chat.",
+      "status": "not_started",
+      "verification": [
+        "Worker tests in workerd: setup drops and moves validated with the Sittuyin Variant; illegal drop rejected.",
+        "Playwright with two contexts: create room, join by code, complete setup, play 4 moves, both boards match."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "sit-009",
+      "priority": 58,
+      "area": "infra",
+      "milestone": "M11",
+      "title": "Deploy Sittuyin on its subdomain",
+      "user_visible_behavior": "The Sittuyin site is live on its own subdomain over HTTPS, deployed by CI on push to main without redeploying Makruk unnecessarily.",
+      "status": "not_started",
+      "verification": [
+        "Owner confirms the subdomain; site address set only in apps/sittuyin config and wrangler routes.",
+        "CI deploys the sittuyin worker (own D1 migrations); production /api/health ok, home loads in Burmese, computer game works.",
+        "Makruk production smoke still passes."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "sit-010",
+      "priority": 59,
+      "area": "growth",
+      "milestone": "M11",
+      "title": "Sittuyin SEO, About and README",
+      "user_visible_behavior": "People searching for Burmese chess (e.g. 'sittuyin', 'စစ်တုရင်') find the site; it has an About page and a showcase README with demos captured from production.",
+      "status": "not_started",
+      "verification": [
+        "Per-page my/en titles, descriptions, canonical + hreflang, OG image, JSON-LD, robots.txt and sitemap on production.",
+        "apps/sittuyin/README.md and README.my.md with media captured from production (no domain visible)."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "sit-011",
+      "priority": 60,
+      "area": "polish",
+      "milestone": "M11",
+      "title": "Burmese translation review",
+      "user_visible_behavior": "All Burmese text reads naturally and uses correct Sittuyin terminology.",
+      "status": "not_started",
+      "verification": [
+        "Native Burmese speaker review recorded in apps/sittuyin/docs/i18n-review.md."
+      ],
+      "evidence": [],
+      "notes": "Needs a human reviewer; an agent cannot sign this off."
     }
   ]
 }

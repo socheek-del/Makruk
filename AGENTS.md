@@ -5,6 +5,11 @@ game-like tutorials and themes in its own "Wat" (Thai temple) design system (`do
 Duolingo's look (fonts, colours, chunky buttons, zig-zag path) — owner decision, legal risk. Full product
 plan: `docs/PLAN.md`.
 
+**Becoming a multi-game monorepo** (owner decision 2026-09-14): repo will be renamed `chaturanga`; Sittuyin
+(Burmese chess, `my` + `en`) is the next game, each game a separate product on its own subdomain. Plan,
+target layout and order of work: `docs/PLATFORM.md`. Until the restructure (plat-003) lands, the Makruk
+facts below still describe the code.
+
 This repository is designed for long-running coding-agent work. The goal is not
 to maximize raw code output. The goal is to leave the repo in a state where the
 next session can continue without guessing.
