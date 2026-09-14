@@ -3,7 +3,8 @@ import { type Color, type Game, type PieceType, parseSquare } from '@makruk/engi
 import { Lightbulb, LoaderCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { create, type StoreApi, type UseBoundStore } from 'zustand';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
@@ -12,7 +13,7 @@ import { PieceSvg } from '../features/board/PieceSvg';
 import { GameScreen, undoAllowed } from '../features/game/GameScreen';
 import { CoachTip } from '../features/learn/CoachTip';
 import { cn } from '../lib/cn';
-import { type GameSessionState, useComputerSession } from '../stores/localSession';
+import { type GameSessionStore, useComputerSession } from '../stores/localSession';
 import { useSettings } from '../stores/settings';
 
 /** Minimum visible "thinking" time so instant bot replies still feel like a turn. */
@@ -20,7 +21,13 @@ const MIN_THINK_MS = 450;
 
 const BOT_PIECE: Record<string, PieceType> = { bia: 'p', met: 'm', khon: 's', ma: 'n', ruea: 'r', khun: 'k' };
 
-const useComputerMatch = create<{ level: number; humanColor: Color }>(() => ({ level: 2, humanColor: 'w' }));
+/** Bot and colour of the current game; saved with the game so a reload continues against the same bot. */
+const useComputerMatch = create<{ level: number; humanColor: Color }>()(
+  persist(() => ({ level: 2, humanColor: 'w' as Color }), {
+    name: 'makruk.session.computerMatch',
+    storage: createJSONStorage(() => localStorage),
+  }),
+);
 
 const opposite = (c: Color): Color => (c === 'w' ? 'b' : 'w');
 
@@ -107,7 +114,7 @@ function ComputerSetup() {
 }
 
 export interface ComputerGameProps {
-  useSession: UseBoundStore<StoreApi<GameSessionState>>;
+  useSession: GameSessionStore;
   level: number;
   humanColor: Color;
   /** Show beginner coach tips (guided first game). */

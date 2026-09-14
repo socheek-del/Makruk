@@ -1,5 +1,5 @@
 import { type Color, FenError } from '@makruk/engine';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 import { Button } from '../components/ui/Button';
@@ -13,6 +13,16 @@ import { type PassAndPlayView, useSettings } from '../stores/settings';
 
 export function LocalGamePage() {
   const phase = useLocalSession((s) => s.phase);
+  const [params] = useSearchParams();
+  const fen = params.get('fen');
+
+  useEffect(() => {
+    // A position link opens its setup — unless the saved game already started from that position
+    // (then this is just a reload of that game).
+    const session = useLocalSession.getState();
+    if (fen && session.phase === 'playing' && session.startFen !== fen) session.exitToSetup();
+  }, [fen]);
+
   return phase === 'setup' ? <LocalSetup /> : <LocalGame />;
 }
 

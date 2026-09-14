@@ -26,3 +26,20 @@ test('opens in Thai by default; English choice applies immediately and persists'
   await page.getByRole('radio', { name: 'ไทย' }).click();
   await expect(html).toHaveAttribute('lang', 'th');
 });
+
+test("a guest's language choice is remembered in the browser without any account or identity", async ({ context, page }) => {
+  await page.goto('/settings');
+  await page.getByRole('radio', { name: 'English' }).click();
+  // No guest identity and no account: the choice lives only in this browser's storage.
+  await page.evaluate(() => localStorage.removeItem('makruk.identity'));
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+
+  const other = await context.newPage();
+  await other.goto('/play/local');
+  await expect(other.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(other.getByRole('heading', { name: 'Pass and play' })).toBeVisible();
+  await other.goto('/account');
+  await expect(other.getByRole('link', { name: 'Settings' })).toBeVisible();
+  expect(await other.evaluate(() => JSON.parse(localStorage.getItem('makruk.settings')!).state.language)).toBe('en');
+});

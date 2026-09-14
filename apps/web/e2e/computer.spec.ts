@@ -66,6 +66,20 @@ test('hint highlights a legal move for the player (ai-003)', async ({ page }) =>
   await expect(plies(page)).toHaveCount(2, { timeout: 15_000 });
 });
 
+test('a refresh continues the same game against the same bot, even while it is thinking', async ({ page }) => {
+  await startComputer(page, { level: 6 });
+  await play(page, [['e3', 'e4']]);
+  await page.reload();
+  // The strongest bot was still thinking: after the reload it picks the search up again and replies.
+  await expect(pieceOn(page, 'e4')).toHaveAttribute('data-piece', 'wp');
+  await expect(plies(page)).toHaveCount(2, { timeout: 15_000 });
+  await expect(page.locator('[data-bot-level]')).toHaveCount(0);
+  await page.reload();
+  await expect(plies(page)).toHaveCount(2);
+  await expect(page.getByTestId('turn-banner')).toHaveText('ตาเดินของฝ่ายขาว');
+  await expect(page.getByTestId('player-b')).toContainText('ขุนพลใหญ่');
+});
+
 test('takeback restores the position before your last move (ai-003)', async ({ page }) => {
   await startComputer(page, { level: 1 });
   await play(page, [['e3', 'e4']]);

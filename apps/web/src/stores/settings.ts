@@ -58,6 +58,9 @@ export const useSettings = create<SettingsState>()(
       version: 1,
       storage: createJSONStorage(() => localStorage),
       partialize: ({ update: _update, ...settings }) => settings,
+      // Settings live only in this browser (no account needed). Keep saved choices such as the language
+      // when the stored format changes instead of silently falling back to defaults.
+      migrate: (saved) => ({ ...DEFAULT_SETTINGS, ...(saved as Partial<Settings>) }),
     },
   ),
 );

@@ -9,9 +9,14 @@ export interface LocalGameOptions {
   fen?: string;
 }
 
-/** Opens pass-and-play setup, applies options and starts the game. */
+/** Opens pass-and-play setup (leaving any saved game), applies options and starts the game. */
 export async function startLocalGame(page: Page, options: LocalGameOptions = {}) {
   await page.goto(options.fen ? `/play/local?fen=${encodeURIComponent(options.fen)}` : '/play/local');
+  // A game saved earlier in this browser is restored after navigation; start over from setup.
+  const start = page.getByRole('button', { name: 'เริ่มเกม' });
+  const newGame = page.getByRole('button', { name: 'เกมใหม่', exact: true }).first();
+  await expect(start.or(newGame).first()).toBeVisible();
+  if (!(await start.isVisible())) await newGame.click();
   await page.locator(`[data-time-control="${options.timeControl ?? 'none'}"]`).click();
   if (options.view) await page.getByRole('radio', { name: options.view }).click();
   await page.getByRole('button', { name: 'เริ่มเกม' }).click();

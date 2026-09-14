@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { play, startLocalGame } from './helpers';
+import { pieceOn, play, startLocalGame } from './helpers';
 
 test('turn banner follows the side to move', async ({ page }) => {
   await startLocalGame(page);
@@ -46,6 +46,31 @@ test('tabletop view turns the far player bar upside down and keeps the board fix
   await expect(page.getByTestId('player-w')).not.toHaveAttribute('data-rotated', 'true');
   await play(page, [['e3', 'e4']]);
   await expect(page.getByRole('grid')).toHaveAttribute('data-orientation', 'w');
+});
+
+test('a refresh keeps the pass-and-play game in progress', async ({ page }) => {
+  await startLocalGame(page);
+  await play(page, [
+    ['e3', 'e4'],
+    ['d6', 'd5'],
+  ]);
+  await page.getByRole('button', { name: 'พลิกกระดาน' }).click();
+  await page.reload();
+  await expect(page.getByTestId('move-list').locator('[data-ply]')).toHaveCount(2);
+  await expect(pieceOn(page, 'e4')).toHaveAttribute('data-piece', 'wp');
+  await expect(pieceOn(page, 'd5')).toHaveAttribute('data-piece', 'bp');
+  await expect(page.getByTestId('turn-banner')).toHaveText('ตาเดินของฝ่ายขาว');
+  await expect(page.getByRole('grid')).toHaveAttribute('data-orientation', 'b');
+  await play(page, [['e4', 'd5']]);
+  await expect(page.getByTestId('move-list').locator('[data-ply]')).toHaveCount(3);
+});
+
+test('a position link opens its setup even when another game is saved', async ({ page }) => {
+  await startLocalGame(page);
+  await play(page, [['e3', 'e4']]);
+  await page.goto(`/play/local?fen=${encodeURIComponent('k7/2R5/8/8/8/8/8/4K2R w - - 0 1')}`);
+  await expect(page.getByRole('button', { name: 'เริ่มเกม' })).toBeVisible();
+  await expect(page.getByText('เริ่มจากตำแหน่งที่กำหนด')).toBeVisible();
 });
 
 test('flip button turns the board around', async ({ page }) => {
