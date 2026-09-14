@@ -6,11 +6,11 @@ import {
   type PublicUser,
   RoomCode,
 } from '@chaturanga/protocol';
+import { generateRoomCode, USER_HEADER } from '@chaturanga/server-kit';
 import { type Context, Hono } from 'hono';
 import { registerAccountRoutes } from './accounts/routes';
 import { newGuest, signToken, verifyToken } from './auth';
 import type { Env } from './env';
-import { generateRoomCode } from './room/code';
 
 export type { Env } from './env';
 
@@ -82,7 +82,7 @@ app.get('/ws/match/:pool', async (c) => {
   const url = new URL(c.req.url);
   url.searchParams.set('pool', decodeURIComponent(c.req.param('pool')));
   const forwarded = new Request(url, c.req.raw);
-  forwarded.headers.set('x-makruk-user', JSON.stringify(user));
+  forwarded.headers.set(USER_HEADER, JSON.stringify(user));
   return c.env.MATCHMAKER.get(c.env.MATCHMAKER.idFromName('global')).fetch(forwarded);
 });
 
@@ -94,6 +94,6 @@ app.get('/ws/game/:code', async (c) => {
   const code = c.req.param('code').toUpperCase();
   if (!RoomCode.safeParse(code).success) return c.text('Not found', 404);
   const forwarded = new Request(c.req.raw);
-  forwarded.headers.set('x-makruk-user', JSON.stringify(user));
+  forwarded.headers.set(USER_HEADER, JSON.stringify(user));
   return room(c, code).fetch(forwarded);
 });

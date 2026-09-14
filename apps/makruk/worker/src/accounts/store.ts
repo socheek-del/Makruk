@@ -171,6 +171,8 @@ export async function getRatings(db: D1Database, userId: string): Promise<Rating
 export interface FinishedGame {
   id: string;
   code: string;
+  /** Which game was played; stored so a history row says what it is without asking the Worker. */
+  variant: string;
   white: PublicUser;
   black: PublicUser;
   startFen: string;
@@ -192,13 +194,14 @@ export async function recordGame(db: D1Database, game: FinishedGame): Promise<{ 
   const rated = isRatable(game);
   const insert = await db
     .prepare(
-      `INSERT OR IGNORE INTO games (id, code, white_id, black_id, white_name, black_name, white_kind, black_kind, start_fen, moves,
+      `INSERT OR IGNORE INTO games (id, code, variant, white_id, black_id, white_name, black_name, white_kind, black_kind, start_fen, moves,
         time_control, time_class, winner, reason, rated, finished_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .bind(
       game.id,
       game.code,
+      game.variant,
       game.white.id,
       game.black.id,
       game.white.name,

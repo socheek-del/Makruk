@@ -96,8 +96,15 @@ broken starting state.
     diagonal and in-place promotion). Apps must list it in an `@source` line in their `index.css` so Tailwind
     generates its classes.
   - `packages/game-shell` (`@chaturanga/game-shell`): shared app layer for the sites. `ProductConfig`
-    (languages, default, language names, Open Graph locales, fonts, storage prefix), locale helpers and SEO
-    tags; `/testing` has `describeLocales`. Each app declares its product in `apps/<game>/web/product.config.ts`.
+    (languages, default, language names, Open Graph locales, fonts, storage prefix), locale helpers, SEO
+    tags, results, time controls and `createGameSession(variant)`; `/testing` has `describeLocales`.
+    `/ui` has the game screen (board, hand trays, player bars, move list, controls, result dialog) with the
+    product's art, words, sounds and counting injected — the keys it reads are in `packages/game-shell/KEYS.md`.
+    Each app declares its product in `apps/<game>/web/product.config.ts` and `@source`s `game-shell/src/ui`.
+  - `packages/server-kit` (`@chaturanga/server-kit`): the online-play Worker layer — the room state
+    machine, room codes, and the `GameRoomBase` and `MatchmakerBase` Durable Objects, all driven by a
+    `Variant`. A product subclasses `GameRoomBase`, names its variant, and stores finished games in its
+    own D1.
   - `apps/makruk/web`, `apps/makruk/worker`: the Makruk product (`apps/makruk/AGENTS.md`).
 - **Commands:**
   - `npm run verify`: lint, typecheck and unit tests in every workspace.

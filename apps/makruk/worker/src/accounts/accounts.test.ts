@@ -296,6 +296,7 @@ describe('ratings and history (acct-003)', () => {
     const game = {
       id: `ONCE23-${Date.now()}`,
       code: 'ONCE23',
+      variant: 'makruk',
       white: white.user,
       black: black.user,
       startFen: 'rnsmksnr/8/pppppppp/8/8/PPPPPPPP/8/RNSKMSNR w - - 0 1',

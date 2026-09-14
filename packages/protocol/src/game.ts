@@ -18,6 +18,7 @@ export const ResultReason = z.enum([
   'stalemate',
   'repetition',
   'counting',
+  'fifty-move',
   'insufficient-material',
   'timeout',
   'resign',
@@ -40,11 +41,13 @@ export const SeatInfo = PublicUser.extend({ connected: z.boolean() });
 
 export const GameSnapshot = z.object({
   code: z.string(),
+  /** Which game this room plays, e.g. 'makruk' or 'sittuyin'. Clients pick the matching rules engine. */
+  variant: z.string(),
   /** Server timestamp (ms) when this snapshot was taken; clients use it for countdowns. */
   serverTime: z.number(),
   status: z.enum(['waiting', 'playing', 'finished']),
   startFen: z.string(),
-  /** Moves in coordinate notation, e.g. e3e4, a5a6m. */
+  /** Moves in coordinate notation, e.g. e3e4, a5a6m, d5d5f, K@e1. */
   moves: z.array(z.string()),
   players: z.object({ w: SeatInfo.nullable(), b: SeatInfo.nullable() }),
   timeControl: TimeControl.nullable(),
@@ -61,7 +64,12 @@ export const GameSnapshot = z.object({
 });
 export type GameSnapshot = z.infer<typeof GameSnapshot>;
 
-const UCI = z.string().regex(/^[a-h][1-8][a-h][1-8]m?$/);
+/**
+ * Fairy-Stockfish coordinate notation, wide enough for every variant: a board move with an optional
+ * promotion letter (`e3e4`, `a5a6m`, `d5d5f`) or a drop from hand (`K@e1`). This is only a cheap shape
+ * guard — the room always replays the move through its own rules engine before accepting it.
+ */
+const UCI = z.string().regex(/^(?:[A-Z]@[a-z]\d{1,2}|[a-z]\d{1,2}[a-z]\d{1,2}[a-z]?)$/);
 
 export const ClientMessage = z.discriminatedUnion('type', [
   z.object({ type: z.literal('move'), uci: UCI, ply: z.number().int().min(0) }),

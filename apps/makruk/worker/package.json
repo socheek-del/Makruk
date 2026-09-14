@@ -14,6 +14,7 @@
   "dependencies": {
     "@chaturanga/makruk": "*",
     "@chaturanga/protocol": "*",
+    "@chaturanga/server-kit": "*",
     "hono": "^4.13.7"
   },
   "devDependencies": {

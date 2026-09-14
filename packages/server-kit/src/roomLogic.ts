@@ -1,14 +1,27 @@
 /**
- * Pure game-room logic for online play. The GameRoom Durable Object is a thin wrapper that loads
- * state, calls these functions with the current time, persists and broadcasts. Keeping the rules
- * here makes clocks, abandonment and validation unit-testable with explicit timestamps.
+ * Pure game-room logic for online play, for any rules Variant. The Durable Object is a thin wrapper
+ * that loads state, calls these functions with the current time, persists and broadcasts. Keeping the
+ * rules here makes clocks, abandonment and validation unit-testable with explicit timestamps.
  */
-import { Game, type GameStatus, IllegalMoveError, START_FEN } from '@chaturanga/makruk';
-import { type ClockState, createClock, flaggedSide, flagTime, pressClock, stopClock, timesAt } from '@chaturanga/makruk/clock';
 import type { ClientMessage, Color, ErrorCode, GameResult, GameSnapshot, PublicUser, TimeControl } from '@chaturanga/protocol';
+import {
+  type ClockState,
+  createClock,
+  flaggedSide,
+  flagTime,
+  type GameStatus,
+  IllegalMoveError,
+  pressClock,
+  stopClock,
+  timesAt,
+  type Variant,
+  type VariantGame,
+} from '@chaturanga/rules-core';
 
 export interface RoomState {
   code: string;
+  /** The variant this room plays; snapshots carry it so a client can pick the matching engine. */
+  variant: string;
   createdAt: number;
   startFen: string;
   moves: string[];
@@ -26,22 +39,26 @@ export interface RoomState {
 
 export const other = (c: Color): Color => (c === 'w' ? 'b' : 'w');
 
-export function createRoom(options: {
-  code: string;
-  creator: PublicUser;
-  color: Color;
-  timeControl: TimeControl | null;
-  now: number;
-  opponent?: PublicUser;
-  rated?: boolean;
-}): RoomState {
+export function createRoom(
+  variant: Variant,
+  options: {
+    code: string;
+    creator: PublicUser;
+    color: Color;
+    timeControl: TimeControl | null;
+    now: number;
+    opponent?: PublicUser;
+    rated?: boolean;
+  },
+): RoomState {
   const players: Record<Color, PublicUser | null> = { w: null, b: null };
   players[options.color] = options.creator;
   if (options.opponent) players[other(options.color)] = options.opponent;
   const room: RoomState = {
     code: options.code,
+    variant: variant.id,
     createdAt: options.now,
-    startFen: START_FEN,
+    startFen: variant.startFen,
     moves: [],
     players,
     timeControl: options.timeControl,
@@ -61,8 +78,8 @@ export function roomStatus(room: RoomState): GameSnapshot['status'] {
   return room.players.w && room.players.b ? 'playing' : 'waiting';
 }
 
-export function replay(room: RoomState): Game {
-  const game = new Game(room.startFen);
+export function replay(variant: Variant, room: RoomState): VariantGame {
+  const game = variant.createGame(room.startFen);
   for (const move of room.moves) game.move(move);
   return game;
 }
@@ -134,6 +151,7 @@ export interface ApplyResult {
 }
 
 export function applyMessage(
+  variant: Variant,
   current: RoomState,
   color: Color | null,
   message: ClientMessage,
@@ -149,7 +167,7 @@ export function applyMessage(
     case 'move': {
       if (status === 'finished') return { room, error: 'game_over' };
       if (status === 'waiting') return { room, error: 'game_not_started' };
-      const game = replay(room);
+      const game = replay(variant, room);
       if (game.turn !== color) return { room, error: 'not_your_turn' };
       if (message.ply !== room.moves.length) return { room, error: 'stale_ply' };
       let uci: string;
@@ -198,6 +216,7 @@ export function snapshot(room: RoomState, now: number, connected: Record<Color, 
   const seat = (c: Color) => (room.players[c] ? { ...room.players[c]!, connected: connected[c] } : null);
   return {
     code: room.code,
+    variant: room.variant,
     serverTime: now,
     status: roomStatus(room),
     startFen: room.startFen,

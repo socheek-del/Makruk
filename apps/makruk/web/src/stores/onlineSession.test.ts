@@ -5,6 +5,7 @@ import { createOnlineSession } from './onlineSession';
 
 const snapshot = (patch: Partial<GameSnapshot> = {}): GameSnapshot => ({
   code: 'ABCDEF',
+  variant: 'makruk',
   serverTime: 1,
   status: 'playing',
   startFen: 'rnsmksnr/8/pppppppp/8/8/PPPPPPPP/8/RNSKMSNR w - - 0 1',
