@@ -2,45 +2,39 @@
 
 ## Verified Now
 
-- What is currently working: 37 of 39 features passing (see `feature_list.json`). Production at
-  https://th-chess.beanroti.com is deployed from `main` by CI.
-- What verification actually ran: `npm run verify` (lint, typecheck, unit tests: engine, ai, web,
-  worker in workerd); full Playwright E2E suite (62) locally; account E2E (3/3) and computer E2E (5/5)
-  after the latest changes; bot strength ladder for all five level pairs on GitHub Actions
-  (`.github/workflows/strength.yml`); production smoke of the account endpoints.
+- What is currently working: the site at https://th-chess.beanroti.com is open to everyone (no accounts):
+  play the computer, online (quick match / room link), pass-and-play, 12 open lessons, About page. Games
+  survive a refresh; language and settings persist per browser. SEO tags, sitemap and robots are live.
+- What verification actually ran: `npm run verify` via CI; web unit tests (110); full Playwright suite
+  (65/65) locally; production checks of static and rendered SEO tags; README media reviewed frame by frame.
 
 ## Changed This Session
 
-- Code or behavior added: username + password accounts with email confirmation and email password reset
-  (Google sign-in removed at the owner's request; migration `0002_password_auth`); AI search checks the
-  opponent's reply for repetition, noise-free bots skip exact root scores (L6 depth cap 8), endgame
-  trade-down bonus, L4 noise 30 with 2% random moves.
-- Infrastructure or harness changes: resumable, shardable strength ladder with seeded paired openings and
-  per-game logs; on-demand "Bot strength ladder" workflow (5 runners × 4 shards + verdict job).
+- Code or behavior added: session persistence (`stores/localSession.ts`), streak removal and lesson
+  unlocking, account UI removal (anonymous seat token only), About page, SEO (`features/seo`,
+  `index.html`, `public/robots.txt`, `public/sitemap.xml`, `public/og-image.png`), lesson banner fix.
+- Infrastructure or harness changes: README + `docs/media` demos, `CONTRIBUTING.md`, feature list status
+  `deferred` for owner-removed features.
 
 ## Broken Or Unverified
 
-- Known defect: none open. AI can still draw some Met-only mates against a bare Khun on the count.
-- Unverified path: real email delivery in production (no Resend key yet; registration reports
-  `accounts:false` until set). Thai copy has not had a native review.
-- Risk for the next session: the laptop runs out of memory under long local jobs — use the Actions
-  ladder, not a local run, for L5/L6 pairs. Any change to search, evaluation or bot configs invalidates
-  ladder evidence and needs a re-run.
+- Known defect: none open.
+- Unverified path: Google indexing/ranking (needs Search Console); Thai copy not natively reviewed.
+- Risk for the next session: worker account routes remain deployed but unused — remove or re-enable
+  deliberately. README GIFs/screenshots go stale when the UI changes (capture script lives in the session
+  scratchpad; re-create with Playwright video + ffmpeg if needed).
 
 ## Next Best Step
 
-- Highest-priority unfinished feature: `acct-002` (blocked on the owner) then `polish-002` (blocked on a
-  native Thai reviewer).
-- Why it is next: they are the only features not passing.
-- What counts as passing: `acct-002` — with `RESEND_API_KEY` and `EMAIL_FROM` set as Worker secrets,
-  register on production, receive and follow the confirmation email, sign in, request and complete a
-  password reset from the emailed link; record evidence. `polish-002` — reviewer completes
-  `docs/i18n-review.md` sign-off and corrections are applied.
-- What must not change during that step: no Google/OAuth sign-in; `DEV_EMAIL_OUTBOX` stays off in
-  production.
+- Highest-priority unfinished feature: `polish-002` (native Thai review) and `seo-001` Search Console step —
+  both owner actions.
+- Why it is next: every other feature is passing or deferred by the owner.
+- What counts as passing: reviewer sign-off in `docs/i18n-review.md` with corrections applied; site verified
+  in Search Console with the sitemap submitted.
+- What must not change during that step: no accounts, streaks or lesson locking unless the owner asks.
 
 ## Commands
 
 - Startup: `./init.sh`
 - Verification: `npm run verify` · `npm run e2e`
-- Focused debug command: `gh workflow run strength.yml -R socheek-del/Makruk -f pair=5 -f games=20`
+- Focused debug command: `npx playwright test e2e/seo.spec.ts -c apps/web/playwright.config.ts`

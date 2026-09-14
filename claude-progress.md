@@ -14,11 +14,11 @@ handoff; no agent updates it automatically.
 - Standard verification path: `npm run verify` (lint + typecheck + unit tests in all workspaces, incl. workerd tests)
 - E2E: `npm run e2e` (Playwright starts vite + wrangler dev) · PWA/offline: `npm run e2e:pwa -w apps/web`
 - Deep engine checks: `npm run test:deep -w packages/engine` · Bot ladder: `npm run test:strength -w packages/ai` (slow; `STRENGTH_PAIR=n`)
-- Milestones: M0 infra ✓, M1 engine ✓, M2 local play ✓, M3 vs computer ✓ (ai-002 ladder verified on GitHub Actions), M4 learning ✓, M5 online ✓ (incl. quick match), M6 accounts (acct-001, acct-003 ✓; acct-002 blocked), M7 polish (PWA, sounds, themes, art ✓; polish-002 blocked)
+- Milestones: M0 infra ✓, M1 engine ✓, M2 local play ✓, M3 vs computer ✓ (ai-002 ladder verified on GitHub Actions), M4 learning ✓, M5 online ✓ (incl. quick match), M6 accounts (acct-001 anonymous seat token ✓; acct-002/acct-003 deferred — accounts removed by the owner), M8 owner requests (play-006, about-001, docs-001 ✓; seo-001 awaiting Search Console), M7 polish (PWA, sounds, themes, art ✓; polish-002 blocked)
 - D1 database `makruk` (id 9e084ac6-9749-411d-867d-c89e8421ed78); migrations in `apps/worker/migrations`, applied by `npm run deploy` (CI) and by the Playwright wrangler command locally
-- Remaining: `acct-002` (production email delivery), `polish-002` (human review) — both blocked on the owner
+- Remaining: `polish-002` (native Thai review) and `seo-001` (Search Console submission) — both need the owner; `acct-002`/`acct-003` deferred (accounts removed from the product for now)
 - Current blockers (owner action needed):
-  - `acct-002`: username/password accounts with email confirmation and password reset are implemented and verified locally (Google sign-in removed at the owner's request). Production email needs a Resend key with beanroti.com verified; set `RESEND_API_KEY`, `EMAIL_FROM` with `wrangler secret put` in `apps/worker`, then verify emails arrive
+  - `seo-001`: verify the site in Google Search Console and submit `https://th-chess.beanroti.com/sitemap.xml`
   - `polish-002`: native Thai reviewer completes `docs/i18n-review.md`
 
 ## Session Log
@@ -44,4 +44,24 @@ handoff; no agent updates it automatically.
   - Vitest swallows console output of passing tests: slow tests write results to files (`packages/ai/strength-results.log`, gitignored).
 - Later in session: accounts reworked to username + password (PBKDF2), email confirmation before sign-in, email password reset, lockout after 10 failures; `DEV_EMAIL_OUTBOX=1` lets tests and local dev read emails from D1.
 - Later in session: `ai-002` verified. The local ladder kept getting killed under memory pressure, so it moved to an on-demand GitHub Actions workflow (`.github/workflows/strength.yml`: 5 runners × 4 shards, resumable per-game log, verdict job). Findings and fixes along the way: noise-free bots replayed identical games (→ seeded paired openings); weaker bots could force repetition (→ search checks the opponent's reply against history); full-window root search wasted L6's budget (→ exact root scores only for noisy bots, L6 depth cap 8); won endgames drew on the count (→ trade-down bonus); L4 too close to L5 (→ L4 noise 30, 2% random moves). Final ladder: +19-0=1, +19-1=0, +18-0=2, +17-0=3, +14-0=6.
-- Next best step: owner configures Resend for `acct-002` production email; native Thai review for `polish-002`.
+- Next best step: native Thai review for `polish-002`; Search Console for `seo-001`.
+
+### Session 002
+
+- Date: 2026-09-14
+- Goal: owner requests — games survive refresh, language remembered without an account, remove streaks,
+  remove accounts/identity (open to all, all lessons unlocked), About page with GitHub contribution links,
+  SEO, and a showcase README.
+- Completed:
+  - `play-006`: local/computer/guided games saved in localStorage and rebuilt on load; computer bot resumes.
+  - Language already persisted per browser (verified on production); settings store gained a migrate step.
+  - Daily streak removed (progress v2 migration); all lessons open.
+  - Accounts, ratings, history, replay and rated toggle removed from the web app (`acct-002`/`acct-003`
+    deferred; worker code dormant); online players shown as You / Opponent.
+  - `about-001`: About page + CONTRIBUTING.md.
+  - `seo-001`: per-page Thai/English titles and descriptions, canonical + hreflang (`?lang=en`), OG image,
+    JSON-LD, robots.txt, sitemap.xml, crawler fallback content — verified on production.
+  - `docs-001`: README with GIF demos captured from production; the capture review found and fixed
+    white-on-white lesson unit banners.
+- Verification run: web unit 110; full E2E 65/65 (plus focused re-runs); CI verify + deploy green through 248b653.
+- Known risk: SEO ranking depends on Search Console submission and time; README media must be re-captured when the UI changes.

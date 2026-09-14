@@ -698,11 +698,12 @@
       "milestone": "M8",
       "title": "Project README that showcases the game",
       "user_visible_behavior": "The GitHub README presents the game like popular open-source games: hero image, animated demos, feature list, play link, tech overview and contribution pointers.",
-      "status": "in_progress",
+      "status": "passing",
       "verification": [
         "README renders on GitHub with working images/GIFs captured from the current app and links to the live site and CONTRIBUTING.md."
       ],
       "evidence": [
+        "2026-09-14: pushed 248b653; raw.githubusercontent.com serves README.md, CONTRIBUTING.md and all media (200); the rendered repository page shows 11 README images (hero og-image, 5 badges, play-computer/online/lesson GIFs, themes, mobile). After the banner fix deployed, lesson.gif and mobile.png were re-captured from production and reviewed (unit banner 'UNIT 1 · Basics: the pieces' visible; lesson wrong → correct → complete).",
         "2026-09-14: demos captured from production with Playwright video + ffmpeg (docs/media/play-computer.gif 760px, lesson.gif 320px, online.gif 640px two players side by side, themes.png, mobile.png); frame contact sheets reviewed — computer game with hints and bot replies, Met lesson wrong → correct → complete, room code + QR then both players moving. The review caught a real bug: Lessons unit banners rendered white-on-white (Card background overrode the unit colour) — fixed in LearnPage with an E2E background check."
       ],
       "notes": ""
