@@ -260,7 +260,7 @@ handoff; no agent updates it automatically.
     - Screenshots reviewed: Makruk home at 1280px and Sittuyin home at 390px.
 - Pitfall: a Bash call that `cd`s changes the working directory for the next parallel call. Always `cd` to
   an absolute path when running a suite.
-- `sit-010` is `in_progress`: the local parts are done and verified.
+- `sit-010`: the local parts came first (details below), then the production checks and the READMEs.
   - Search: per-page my/en titles and descriptions (`SeoController`), canonical + hreflang, robots.txt and
     sitemap.xml (12 URLs) generated from `site.config.ts`, JSON-LD, crawlable fallback content in
     index.html, and an OG image (`npm run icons`).
@@ -271,5 +271,18 @@ handoff; no agent updates it automatically.
     `apps/sittuyin/README.md` and `README.my.md` with media captured from production.
 - `sit-011`: `apps/sittuyin/docs/i18n-review.md` is written (scope, terminology, sign-off). The feature stays
   `blocked`, because a native Burmese reviewer must do the review.
-- Next: `sit-009` needs the owner to name the Sittuyin subdomain and approve pushing. Pushing also deploys
-  Makruk. After deploy, finish `sit-010`.
+- The owner chose `my-chess.beanroti.com` and approved pushing both products.
+- `sit-009` is now `passing`.
+  - Created D1 `sittuyin`, and set `AUTH_SECRET` on the `sittuyin` Worker.
+  - Added the custom-domain route, plus a `changes` job (paths-filter) that gates `deploy` (Makruk) and
+    `deploy-sittuyin`.
+  - Pushed 8590056..a5e32a7. Run 34860305355 is all green.
+  - Production smoke 11/11 on both sites: health, guest token, Burmese home, computer game, online room
+    across two browsers, more-games links, Makruk computer game and room.
+- `sit-010` is now `passing`.
+  - Live SEO check 7/7: raw HTML tags, per-page my/en tags, noindex rooms, robots, sitemap, OG image, About.
+  - `apps/sittuyin/README.md` and `README.my.md` are written, with media captured from production
+    (`npm run capture:readme`, ffmpeg + ImageMagick). Sampled frames were reviewed and show no domain.
+  - The root README lists Sittuyin as live.
+- Remaining (humans only): `polish-002` (Thai review) and `sit-011` (Burmese review). Submitting the Sittuyin
+  sitemap in Search Console is an owner action.

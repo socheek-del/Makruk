@@ -26,7 +26,10 @@ The product plan is `apps/sittuyin/docs/PLAN.md`. The platform rules in the root
 - **Site address:** the domain is temporary, so never hardcode it.
   - Web code reads `SITE_URL` from `apps/sittuyin/web/site.config.ts` (override: `SITTUYIN_SITE_URL`). It is
     injected as `__SITE_URL__` and `%SITE_URL%`; robots.txt and sitemap.xml are generated from it.
-  - The only other place is `routes` in `apps/sittuyin/worker/wrangler.jsonc`.
+  - The only other places are `routes` in `apps/sittuyin/worker/wrangler.jsonc` and the `[play]` link at the
+    bottom of `apps/sittuyin/README.md` / `README.my.md`.
+  - README media: `BASE_URL=<live site> npm run capture:readme -w apps/sittuyin/web` (needs ffmpeg and
+    ImageMagick); it never films a screen that shows the address.
 - **Deploy:**
   - GitHub Actions job `deploy-sittuyin` runs on push to `main` when Sittuyin's folders, a shared package or
     the lock file changed.

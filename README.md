@@ -22,7 +22,7 @@ on one device.
 | Game | | Status | Languages |
 |---|---|---|---|
 | [**หมากรุกไทย · Makruk**](apps/makruk/README.md) | Thai chess | ✅ Live: computer, online, pass-and-play, lessons | Thai, English |
-| **စစ်တုရင် · Sittuyin** | Burmese chess | 🛠️ Rules engine done ([`packages/sittuyin`](packages/sittuyin/RULES.md)); app in progress | Burmese, English |
+| [**စစ်တုရင် · Sittuyin**](apps/sittuyin/README.md) | Burmese chess | ✅ Live: computer, online, pass-and-play, lessons | Burmese, English |
 
 More games (Shogi, Xiangqi…) may follow. See the [platform plan](docs/PLATFORM.md).
 
@@ -38,9 +38,15 @@ belongs to one game. The shared packages hold what every game needs.
 | [`packages/rules-core`](packages/rules-core) | The `Variant` interface every rules engine implements, the shared 8×8 board and attacks, and a conformance test suite |
 | [`packages/makruk`](packages/makruk) | Makruk rules, verified move-for-move against [Fairy-Stockfish](https://github.com/fairy-stockfish/Fairy-Stockfish) |
 | [`packages/sittuyin`](packages/sittuyin) | Sittuyin rules (setup phase, promotion, counting), verified the same way |
-| [`packages/ai`](packages/ai) | Computer opponents for Makruk |
+| [`packages/ai-core`](packages/ai-core) | Game-independent alpha-beta search and bot personas |
+| [`packages/ai`](packages/ai), [`packages/sittuyin-ai`](packages/sittuyin-ai) | Computer opponents for Makruk and Sittuyin |
+| [`packages/ui`](packages/ui), [`packages/board-ui`](packages/board-ui) | Palette-free component primitives; a board of any size with pieces in hand |
+| [`packages/game-shell`](packages/game-shell) | Game screen, lesson player, online lobby and room, languages and search tags for every site |
+| [`packages/server-kit`](packages/server-kit) | Online rooms, clocks and matchmaking as Durable Objects, driven by a rules `Variant` |
+| [`packages/family`](packages/family) | The list of games, so each site can link to the others |
 | [`packages/protocol`](packages/protocol) | Message schemas shared by browsers and servers |
 | [`apps/makruk`](apps/makruk) | The Makruk product: React PWA (`web`) and Cloudflare Worker (`worker`) |
+| [`apps/sittuyin`](apps/sittuyin) | The Sittuyin product: React PWA (`web`) and Cloudflare Worker (`worker`) |
 
 ## Run it locally
 
@@ -49,7 +55,8 @@ git clone https://github.com/socheek-del/chaturanga.git
 cd chaturanga
 nvm use          # Node 22
 ./init.sh        # install dependencies and run all checks
-npm run dev      # Makruk web on http://localhost:5173, API + online play on :8787
+npm run dev:makruk     # Makruk web on http://localhost:5173, API + online play on :8787
+npm run dev:sittuyin   # Sittuyin web on http://localhost:5174, API + online play on :8788
 ```
 
 ## Contributing

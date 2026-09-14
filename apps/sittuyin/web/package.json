@@ -13,7 +13,8 @@
     "e2e": "playwright test",
     "e2e:pwa": "playwright test -c playwright.pwa.config.ts",
     "icons": "node scripts/generate-icons.mjs",
-    "capture": "node scripts/capture-evidence.mjs"
+    "capture": "node scripts/capture-evidence.mjs",
+    "capture:readme": "node scripts/capture-readme.mjs"
   },
   "dependencies": {
     "@chaturanga/board-ui": "*",

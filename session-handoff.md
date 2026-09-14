@@ -4,7 +4,7 @@
 
 - **Repository:** `socheek-del/chaturanga`, a family of games.
   - Makruk (Thai chess) is live; players see only the new "more games" link since the last deploy.
-  - Sittuyin (Burmese chess) is built and verified locally but **not deployed**. Plan: `apps/sittuyin/docs/PLAN.md`.
+  - Sittuyin (Burmese chess) is live on its own subdomain (address in `apps/sittuyin/web/site.config.ts`); production smoke 11/11 and SEO check 7/7 on 2026-09-14. Plan: `apps/sittuyin/docs/PLAN.md`.
 - **Shared packages:**
 
   | Package | Contents |
@@ -23,18 +23,16 @@
 
 ## Changed This Session (006)
 
-- sit-007 lessons, sit-008 online play, plat-006 links between games: `passing`.
-- sit-010: local SEO and About done; `in_progress` until verified on production with README media.
+- sit-007 lessons, sit-008 online play, plat-006 links between games, sit-009 deploy, sit-010 SEO/About/README: `passing`.
 - sit-011: review sheet `apps/sittuyin/docs/i18n-review.md` written; `blocked` on a native reviewer.
-- sit-009: `blocked` on the owner (subdomain, push approval).
+- CI deploys each product only when its paths, a shared package or the lock file change (`changes` job).
 - Online client and lobby/room UI moved from the Makruk app into game-shell; seat tokens and play routes into server-kit.
 - Site address overrides are per product: `MAKRUK_SITE_URL`, `SITTUYIN_SITE_URL`.
 
 ## Broken Or Unverified
 
 - **Known defect:** none open.
-- **Not pushed:** every commit since `8590056`. A push to `main` runs the CI deploy of Makruk.
-- **Not deployed:** Sittuyin. `apps/sittuyin/worker/wrangler.jsonc` has a placeholder `database_id` and no routes; the site address default in `apps/sittuyin/web/site.config.ts` is a placeholder.
+- **Owner actions:** submit the Sittuyin sitemap in Google Search Console; find native Thai (polish-002) and Burmese (sit-011) reviewers.
 - **Known flakes (pass on re-run):** Makruk online-004 "reload rejoins", Makruk clock.spec "clock counts down" under full-suite load.
 - **Risks:**
   - Run npm and vitest under the `.nvmrc` Node (`. ~/.nvm/nvm.sh && nvm use`).
@@ -44,9 +42,9 @@
 
 ## Next Best Step
 
-- **sit-009 once the owner answers:** create D1 `sittuyin` and put its id in `wrangler.jsonc`; `wrangler secret put AUTH_SECRET` on the `sittuyin` Worker; add routes and the site address; add a path-filtered `deploy:sittuyin` job to `ci.yml`; push; smoke both production sites.
-- **Then sit-010:** check tags on production; write `apps/sittuyin/README.md` + `README.my.md` with media captured from production (no domain visible); update the Sittuyin row in the root README.
-- **Owner/humans:** polish-002 (Thai review), sit-011 (Burmese review).
+- **Every feature an agent can finish is passing.** Left: polish-002 and sit-011 (native reviews), acct-002/acct-003 (deferred by the owner).
+- **Candidates for new owner-approved work:** migrate `packages/ai` onto `ai-core` (needs a ladder re-run); a guided first game with coach tips for Sittuyin (in the plan, not in sit-007's verification).
+- **After UI changes:** `npm run capture -w apps/sittuyin/web` (review screenshots) and `BASE_URL=<live site> npm run capture:readme -w apps/sittuyin/web` (README media).
 - **Must not change:** Makruk behaviour, Worker and D1 names, and the no-accounts / open-lessons / no-chat decisions.
 
 ## Commands

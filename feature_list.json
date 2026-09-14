@@ -1208,16 +1208,18 @@
       "milestone": "M11",
       "title": "Deploy Sittuyin on its subdomain",
       "user_visible_behavior": "The Sittuyin site is live on its own subdomain over HTTPS, deployed by CI on push to main without redeploying Makruk unnecessarily.",
-      "status": "blocked",
+      "status": "passing",
       "verification": [
         "Owner confirms the subdomain; site address set only in apps/sittuyin config and wrangler routes.",
         "CI deploys the sittuyin worker (own D1 migrations); production /api/health ok, home loads in Burmese, computer game works.",
         "Makruk production smoke still passes."
       ],
       "evidence": [
-        "2026-09-14 (session 006) — ready for deploy, not deployed: apps/sittuyin/worker builds (wrangler deploy --dry-run 884 KiB) and passes its workerd tests; npm run build:sittuyin runs in CI; the web build emits robots.txt, sitemap.xml and og-image.png from site.config.ts."
+        "2026-09-14 (session 006): owner chose my-chess.beanroti.com and approved pushing. The address is set only in apps/sittuyin/web/site.config.ts (default) and apps/sittuyin/worker/wrangler.jsonc routes (custom domain). Production D1 'sittuyin' created (2645cb45-b6a3-4df2-b953-439d2648cd47); AUTH_SECRET set on the 'sittuyin' Worker with wrangler secret put (random 32 bytes, not stored anywhere else).",
+        "CI: a changes job (dorny/paths-filter) gates deploy (Makruk) and deploy-sittuyin on each product's folders, shared packages and the lock file. Push 8590056..a5e32a7 → run 34860305355: verify success (npm ci on linux, verify, build, build:sittuyin), changes success, deploy success, deploy-sittuyin success (npm run deploy:sittuyin applies D1 migrations, then publishes).",
+        "Production smoke (Playwright script against both live sites), 11/11 PASS: Sittuyin /api/health service 'sittuyin'; POST /api/guest issues a token; home html lang=my with h1 စစ်တုရင်, Burmese title and canonical; more-games links to the Makruk address; computer game: Auto-arrange finishes 16 placements, a3a4 and the bot replies (18 plies); robots.txt, 12-URL sitemap and og-image.png served; online room created in one browser, joined by code in another, both Auto-arrange, host's a3a4 reaches the friend. Makruk: /api/health service 'makruk'; home lang=th with more-games link to the Sittuyin address; computer game replies; online room created."
       ],
-      "notes": "BLOCKED on the owner: (1) the Sittuyin subdomain — apps/sittuyin/web/site.config.ts still has a placeholder default, and wrangler.jsonc has no routes; (2) approval to push, because a push to main also redeploys Makruk and the local commits since 8590056 are unpushed. Remaining steps once answered: create the D1 database 'sittuyin' and put its id in wrangler.jsonc, set the AUTH_SECRET secret on the 'sittuyin' Worker, add routes + the site address, add a path-filtered deploy:sittuyin job to ci.yml (so Makruk is only redeployed when its paths or shared packages change), push, then smoke both production sites."
+      "notes": "Makruk is only redeployed when its own paths, a shared package, a site/product config or the lock file change. Worker 'sittuyin' and D1 'sittuyin' are separate from Makruk's."
     },
     {
       "id": "sit-010",
@@ -1227,16 +1229,18 @@
       "milestone": "M11",
       "title": "Sittuyin SEO, About and README",
       "user_visible_behavior": "People searching for Burmese chess (e.g. 'sittuyin', 'စစ်တုရင်') find the site; it has an About page and a showcase README with demos captured from production.",
-      "status": "in_progress",
+      "status": "passing",
       "verification": [
         "Per-page my/en titles, descriptions, canonical + hreflang, OG image, JSON-LD, robots.txt and sitemap on production.",
         "apps/sittuyin/README.md and README.my.md with media captured from production (no domain visible)."
       ],
       "evidence": [
         "2026-09-14 (session 006), local only: apps/sittuyin/web/src/features/seo (pageSeo for home/computer/online/room/local/learn/about/settings, SeoController in AppShell, sitemap.ts), seo.* titles and descriptions in my and en, index.html static head with canonical, hreflang my/en/x-default, Open Graph (my_MM, en_US alternate), Twitter card and JSON-LD WebSite + VideoGame (alternate names Sittuyin, Burmese Chess, Myanmar Chess, စစ်တုရင်), crawlable Burmese + English fallback text with links, vite plugin serving and emitting robots.txt and sitemap.xml, and public/og-image.png (1200x630, no domain) rendered by scripts/generate-icons.mjs with the site's own fonts. About page: what Sittuyin is, GitHub, contribute, report a bug and review-the-Burmese links.",
-        "Checks: seo.test.ts 6 (routes and indexing, my plain / en ?lang=en URLs, every page titled with စစ်တုရင် / Sittuyin|Burmese Chess, home title ≤70 and description ≤170, head tags written once, robots and a 12-URL sitemap for any domain with no beanroti). E2E seo.spec.ts (Burmese /learn title and canonical; /play/computer?lang=en English title, canonical, hreflang my/en, og:title and og:locale; room pages noindex; JSON-LD ids; robots.txt, sitemap and og-image.png served) and about.spec.ts (Burmese headings and all four GitHub links, English page). Full Sittuyin e2e 29/29, e2e:pwa 2/2, build:sittuyin emits robots.txt, sitemap.xml (12 <url>) and og-image.png, npm run verify exit 0. OG image and About page screenshots reviewed."
+        "Checks: seo.test.ts 6 (routes and indexing, my plain / en ?lang=en URLs, every page titled with စစ်တုရင် / Sittuyin|Burmese Chess, home title ≤70 and description ≤170, head tags written once, robots and a 12-URL sitemap for any domain with no beanroti). E2E seo.spec.ts (Burmese /learn title and canonical; /play/computer?lang=en English title, canonical, hreflang my/en, og:title and og:locale; room pages noindex; JSON-LD ids; robots.txt, sitemap and og-image.png served) and about.spec.ts (Burmese headings and all four GitHub links, English page). Full Sittuyin e2e 29/29, e2e:pwa 2/2, build:sittuyin emits robots.txt, sitemap.xml (12 <url>) and og-image.png, npm run verify exit 0. OG image and About page screenshots reviewed.",
+        "2026-09-14 production (after sit-009 deploy, run 34860305355): Playwright check of the live Sittuyin site 7/7 PASS — raw HTML without JavaScript carries the Burmese title, description, canonical, hreflang en, og:image, JSON-LD @ids and the English fallback text with %SITE_URL% fully substituted; /learn Burmese title, canonical, robots index and og:locale my_MM after the app starts; /play/computer?lang=en English title, canonical ?lang=en, hreflang my and x-default at the plain URL, one description; room pages noindex; robots.txt (text/plain) names the sitemap; sitemap.xml has 12 <url> covering all six pages in my and ?lang=en; og-image.png 200 image/png; About page heading and title.",
+        "README: apps/sittuyin/README.md and README.my.md (features, what Sittuyin is with a piece table and promotion/count rules checked against packages/sittuyin/RULES.md, how it's built, run locally, contributing, [play] link defined once at the bottom). Media captured from production by apps/sittuyin/web/scripts/capture-readme.mjs (BASE_URL=live site; Playwright video → ffmpeg palette GIF; ImageMagick collage): docs/media/play-computer.gif (Auto-arrange, a4 and b4 with bot replies, hint), online.gif (two players side by side: both Auto-arrange, four moves, clocks running), lesson.gif (setup lesson on a phone: Yahhta placed on d1, quiz, 3 stars +15 XP), mobile.png (home, lesson path, dark-mode game). The online scene creates its room off camera and joins directly, so the waiting room's share link (which names the address) is never filmed; frames sampled at 15/50/95% of every GIF and the collage were reviewed and show no domain. Root README: Sittuyin marked live and linked, package table and dev commands updated."
       ],
-      "notes": "Waiting on sit-009: both verification steps name production (tags checked on the live site; README media captured from it), so the README files are not written yet."
+      "notes": "Re-capture README media after UI changes: BASE_URL=<live site> npm run capture:readme -w apps/sittuyin/web (needs ffmpeg and ImageMagick). Search Console submission for the Sittuyin sitemap is an owner action, as it was for Makruk (seo-001)."
     },
     {
       "id": "sit-011",
