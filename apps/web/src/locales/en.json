@@ -60,7 +60,10 @@
     "settings": "Settings"
   },
   "home": {
-    "choose": "Choose how to play"
+    "choose": "Choose how to play",
+    "aboutTitle": "Play Thai chess online for free",
+    "aboutBody1": "Makruk, or Thai chess (หมากรุกไทย), is the traditional chess of Thailand. Play Makruk online here for free with no sign-up: challenge the computer at six levels, invite a friend to an online game with a link, or pass-and-play on one device.",
+    "aboutBody2": "New to the game? Interactive Thai chess lessons teach how the Khun, Met, Khon, Ma, Ruea and Bia move, checkmate and the counting rules. Works on phones and computers, and installs as an app for offline play."
   },
   "modes": {
     "single": "Play the computer",

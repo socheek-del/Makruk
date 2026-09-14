@@ -70,6 +70,15 @@ export function HomePage() {
         </ul>
       </section>
 
+      {/* seo-001: plain, crawlable text about Makruk for people searching "Thai chess online" / "หมากรุกไทย". */}
+      <section aria-labelledby="about-makruk" data-testid="home-about" className="flex flex-col gap-2 rounded-[1.25rem] border border-line bg-surface p-5 shadow-card">
+        <h2 id="about-makruk" className="text-xl font-bold">
+          {t('home.aboutTitle')}
+        </h2>
+        <p className="text-muted">{t('home.aboutBody1')}</p>
+        <p className="text-muted">{t('home.aboutBody2')}</p>
+      </section>
+
       <footer className="text-center text-sm text-muted">
         {t('status.label')}:{' '}
         <span className={status === 'ok' ? 'text-secondary' : status === 'down' ? 'text-danger' : ''}>
