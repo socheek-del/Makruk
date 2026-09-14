@@ -1,19 +1,24 @@
 import {
   BLACK,
+  type Board,
   type ColorIndex,
   colorBits,
   fileOf,
   inCheck,
+  KHON,
   KING,
+  KNIGHT,
+  MET,
   parseSquare,
   PAWN,
   rankOf,
+  ROOK,
   squareName,
   toColor,
   TYPE_MASK,
 } from '@makruk/engine/core';
 import { codeToPiece, HAND_ORDER, handCount, typeFromChar } from './board';
-import { parseFen, serializeFen, START_FEN } from './fen';
+import { handsOf, parseFen, placementOf, serializeFen, START_FEN } from './fen';
 import {
   dropType,
   encodeDrop,
@@ -28,7 +33,7 @@ import {
   PROMOTION_FLAG,
   unmakeRaw,
 } from './movegen';
-import type { Color, GameStatus, Move, MoveRecord, Piece, PieceType, Square } from './types';
+import type { Color, CountingState, GameStatus, Move, MoveRecord, Piece, PieceType, Square } from './types';
 
 export class IllegalMoveError extends Error {
   constructor(readonly move: string) {
@@ -50,6 +55,71 @@ interface HistoryEntry {
 
 const SAN_LETTER = ['', '', 'N', 'S', 'F', 'R', 'K'];
 const UCI = /^(?:([KSFRN])@([a-h][1-8])|([a-h][1-8])([a-h][1-8])(f?))$/;
+/** Fairy-Stockfish sittuyin nMoveRule: 50 moves without a capture, Ne move or placement. */
+const FIFTY_MOVE_PLIES = 100;
+
+function pieceCount(board: Board, c: ColorIndex): number {
+  let n = 0;
+  for (const p of board) if (p && (p & BLACK ? 1 : 0) === c) n++;
+  return n;
+}
+
+/**
+ * Counting limit in full moves for `side` (Fairy-Stockfish ASEAN counting): only when no Ne is left
+ * and `side` has a lone Min-gyi — 16 if the opponent has a Yahhta, else 44 with a Sin, else 64 with a
+ * Myin; otherwise no count.
+ */
+function countLimit(board: Board, side: ColorIndex): number {
+  let rook = false;
+  let sin = false;
+  let knight = false;
+  for (const p of board) {
+    if (!p) continue;
+    const type = p & TYPE_MASK;
+    if (type === PAWN) return 0;
+    if ((p & BLACK ? 1 : 0) === side) continue;
+    if (type === ROOK) rook = true;
+    else if (type === KHON) sin = true;
+    else if (type === KNIGHT) knight = true;
+  }
+  if (pieceCount(board, side) !== 1) return 0;
+  return rook ? 16 : sin ? 44 : knight ? 64 : 0;
+}
+
+/**
+ * Mirrors Fairy-Stockfish `has_insufficient_material` (the same rule as Makruk): a Yahhta or Sin can
+ * mate, a Sit-ke is colour-bound, a Myin or Ne needs a helper piece. Pieces in hand can still be placed.
+ */
+function hasInsufficientMaterial(pos: Position, c: ColorIndex): boolean {
+  if (handCount(pos.hands[c]) > 0) return false;
+  const own = colorBits(c);
+  let ownMet = false;
+  let ownUnbound = false;
+  let metDark = false;
+  let metLight = false;
+  let unbound = 0;
+  let nonKing = 0;
+  for (let sq = 0; sq < 64; sq++) {
+    const p = pos.board[sq]!;
+    if (!p) continue;
+    const type = p & TYPE_MASK;
+    if (type === KING) continue;
+    nonKing++;
+    const mine = (p & BLACK) === own;
+    if (mine && (type === ROOK || type === KHON)) return false;
+    if (type === MET) {
+      if ((fileOf(sq) + rankOf(sq)) % 2 === 0) metDark = true;
+      else metLight = true;
+      if (mine) ownMet = true;
+    } else {
+      unbound++;
+      if (mine) ownUnbound = true;
+    }
+  }
+  if (ownMet && ((metDark && metLight) || unbound > 0)) return false;
+  if (ownUnbound && nonKing >= 2) return false;
+  return true;
+}
 
 export class Game {
   private readonly pos: Position;
@@ -58,6 +128,7 @@ export class Game {
   private rule50: number;
   private fullmove: number;
   private readonly history: HistoryEntry[] = [];
+  private readonly keys: string[] = [];
 
   constructor(fen: string = START_FEN) {
     const data = parseFen(fen);
@@ -66,6 +137,7 @@ export class Game {
     this.countingPly = data.countingPly;
     this.rule50 = data.rule50;
     this.fullmove = data.fullmove;
+    this.keys.push(this.key());
   }
 
   get turn(): Color {
@@ -156,6 +228,8 @@ export class Game {
     if (captured || isDrop(encoded) || (moved & TYPE_MASK) === PAWN) this.rule50 = 0;
     if (mover === 1) this.fullmove++;
     this.pos.turn = mover === 0 ? 1 : 0;
+    this.applyCounting(captured, isPromotion(encoded));
+    this.keys.push(this.key());
 
     const replies = generateLegalMoves(this.pos);
     const check = inCheck(this.pos.board, this.pos.turn);
@@ -183,16 +257,61 @@ export class Game {
     this.countingLimit = entry.countingLimit;
     this.countingPly = entry.countingPly;
     this.fullmove = entry.fullmove;
+    this.keys.pop();
     return entry.record;
   }
 
   status(): GameStatus {
-    if (generateLegalMoves(this.pos).length > 0) return { kind: 'ongoing' };
-    return this.inCheck() ? { kind: 'checkmate', winner: toColor(this.pos.turn === 0 ? 1 : 0) } : { kind: 'stalemate' };
+    if (generateLegalMoves(this.pos).length === 0) {
+      return this.inCheck() ? { kind: 'checkmate', winner: toColor(this.pos.turn === 0 ? 1 : 0) } : { kind: 'stalemate' };
+    }
+    if (this.isRepetition()) return { kind: 'repetition' };
+    if (this.countingLimit && this.countingPly > this.countingLimit) return { kind: 'counting' };
+    if (this.rule50 >= FIFTY_MOVE_PLIES) return { kind: 'fifty-move' };
+    if (hasInsufficientMaterial(this.pos, 0) && hasInsufficientMaterial(this.pos, 1)) {
+      return { kind: 'insufficient-material' };
+    }
+    return { kind: 'ongoing' };
   }
 
   isGameOver(): boolean {
     return this.status().kind !== 'ongoing';
+  }
+
+  counting(): CountingState | null {
+    if (!this.countingLimit) return null;
+    return { limitPlies: this.countingLimit, plies: this.countingPly };
+  }
+
+  /** Position identity used for repetition: placement, pieces in hand and side to move. */
+  private key(): string {
+    return `${placementOf(this.pos.board)}[${handsOf(this.pos.hands)}] ${this.pos.turn}`;
+  }
+
+  /** Threefold repetition within the reversible-move window (Fairy-Stockfish n-fold rule). */
+  private isRepetition(): boolean {
+    const n = this.keys.length - 1;
+    const end = Math.min(this.rule50, n);
+    if (end < 4) return false;
+    let count = 0;
+    for (let i = 4; i <= end; i += 2) {
+      if (this.keys[n - i] === this.keys[n] && ++count + 1 >= 3) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Fairy-Stockfish ASEAN counting: the count (re)starts from 0 when none is running, or when a capture
+   * or promotion leaves the side to move with a lone Min-gyi — but only if that position has a limit.
+   * Otherwise (a lone Min-gyi's own capture, bare Min-gyi) the running count is kept.
+   */
+  private applyCounting(captured: number, promotion: boolean): void {
+    const stm = this.pos.turn;
+    if (this.countingLimit && !((captured || promotion) && pieceCount(this.pos.board, stm) === 1)) return;
+    const limit = countLimit(this.pos.board, stm);
+    if (!limit) return;
+    this.countingLimit = 2 * limit;
+    this.countingPly = 0;
   }
 
   private sanBase(m: number, legal: number[], moved: number): string {

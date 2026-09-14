@@ -883,14 +883,18 @@
       "milestone": "M9",
       "title": "Sittuyin game end: checkmate, stalemate, repetition, counting and material draws",
       "user_visible_behavior": "The engine reports check, checkmate, stalemate, repetition and any counting or insufficient-material draws exactly as Fairy-Stockfish's sittuyin variant does.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "docs/sittuyin-rules.md documents every end rule with the ffish probe that settles it.",
         "Scenario unit tests for each rule.",
         "Game-over flag, result and FEN counting fields equal ffish on every ply of 400 seeded random games."
       ],
-      "evidence": [],
-      "notes": ""
+      "evidence": [
+        "2026-09-14: docs/sittuyin-rules.md — pieces, setup, promotion and every end rule as probed with ffish 0.7.10. Game end: checkmate win; stalemate draw; threefold repetition (placement + hands + side); 50-move rule (100 plies without capture, Ne move or placement; not in Makruk); insufficient material as in Makruk (pieces in hand count as material). ASEAN counting, unlike Makruk: no board's honour, count starts at 0, limit 32 plies with a Yahhta, else 88 with a Sin, else 128 with a Myin, none with only Sit-ke/Ne; starts when no Ne is left and the side to move has a lone Min-gyi; a capture or promotion leaving the side to move lone restarts it only if that position has a limit.",
+        "2026-09-14: src/rules.test.ts — 30 scenario tests, each from an ffish probe: checkmate (Ra1#), stalemate, repetition with FEN 'w - - 8 5' and undo, 50-move at halfmove 100, four insufficient-material cases, Sin and hand material not insufficient, 15 counting limit/start cases, per-ply count and draw past the limit, lone Min-gyi capture keeps the count, capture restarts with the new limit, lone side capturing the last Ne starts the count one move later, bare-king capture keeps '32 23', counted plies separate from the 50-move clock.",
+        "2026-09-14: src/reference.test.ts now compares the full FEN (incl. counting fields) and isGameOver with ffish on every ply, plus legal moves and SAN; asserts promotions > 0, counting plies > 0 and more than two ending kinds. The lock-step caught one real bug on seed 6: a capture leaving bare kings cleared the running count, while ffish keeps it. Fixed with the 'only if limit' guard Makruk already has, and a unit test added. 60 games in npm test; 400 with PERFT_DEEP=1: npm run test:deep 165/165 passed. npm run verify exit 0 (web 112, worker 48, ai 20, engine 129, protocol 2, sittuyin 159 + 6 deep-only skipped)."
+      ],
+      "notes": "Two probe FENs that ffish accepted were illegal (the side not to move in check) and are rightly rejected by our parser; the tests use corrected positions, each re-probed."
     },
     {
       "id": "plat-002",

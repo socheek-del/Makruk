@@ -32,4 +32,19 @@ export type MoveRecord = Move & {
 export type GameStatus =
   | { kind: 'ongoing' }
   | { kind: 'checkmate'; winner: Color }
-  | { kind: 'stalemate' };
+  /** Draw, as in Fairy-Stockfish's sittuyin variant. */
+  | { kind: 'stalemate' }
+  | { kind: 'repetition' }
+  /** The count ran past its limit before the lone Min-gyi was mated. */
+  | { kind: 'counting' }
+  /** 50 moves without a capture, Ne move or placement. */
+  | { kind: 'fifty-move' }
+  /** Neither side can force mate (Fairy-Stockfish insufficient-material rule). */
+  | { kind: 'insufficient-material' };
+
+export interface CountingState {
+  /** Limit in plies, as tracked by Fairy-Stockfish. */
+  limitPlies: number;
+  /** Plies counted so far. A draw is declared once it exceeds the limit. */
+  plies: number;
+}

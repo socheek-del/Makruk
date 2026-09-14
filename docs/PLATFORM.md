@@ -111,7 +111,7 @@ Every step leaves Makruk green: `npm run verify`, `npm run e2e`, CI deploy.
   - R (Yahhta) = rook
   - P (Ne) = one step forward, captures diagonally forward
 - **Promotion is a separate move** (`h5g4f` diagonal step, `e5e5f` in place). The pawn becomes a Sit-ke (F).
-- Draws and counting: to be pinned down with ffish probes and documented in `docs/sittuyin-rules.md` during sit-003.
+- **Game end:** differs from Makruk: 50-move rule, ASEAN counting with no board's honour, limits 32/88/128 plies by strongest piece. Full rules as implemented and verified: `docs/sittuyin-rules.md`.
 
 ## Open questions
 
