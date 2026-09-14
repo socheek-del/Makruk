@@ -1,8 +1,8 @@
-import { Board, type BoardTheme, parseUci, useMoveInput } from '@chaturanga/board-ui';
-import { parseSquare, type Piece, type Square, squareName, type Variant, type VariantGame } from '@chaturanga/rules-core';
+import { Board, type BoardHandle, type BoardTheme, HandTray, parseUci, useMoveInput } from '@chaturanga/board-ui';
+import { type Color, parseSquare, type Piece, type Square, squareName, type Variant, type VariantGame } from '@chaturanga/rules-core';
 import { Button, Card, cn, ProgressBar } from '@chaturanga/ui';
 import { CheckCircle2, Star, X, XCircle } from 'lucide-react';
-import { type ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type L10n, type Lesson, type LessonStep, starsFor } from '../lessons';
 
@@ -33,6 +33,14 @@ export interface LessonPlayerProps<G extends VariantGame, Verify = never> {
   boardOverlay?: ReactNode;
   /** Plays a sound; omit for a silent product. */
   onSound?: (sound: LessonSound) => void;
+
+  /**
+   * Required for a variant with hands (`variant.hasHands`) whose lessons teach the setup phase: a move
+   * step then shows the side-to-move's tray so the learner can place a piece. Same props as the game
+   * screen's trays, and named the same way.
+   */
+  handLabel?: (color: Color) => string;
+  describeHandPiece?: (type: string, count: number) => string;
 }
 
 /**
@@ -146,7 +154,7 @@ function LessonBoard({ children }: { children: ReactNode }) {
   return <div className="mx-auto w-full max-w-[min(100%,calc(100dvh-22rem),28rem)]">{children}</div>;
 }
 
-/** The lesson board never animates or shows a hand tray: every step starts from its own FEN. */
+/** The lesson board never animates: every step starts from its own FEN and is played once. */
 function StepBoard<G extends VariantGame, Verify>({
   props,
   game,
@@ -155,12 +163,14 @@ function StepBoard<G extends VariantGame, Verify>({
   props: LessonPlayerProps<G, Verify>;
   game: G;
   targets?: Square[];
+  promotionTargets?: Square[];
   selected?: Square | null;
   lastMove?: { from?: Square | null; to: Square } | null;
   checkSquare?: Square | null;
   onSquareClick?: (square: Square) => void;
   canDrag?: (square: Square) => boolean;
   onDrop?: (from: Square, to: Square) => boolean;
+  handle?: React.RefObject<BoardHandle | null>;
 }) {
   return (
     <LessonBoard>
@@ -253,8 +263,10 @@ function InfoStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, Ext
 
 function MoveStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, Extract<LessonStep<Verify>, { kind: 'move' }>>) {
   const { step, feedback, onAnswer } = props;
+  const { t } = useTranslation();
   const [game] = useState(() => props.variant.createGame(step.fen));
   const [version, setVersion] = useState(0);
+  const boardHandle = useRef<BoardHandle | null>(null);
   const input = useMoveInput({
     game,
     version,
@@ -270,6 +282,10 @@ function MoveStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, Ext
   const last = game.lastMove();
   // A record names only its destination, because a drop has no origin; the origin comes from the move string.
   const parsedLast = last ? parseUci(last.uci, props.variant.files) : null;
+  // Only the side to move has a tray: a lesson is one move long, so the other side never places.
+  const turn: Color = game.turn;
+  const inHand = props.variant.hasHands ? game.hand(turn) : [];
+  const showTray = inHand.length > 0 && !!props.handLabel && !!props.describeHandPiece;
   return (
     <>
       <Prompt text={step.text} mood={moodFor(step.kind, feedback)} translate={props.translate} renderMascot={props.renderMascot} />
@@ -280,10 +296,34 @@ function MoveStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, Ext
         checkSquare={game.checkedKingSquare()}
         selected={input.selected}
         targets={input.targets}
+        promotionTargets={input.promotionTargets}
         onSquareClick={input.onSquareClick}
         canDrag={input.canDrag}
         onDrop={input.onDrop}
+        handle={boardHandle}
       />
+      {showTray && (
+        <LessonBoard>
+          <HandTray
+            color={turn}
+            pieces={inHand}
+            theme={props.theme}
+            renderPiece={props.renderPiece}
+            label={props.handLabel!(turn)}
+            describePiece={props.describeHandPiece!}
+            selected={input.selectedHand}
+            canSelect={input.canSelectHand}
+            onSelect={input.onHandSelect}
+            board={boardHandle}
+            onDropOnBoard={input.onDropFromHand}
+          />
+        </LessonBoard>
+      )}
+      {input.canPromoteInPlace && feedback === null && (
+        <Button block variant="warning" data-testid="promote-in-place" onClick={() => input.promoteInPlace()}>
+          {t('play.promote')}
+        </Button>
+      )}
       {feedback !== null && (
         <Footer
           feedback={feedback}

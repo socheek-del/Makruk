@@ -212,3 +212,19 @@ handoff; no agent updates it automatically.
     direction (`apps/sittuyin/docs/evidence/`); say whether to push the waiting commits, which deploy
     Makruk; and name the Sittuyin subdomain for `sit-009`.
   - `sit-007`: Sittuyin lessons.
+
+### Session 006
+
+- Date: 2026-09-14
+- Goal: implement everything left in `feature_list.json`.
+- Owner approved the Sittuyin design direction (`sit-005` now `passing`, recorded in its evidence).
+- Commit d35e422 moved lesson shapes, the progress store and the lesson player into `@chaturanga/game-shell`.
+- `sit-007` is now `passing`.
+  - 12 Sittuyin lessons in 3 units, a lesson path with XP, and a Learn tab and home card.
+  - The shared LessonPlayer gained a hand tray for placement steps and a Promote button.
+  - Verification: sittuyin-web unit 79 (engine-validated lessons), `learn.spec.ts` 3/3 (one full lesson in
+    Burmese, one in English), full Sittuyin e2e 22/22, Makruk learn + path e2e 6/6, `npm run verify` exit 0.
+  - `npm run capture` now also writes four lesson screenshots; all evidence PNGs were re-captured because
+    the nav gained Learn.
+- No Chrome DevTools MCP server is connected in this environment; visual checks use Playwright Chromium.
+- Next: `sit-008` (Sittuyin Worker and online play).

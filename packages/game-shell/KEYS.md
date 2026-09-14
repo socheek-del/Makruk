@@ -1,8 +1,10 @@
-# Keys the shared game screen reads
+# Keys the shared screens read
 
 `@chaturanga/game-shell/ui` renders words through react-i18next. The keys are shared so the components
 can be; the text behind them belongs to each product's locale files, in every language that product
 declares.
+
+# Game screen
 
 ## Always required
 
@@ -35,3 +37,26 @@ reasons its own rules can reach — Makruk has no fifty-move rule, so it omits t
 
 The hand trays take their names as props (`handLabel`, `describeHandPiece`) rather than keys, because a
 tray is named after the game's own pieces.
+
+# Lesson player
+
+Only a product with lessons needs these.
+
+| Key | Used for |
+| --- | --- |
+| `learn.exit` | Accessible name of the leave-lesson button |
+| `learn.progress` | Accessible name of the step progress bar |
+| `learn.check` | Checks a squares or quiz answer |
+| `learn.continue` | Moves on after a step, and leaves the finished screen |
+| `learn.correct`, `learn.wrong` | Feedback headings |
+| `learn.tryAgain` | Retries the step after a wrong answer |
+| `learn.complete` | Heading of the finished screen |
+| `learn.stars` (`{{count}}`) | Accessible name of the star row |
+| `play.promote` | The promote-in-place button on a move step, for a variant that allows it |
+
+The lesson's own words — prompts, hints, choices and titles — live in the lesson data rather than the
+locale files, because a step's prompt, hint and choices only make sense together. `describeLessons` in
+`@chaturanga/game-shell/testing` checks that each of them exists in every language the product declares.
+
+A product whose lessons teach a setup phase also passes `handLabel` and `describeHandPiece`, the same
+props the game screen's trays take.

@@ -1108,7 +1108,7 @@
       "milestone": "M11",
       "title": "Sittuyin design identity and piece art",
       "user_visible_behavior": "The Sittuyin site has its own Burmese-inspired look (tokens, fonts, board and in-house piece art) that is clearly different from Makruk's Wat theme and from Duolingo.",
-      "status": "in_progress",
+      "status": "passing",
       "verification": [
         "apps/sittuyin/docs/design.md describes tokens, Myanmar typography (Unicode, OFL font, line-height) and piece-art guide; owner approves the direction.",
         "Showcase page screenshots in light and dark at 390px and 1280px reviewed; all 6 piece types x 2 colours readable at 40px squares."
@@ -1122,9 +1122,10 @@
         "Five board themes (lacquer default, thanaka, jade, teak-night, contrast). @chaturanga/board-ui gained a generic `overlay` prop so a product can draw markings its rules make meaningful; Sittuyin uses it for the two promotion diagonals in brass.",
         "Found and fixed while reviewing the rendered page rather than the code: the first piece art failed its own 40px rule (small, bottom-heavy forms on a wide base) and was redrawn; the overlay first shipped as a grid item, which took part in row sizing and collapsed every square to 0px height (cell height 0 measured in the browser) and is now positioned instead; the piece row overflowed horizontally at 390px.",
         "Verification: npm run verify green (sittuyin-web 8 new tests — locale completeness for my and en, and the piece set: every type drawn in both colours, a promoted Ne marked differently from the original Sit-ke, all six silhouettes distinct, the two colours distinct; board-ui 20, 2 new for the overlay incl. a regression test that the squares keep their height). npm run build -w apps/sittuyin/web OK, with Noto subset entrypoints only so the bundle ships no Devanagari or Cyrillic. Makruk npm run e2e 65/65 after the board change.",
-        "Screenshots for review: apps/sittuyin/docs/evidence/design-{light,dark}-{390,1280}.png, and no horizontal overflow at 390px (measured)."
+        "Screenshots for review: apps/sittuyin/docs/evidence/design-{light,dark}-{390,1280}.png, and no horizontal overflow at 390px (measured).",
+        "2026-09-14 (session 006): the owner reviewed apps/sittuyin/docs/evidence/design-light-1280.png and design-dark-390.png and approved the direction as-is — peacock teal and aubergine interface, lacquer board default, yun piece set. That was the last open item in this feature's verification."
       ],
-      "notes": "Owner approval of the direction is still required before sit-006 styles the app (the feature's own verification says so). Everything else for sit-005 is done and verified; the screenshots in apps/sittuyin/docs/evidence are what needs a look."
+      "notes": "Owner approved the direction on 2026-09-14. sit-006 styled the app on it."
     },
     {
       "id": "sit-006",
@@ -1159,13 +1160,18 @@
       "milestone": "M11",
       "title": "Sittuyin lessons",
       "user_visible_behavior": "A beginner learns the Sittuyin board, setup, each piece, promotion, check and checkmate through interactive lessons in Burmese and English.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Lesson data validated by the Sittuyin engine in tests (legal solutions, my+en text for every step).",
         "Playwright completes one full lesson in each language."
       ],
-      "evidence": [],
-      "notes": ""
+      "evidence": [
+        "2026-09-14 (session 006): 12 lessons in 3 units (apps/sittuyin/web/src/features/learn/lessons.ts) — board, setup, Ne, Yahhta, Myin, Sin, Sit-ke, Min-gyi, promotion, check, checkmate, counting — played by the shared @chaturanga/game-shell LessonPlayer, which gained a hand tray for placement steps and a Promote button for in-place promotion (packages/game-shell/KEYS.md).",
+        "Unit: lessons.test.ts runs describeLessons(PRODUCT, sittuyin, ALL_LESSONS) — every FEN parses, every move solution is legal with a wrong legal alternative, every targetsOf answer equals the engine's legal destinations, my+en text on every step — plus Sittuyin claims: every piece type has a lesson, counting limits and quiz answers equal Game.counting() (Yahhta 16, Sin 44, Myin 64, none for a Sit-ke), the checkmate solution checkmates, every promotion solution produces a Sit-ke, and the setup placement step's solutions are exactly the engine's legal Yahhta drops, all on rank 1. sittuyin-web 79 tests pass; npm run verify exit 0.",
+        "E2E apps/sittuyin/web/e2e/learn.spec.ts 3/3: path shows 12 open lessons and 0 XP; the setup lesson completed in Burmese (a legal but wrong Myin placement gives wrong feedback and is reset, a Yahhta tap on d2 is refused, R@d1 is correct, 2 stars, +15 XP, completion survives reload); the promotion lesson completed in English by selecting d5 and pressing Promote (d5 becomes a Sit-ke, 3 stars, +20 XP). Full Sittuyin e2e 22/22; Makruk learn.spec + path.spec 6/6 after the shared LessonPlayer change.",
+        "Screenshots reviewed (npm run capture): apps/sittuyin/docs/evidence/learn-path-390.png, learn-path-dark-1280.png, lesson-setup-390.png (tray with back-rank targets), lesson-promotion-1280.png (Promote button, promotion rings) — legible in both themes, no overflow at 390px."
+      ],
+      "notes": "The plan also listed a guided first game with coach tips and a 50-move-rule lesson; neither is in this feature's behaviour or verification, so they are left for later rather than claimed."
     },
     {
       "id": "sit-008",

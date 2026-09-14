@@ -70,4 +70,24 @@ await shot(
 await shot('app-computer-390', 390, 820, (page) => page.goto(`${BASE}/play/computer`));
 await shot('app-settings-390', 390, 900, (page) => page.goto(`${BASE}/settings`));
 
+// sit-007: the lesson path and the steps that need more than a board — the tray and the Promote button.
+await shot('learn-path-390', 390, 900, (page) => page.goto(`${BASE}/learn`));
+await shot('learn-path-dark-1280', 1280, 860, (page) => page.goto(`${BASE}/learn?lang=en`), { dark: true });
+await shot('lesson-setup-390', 390, 900, async (page) => {
+  await page.goto(`${BASE}/learn/setup`);
+  for (let i = 0; i < 2; i++) await page.getByRole('button', { name: 'ဆက်လုပ်ရန်', exact: true }).click();
+  await page.locator('[data-hand="w"] [data-hand-piece="r"]').click();
+});
+await shot(
+  'lesson-promotion-1280',
+  1280,
+  860,
+  async (page) => {
+    await page.goto(`${BASE}/learn/promotion?lang=en`);
+    for (let i = 0; i < 2; i++) await page.getByRole('button', { name: 'Continue', exact: true }).click();
+    await page.locator('[data-square="d5"]').click();
+  },
+  { dark: true },
+);
+
 await browser.close();

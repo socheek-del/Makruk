@@ -4,6 +4,8 @@ import { AboutPage } from './pages/AboutPage';
 import { ComputerGamePage } from './pages/ComputerGamePage';
 import { DesignPage } from './DesignPage';
 import { HomePage } from './pages/HomePage';
+import { LearnPage } from './pages/LearnPage';
+import { LessonPage } from './pages/LessonPage';
 import { LocalGamePage } from './pages/LocalGamePage';
 import { SettingsPage } from './pages/SettingsPage';
 
@@ -14,6 +16,8 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: 'play/local', element: <LocalGamePage /> },
       { path: 'play/computer', element: <ComputerGamePage /> },
+      { path: 'learn', element: <LearnPage /> },
+      { path: 'learn/:lessonId', element: <LessonPage /> },
       { path: 'about', element: <AboutPage /> },
       { path: 'settings', element: <SettingsPage /> },
       { path: 'design', element: <DesignPage /> },

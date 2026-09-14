@@ -1,8 +1,19 @@
 {
   "brand": "Sittuyin",
-  "app": { "name": "Sittuyin" },
-  "nav": { "label": "Main", "play": "Play", "about": "About", "settings": "Settings" },
-  "colors": { "w": "White", "b": "Black" },
+  "app": {
+    "name": "Sittuyin"
+  },
+  "nav": {
+    "label": "Main",
+    "play": "Play",
+    "about": "About",
+    "settings": "Settings",
+    "learn": "Learn"
+  },
+  "colors": {
+    "w": "White",
+    "b": "Black"
+  },
   "pieces": {
     "k": "Min-gyi",
     "f": "Sit-ke",
@@ -28,7 +39,9 @@
     "localDesc": "Pass the device back and forth.",
     "aboutGame": "About Sittuyin",
     "traditional": "Traditional",
-    "intro": "Sittuyin is the chess of Myanmar. Each player first places their own pieces behind their pawns, so no two games begin the same way. A Ne promotes to a Sit-ke on its own side's diagonal."
+    "intro": "Sittuyin is the chess of Myanmar. Each player first places their own pieces behind their pawns, so no two games begin the same way. A Ne promotes to a Sit-ke on its own side's diagonal.",
+    "learn": "Learn Sittuyin",
+    "learnDesc": "Twelve short lessons: the board, the setup, every piece, promotion and the count."
   },
   "setup": {
     "hand": "{{color}} pieces to place",
@@ -67,9 +80,20 @@
     "custom": "Custom",
     "minutes": "Minutes",
     "increment": "Increment (s)",
-    "categories": { "bullet": "Bullet", "blitz": "Blitz", "rapid": "Rapid", "classical": "Classical" },
-    "counting": { "title": "Counting" },
-    "result": { "whiteWins": "White wins", "blackWins": "Black wins", "draw": "Draw" },
+    "categories": {
+      "bullet": "Bullet",
+      "blitz": "Blitz",
+      "rapid": "Rapid",
+      "classical": "Classical"
+    },
+    "counting": {
+      "title": "Counting"
+    },
+    "result": {
+      "whiteWins": "White wins",
+      "blackWins": "Black wins",
+      "draw": "Draw"
+    },
     "reason": {
       "checkmate": "Checkmate",
       "stalemate": "Stalemate",
@@ -95,12 +119,30 @@
     "hint": "Hint"
   },
   "bots": {
-    "ne": { "name": "Ne", "desc": "Just learning. Plays quickly and loosely." },
-    "sitke": { "name": "Sit-ke", "desc": "Sees captures one move ahead." },
-    "sin": { "name": "Sin", "desc": "Steady and careful." },
-    "myin": { "name": "Myin", "desc": "Quick to punish a mistake." },
-    "yahhta": { "name": "Yahhta", "desc": "Plans several moves ahead." },
-    "mingyi": { "name": "Min-gyi", "desc": "The strongest. Expect no gifts." }
+    "ne": {
+      "name": "Ne",
+      "desc": "Just learning. Plays quickly and loosely."
+    },
+    "sitke": {
+      "name": "Sit-ke",
+      "desc": "Sees captures one move ahead."
+    },
+    "sin": {
+      "name": "Sin",
+      "desc": "Steady and careful."
+    },
+    "myin": {
+      "name": "Myin",
+      "desc": "Quick to punish a mistake."
+    },
+    "yahhta": {
+      "name": "Yahhta",
+      "desc": "Plans several moves ahead."
+    },
+    "mingyi": {
+      "name": "Min-gyi",
+      "desc": "The strongest. Expect no gifts."
+    }
   },
   "boards": {
     "lacquer": "Lacquer",
@@ -140,5 +182,20 @@
     "dark": "Dark",
     "boards": "Boards",
     "sample": "Sample"
+  },
+  "learn": {
+    "title": "Lessons",
+    "exit": "Leave lesson",
+    "progress": "Lesson progress",
+    "check": "Check",
+    "continue": "Continue",
+    "correct": "Correct!",
+    "wrong": "Not quite",
+    "tryAgain": "Try again",
+    "complete": "Lesson complete!",
+    "stars": "Stars: {{count}}",
+    "unit": "Unit {{number}}",
+    "start": "Start",
+    "xpLabel": "Experience points"
   }
 }
