@@ -39,7 +39,7 @@ test("a guest's language choice is remembered in the browser without any account
   await other.goto('/play/local');
   await expect(other.locator('html')).toHaveAttribute('lang', 'en');
   await expect(other.getByRole('heading', { name: 'Pass and play' })).toBeVisible();
-  await other.goto('/account');
+  await other.goto('/learn');
   await expect(other.getByRole('link', { name: 'Settings' })).toBeVisible();
   expect(await other.evaluate(() => JSON.parse(localStorage.getItem('makruk.settings')!).state.language)).toBe('en');
 });

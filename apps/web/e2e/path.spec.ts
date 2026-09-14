@@ -39,36 +39,25 @@ async function completeKhunLesson(page: Page) {
   await button(page, 'ต่อไป').click();
 }
 
-test('path unlocks the next node, XP adds up and the daily streak grows (learn-005)', async ({ page }) => {
-  await page.clock.install({ time: new Date('2026-09-13T10:00:00') });
+test('every lesson is open from the start; finishing one marks it and adds XP; no streak (learn-005)', async ({ page }) => {
   await page.goto('/learn');
   await expect(page.getByTestId('xp')).toHaveText('0 XP');
-  await expect(page.getByTestId('streak')).toHaveText('0');
+  await expect(page.getByTestId('streak')).toHaveCount(0);
   await expect(page.locator('[data-lesson]')).toHaveCount(12);
-  await expect(page.locator('[data-status="locked"]')).toHaveCount(11);
+  await expect(page.locator('[data-lesson] a')).toHaveCount(12);
+  await expect(page.locator('[data-status="locked"]')).toHaveCount(0);
   await page.screenshot({ path: 'e2e-evidence/learn-path.png', fullPage: true });
 
-  await completeBoardLesson(page);
-  await expect(page.getByTestId('xp')).toHaveText('10 XP');
-  await expect(page.getByTestId('streak')).toHaveText('1');
-  await expect(page.locator('[data-lesson="board"]')).toHaveAttribute('data-status', 'completed');
-  await expect(page.locator('[data-lesson="khun"]')).toHaveAttribute('data-status', 'unlocked');
-  await expect(page.locator('[data-lesson="met"]')).toHaveAttribute('data-status', 'locked');
-
-  // Next calendar day: streak continues.
-  await page.clock.setSystemTime(new Date('2026-09-14T09:00:00'));
-  await page.reload();
-  await expect(page.getByTestId('streak')).toHaveText('1');
+  // Skip ahead: the Khun lesson is playable without finishing the board lesson first.
   await completeKhunLesson(page);
-  await expect(page.getByTestId('xp')).toHaveText('20 XP');
-  await expect(page.getByTestId('streak')).toHaveText('2');
-  await expect(page.locator('[data-lesson="met"]')).toHaveAttribute('data-status', 'unlocked');
+  await expect(page.getByTestId('xp')).toHaveText('10 XP');
+  await expect(page.locator('[data-lesson="khun"]')).toHaveAttribute('data-status', 'completed');
+  await expect(page.locator('[data-lesson="board"]')).toHaveAttribute('data-status', 'unlocked');
 
-  // Two days without a lesson: streak is broken.
-  await page.clock.setSystemTime(new Date('2026-09-16T09:00:00'));
   await page.reload();
-  await expect(page.getByTestId('streak')).toHaveText('0');
+  await completeBoardLesson(page);
   await expect(page.getByTestId('xp')).toHaveText('20 XP');
+  await expect(page.locator('[data-lesson="board"]')).toHaveAttribute('data-status', 'completed');
 });
 
 test('guided first game shows coach tips and completing it finishes the lesson (learn-004)', async ({ page }) => {

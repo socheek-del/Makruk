@@ -10,7 +10,7 @@ import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { GameScreen } from '../features/game/GameScreen';
 import { openGameConnection } from '../features/online/connection';
-import { displayName, useIdentity } from '../features/online/identity';
+import { useIdentity } from '../features/online/identity';
 import { useNow } from '../hooks/useNow';
 import { createOnlineSession, type OnlineSessionState } from '../stores/onlineSession';
 
@@ -130,9 +130,10 @@ function OnlineGame({ session, snapshot }: { session: OnlineStore; snapshot: Gam
   const base: Color = you ?? 'w';
   const orientation: Color = flipped ? other(base) : base;
   const opponent = you ? other(you) : null;
+  // No accounts: players are "You" and "Opponent"; spectators see the colours.
   const nameOf = (color: Color) => {
-    const name = displayName(snapshot.players[color], t);
-    return color === you ? `${name} (${t('computer.you')})` : name;
+    if (!you) return t(`colors.${color}`);
+    return color === you ? t('computer.you') : t('online.opponent');
   };
   const send = session.getState().send;
 
@@ -142,11 +143,6 @@ function OnlineGame({ session, snapshot }: { session: OnlineStore; snapshot: Gam
         <Card tone="secondary" className="py-2 text-center text-sm font-bold">
           {t('online.spectating')}
         </Card>
-      )}
-      {snapshot.rated && snapshot.players.w?.kind === 'user' && snapshot.players.b?.kind === 'user' && snapshot.timeControl && (
-        <p data-testid="rated-badge" className="text-center text-sm font-extrabold text-gold">
-          {t('account.rated')}
-        </p>
       )}
       {connection !== 'open' && (
         <Card tone="warning" data-testid="connection-status" className="flex items-center gap-2 py-2 text-sm font-bold">

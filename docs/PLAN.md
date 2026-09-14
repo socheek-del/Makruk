@@ -77,7 +77,7 @@ Status: draft for review · Date: 2026-09-13
 - Makruk vs Western chess cheat-sheet for chess players
 
 ### Design language
-- **Learning & app shell = Duolingo-style:** bright friendly palette, chunky rounded buttons with bottom "press" shadow, bouncy micro-animations, a Makruk mascot character (in-house), lesson path map with unlockable nodes, XP, daily streak, hearts/stars per lesson, celebratory end-of-lesson screens
+- **Learning & app shell = Duolingo-style:** bright friendly palette, chunky rounded buttons with bottom "press" shadow, bouncy micro-animations, a Makruk mascot character (in-house), lesson path map with unlockable nodes, XP, stars per lesson (a daily streak was built, then removed at the owner's request), celebratory end-of-lesson screens
 - **Game screen = Chess.com-style:** clean focused board, player cards with clocks, move list panel, post-game review with best-move/blunder markers, compact controls
 - **All art in-house:** SVG piece sets, mascot + poses, lesson illustrations, board textures. Plan a design-system step (tokens, components, illustration style guide) before bulk UI work
 

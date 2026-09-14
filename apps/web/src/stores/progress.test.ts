@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { currentStreak, dayKey, nextStreak, REPLAY_XP, useProgress } from './progress';
+import { REPLAY_XP, useProgress } from './progress';
 
 const at = (iso: string) => new Date(iso);
 
@@ -21,36 +21,16 @@ describe('lesson progress', () => {
     expect(useProgress.getState().xp).toBe(10 + REPLAY_XP);
   });
 
-  it('persists to localStorage', () => {
+  it('persists lessons and XP to localStorage, without a streak', () => {
     useProgress.getState().completeLesson('khun', 3, 10, at('2026-09-13T10:00:00'));
-    expect(JSON.parse(localStorage.getItem('makruk.progress')!).state.lessons.khun.stars).toBe(3);
-  });
-});
-
-describe('streaks', () => {
-  it('increments on consecutive days, not twice on the same day', () => {
-    let streak = { count: 0, lastDay: null as string | null };
-    streak = nextStreak(streak, at('2026-09-13T08:00:00'));
-    streak = nextStreak(streak, at('2026-09-13T22:00:00'));
-    expect(streak).toEqual({ count: 1, lastDay: '2026-09-13' });
-    streak = nextStreak(streak, at('2026-09-14T07:00:00'));
-    streak = nextStreak(streak, at('2026-09-15T23:59:00'));
-    expect(streak.count).toBe(3);
+    const saved = JSON.parse(localStorage.getItem('makruk.progress')!);
+    expect(saved.state.lessons.khun.stars).toBe(3);
+    expect(saved.state).not.toHaveProperty('streak');
   });
 
-  it('resets after a missed day', () => {
-    const streak = nextStreak({ count: 5, lastDay: '2026-09-10' }, at('2026-09-13T09:00:00'));
-    expect(streak).toEqual({ count: 1, lastDay: '2026-09-13' });
-  });
-
-  it('shows 0 once the streak is broken', () => {
-    const streak = { count: 4, lastDay: '2026-09-12' };
-    expect(currentStreak(streak, at('2026-09-13T12:00:00'))).toBe(4);
-    expect(currentStreak(streak, at('2026-09-14T12:00:00'))).toBe(0);
-  });
-
-  it('handles month boundaries', () => {
-    expect(nextStreak({ count: 2, lastDay: '2026-09-30' }, at('2026-10-01T10:00:00')).count).toBe(3);
-    expect(dayKey(at('2026-01-05T10:00:00'))).toBe('2026-01-05');
+  it('migrates saved progress from before streaks were removed', async () => {
+    const migrate = useProgress.persist.getOptions().migrate!;
+    const migrated = await migrate({ lessons: { board: { stars: 2, completedAt: 'x' } }, xp: 30, streak: { count: 4, lastDay: '2026-09-12' } }, 1);
+    expect(migrated).toEqual({ lessons: { board: { stars: 2, completedAt: 'x' } }, xp: 30 });
   });
 });

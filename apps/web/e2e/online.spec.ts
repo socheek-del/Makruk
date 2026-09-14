@@ -3,7 +3,7 @@ import { pieceOn, play } from './helpers';
 
 async function createRoom(page: Page, color: 'ขาว' | 'ดำ' = 'ขาว', timeControl = '5+0') {
   await page.goto('/play/online');
-  await expect(page.getByTestId('identity')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'สร้างห้อง' })).toBeEnabled();
   await page.locator(`[data-time-control="${timeControl}"]`).click();
   await page.getByRole('radio', { name: color, exact: true }).click();
   await page.getByRole('button', { name: 'สร้างห้อง' }).click();
@@ -24,13 +24,16 @@ async function twoPlayers(browser: Browser) {
 
 const plies = (page: Page) => page.getByTestId('move-list').locator('[data-ply]');
 
-test('guest identity is created once and kept after reload (acct-001)', async ({ page }) => {
+test('an anonymous seat token is created once and kept after reload, with no name shown (acct-001)', async ({ page }) => {
+  const seat = () => page.evaluate(() => JSON.parse(localStorage.getItem('makruk.identity')!).user.id as string);
+  const create = page.getByRole('button', { name: 'สร้างห้อง' });
   await page.goto('/play/online');
-  const badge = page.getByTestId('identity');
-  await expect(badge).toHaveText(/คุณ: ผู้เล่น \d{4}/);
-  const first = await badge.textContent();
+  await expect(create).toBeEnabled();
+  const first = await seat();
   await page.reload();
-  await expect(badge).toHaveText(first!);
+  await expect(create).toBeEnabled();
+  expect(await seat()).toBe(first);
+  await expect(page.getByText(/ผู้เล่น \d{4}/)).toHaveCount(0);
 });
 
 test('create a room, a friend joins by code, both play and see the same board (online-002)', async ({ browser }) => {

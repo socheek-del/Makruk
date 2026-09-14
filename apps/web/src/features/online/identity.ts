@@ -1,11 +1,13 @@
-import { GuestResponse, type PublicUser } from '@makruk/protocol';
-import type { TFunction } from 'i18next';
+import { GuestResponse } from '@makruk/protocol';
 import { useEffect, useState } from 'react';
 
+/**
+ * Anonymous seat token for online play (acct-001). There are no accounts: the token only lets the
+ * server recognise this browser, so a reload or dropped connection returns the player to their seat.
+ */
 export type Identity = GuestResponse;
 
 const STORAGE_KEY = 'makruk.identity';
-const listeners = new Set<(identity: Identity) => void>();
 
 function readStored(): Identity | null {
   try {
@@ -23,7 +25,7 @@ function store(identity: Identity | null) {
     if (identity) localStorage.setItem(STORAGE_KEY, JSON.stringify(identity));
     else localStorage.removeItem(STORAGE_KEY);
   } catch {
-    // Private mode: identity lasts for this tab only.
+    // Private mode: the token lasts for this tab only.
   }
 }
 
@@ -38,11 +40,7 @@ async function issueGuest(): Promise<Identity> {
 let pending: Promise<Identity> | null = null;
 let verified = false;
 
-function announce(identity: Identity) {
-  for (const listener of listeners) listener(identity);
-}
-
-/** acct-001: returns the saved identity (guest or account), or asks the server for a new guest. */
+/** Returns this browser's saved seat token, or asks the server for a new one. */
 export function ensureIdentity(): Promise<Identity> {
   pending ??= (async () => {
     const saved = readStored();
@@ -65,22 +63,6 @@ export function ensureIdentity(): Promise<Identity> {
   return pending;
 }
 
-/** acct-002: switch to a signed-in account. */
-export function setIdentity(identity: Identity): void {
-  store(identity);
-  verified = true;
-  announce(identity);
-}
-
-export async function signOut(): Promise<Identity> {
-  store(null);
-  verified = false;
-  const guest = await issueGuest();
-  verified = true;
-  announce(guest);
-  return guest;
-}
-
 export function useIdentity(): { identity: Identity | null; failed: boolean } {
   const [identity, setState] = useState<Identity | null>(null);
   const [failed, setFailed] = useState(false);
@@ -89,17 +71,9 @@ export function useIdentity(): { identity: Identity | null; failed: boolean } {
     ensureIdentity()
       .then((id) => active && setState(id))
       .catch(() => active && setFailed(true));
-    const listener = (id: Identity) => active && setState(id);
-    listeners.add(listener);
     return () => {
       active = false;
-      listeners.delete(listener);
     };
   }, []);
   return { identity, failed };
-}
-
-export function displayName(user: Pick<PublicUser, 'name' | 'kind'> | null | undefined, t: TFunction): string {
-  if (!user) return '—';
-  return user.kind === 'guest' ? t('online.guestName', { tag: user.name }) : user.name;
 }

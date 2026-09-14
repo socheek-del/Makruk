@@ -58,9 +58,11 @@ feature work on top of a broken starting state.
 - **Deploy:** production at `https://th-chess.beanroti.com` (Worker custom domain
   on Cloudflare zone `beanroti.com`). GitHub Actions deploys on push to `main`;
   `npm run deploy` applies D1 migrations (`apps/worker/migrations`) first.
-- **Accounts:** username + password (PBKDF2-SHA256, 100k iterations — the Workers maximum), email
-  confirmation required before sign-in, password reset by emailed one-time link (only token hashes stored).
-  No Google/OAuth sign-in (owner decision).
+- **Accounts:** removed from the product for now (owner decision 2026-09-14) — the site is open to
+  everyone with no sign-in, ratings or history. Online play uses an invisible anonymous seat token
+  (`features/online/identity.ts`). The worker still contains the dormant account code (username + password
+  with PBKDF2, email confirmation, password reset; no Google/OAuth) and its tests.
+- **Lessons:** all lessons are open (no locking) and there is no daily streak.
 - **Worker config:** secrets `AUTH_SECRET` (required) and `RESEND_API_KEY` (email delivery via Resend;
   registration is disabled until set). `EMAIL_FROM` is a var in `wrangler.jsonc` (beanroti.com sender). `DEV_EMAIL_OUTBOX=1` stores emails in D1 and exposes
   `/api/dev/outbox` — only for local dev, workerd tests and Playwright; never in production.

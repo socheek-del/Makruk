@@ -1,7 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router';
 import { AppShell } from './components/AppShell';
-import { AccountPage } from './pages/AccountPage';
-import { AuthCompletePage } from './pages/AuthCompletePage';
+import { AboutPage } from './pages/AboutPage';
 import { ComputerGamePage } from './pages/ComputerGamePage';
 import { DesignPage } from './pages/DesignPage';
 import { GuidedGamePage } from './pages/GuidedGamePage';
@@ -11,8 +10,6 @@ import { LessonPage } from './pages/LessonPage';
 import { LocalGamePage } from './pages/LocalGamePage';
 import { OnlineGameRoute } from './pages/OnlineGamePage';
 import { OnlinePage } from './pages/OnlinePage';
-import { ForgotPasswordPage, ResetPasswordPage } from './pages/PasswordPages';
-import { ReplayPage } from './pages/ReplayPage';
 import { SettingsPage } from './pages/SettingsPage';
 
 export const router = createBrowserRouter([
@@ -27,11 +24,7 @@ export const router = createBrowserRouter([
       { path: 'play/online/:code', element: <OnlineGameRoute /> },
       { path: 'learn', element: <LearnPage /> },
       { path: 'learn/:lessonId', element: <LessonPage /> },
-      { path: 'account', element: <AccountPage /> },
-      { path: 'auth/complete', element: <AuthCompletePage /> },
-      { path: 'forgot-password', element: <ForgotPasswordPage /> },
-      { path: 'reset-password', element: <ResetPasswordPage /> },
-      { path: 'replay/:id', element: <ReplayPage /> },
+      { path: 'about', element: <AboutPage /> },
       { path: 'settings', element: <SettingsPage /> },
       { path: 'design', element: <DesignPage /> },
       { path: '*', element: <Navigate to="/" replace /> },

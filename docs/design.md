@@ -27,7 +27,7 @@ on `<html>` or any subtree (the showcase uses both at once).
 | `secondary` | #1cb0f6 | #49c0f8 | Links, selection, info |
 | `danger` | #ff4b4b | #ff4b4b | Errors, wrong answers, resign |
 | `warning` | #ffc800 | #ffc800 | Hints, counting-rule alerts |
-| `gold` | #ff9600 | #ff9600 | XP, streaks, rewards |
+| `gold` | #ff9600 | #ff9600 | XP, stars, rewards |
 
 Every accent has a darker `-shadow` shade for the pressable bottom border and a
 `-soft` tint for tinted cards.

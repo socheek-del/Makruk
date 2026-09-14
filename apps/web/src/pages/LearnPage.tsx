@@ -1,16 +1,16 @@
 import type { PieceType } from '@makruk/engine';
-import { Check, Crown, Flame, Hash, Lock, type LucideIcon, Star, Swords, Zap } from 'lucide-react';
+import { Check, Crown, Hash, type LucideIcon, Star, Swords, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { Card } from '../components/ui/Card';
 import { PieceSvg } from '../features/board/PieceSvg';
 import { ALL_LESSONS, UNITS } from '../features/learn/lessons';
 import { type Lesson, useL10n } from '../features/learn/types';
-import { useNow } from '../hooks/useNow';
 import { cn } from '../lib/cn';
-import { currentStreak, useProgress } from '../stores/progress';
+import { useProgress } from '../stores/progress';
 
-type Status = 'completed' | 'current' | 'unlocked' | 'locked';
+/** Every lesson is open; `current` just marks the first one not yet completed. */
+type Status = 'completed' | 'current' | 'unlocked';
 
 /** Horizontal offsets (rem) that give the path its Duolingo-style zig-zag. */
 const ZIGZAG = [0, 3, 4.5, 3, 0, -3, -4.5, -3];
@@ -28,7 +28,6 @@ const ICONS: Partial<Record<Lesson['icon'], LucideIcon>> = {
 
 function LessonIcon({ lesson, status }: { lesson: Lesson; status: Status }) {
   if (status === 'completed') return <Check aria-hidden className="h-9 w-9" strokeWidth={3} />;
-  if (status === 'locked') return <Lock aria-hidden className="h-8 w-8" />;
   if (lesson.icon.length === 1) {
     return <PieceSvg piece={{ color: 'w', type: lesson.icon as PieceType, promoted: false }} className="h-11 w-11" />;
   }
@@ -41,14 +40,11 @@ export function LearnPage() {
   const tr = useL10n();
   const lessons = useProgress((s) => s.lessons);
   const xp = useProgress((s) => s.xp);
-  const streak = useProgress((s) => s.streak);
-  const now = useNow(60_000);
 
-  const firstOpen = ALL_LESSONS.find((l, i) => !lessons[l.id] && (i === 0 || lessons[ALL_LESSONS[i - 1]!.id]));
+  const firstOpen = ALL_LESSONS.find((l) => !lessons[l.id]);
   const status = (lesson: Lesson): Status => {
     if (lessons[lesson.id]) return 'completed';
-    if (lesson === firstOpen) return 'current';
-    return 'locked';
+    return lesson === firstOpen ? 'current' : 'unlocked';
   };
 
   let index = 0;
@@ -57,12 +53,6 @@ export function LearnPage() {
       <header className="flex items-center justify-between gap-4">
         <h1 className="text-3xl font-extrabold">{t('learn.title')}</h1>
         <div className="flex items-center gap-4 text-lg font-extrabold">
-          <span className="flex items-center gap-1 text-gold" title={t('learn.streakLabel')}>
-            <Flame aria-hidden className="h-6 w-6 fill-gold" />
-            <span data-testid="streak" aria-label={t('learn.streakLabel')}>
-              {currentStreak(streak, new Date(now))}
-            </span>
-          </span>
           <span className="flex items-center gap-1 text-secondary" title={t('learn.xpLabel')}>
             <Zap aria-hidden className="h-6 w-6 fill-secondary" />
             <span data-testid="xp">{xp} XP</span>
@@ -94,13 +84,13 @@ export function LearnPage() {
                         'grid h-20 w-20 place-items-center rounded-full border-b-[6px] text-white transition-transform',
                         state === 'completed' && 'border-gold-shadow bg-gold',
                         state === 'current' && 'border-primary-shadow bg-primary ring-8 ring-primary/20',
-                        state === 'locked' && 'border-line bg-surface-2 text-subtle',
+                        state === 'unlocked' && 'border-secondary-shadow bg-secondary',
                       )}
                     >
                       <LessonIcon lesson={lesson} status={state} />
                     </span>
                   </span>
-                  <span className={cn('max-w-40 text-center text-sm font-extrabold', state === 'locked' && 'text-subtle')}>
+                  <span className="max-w-40 text-center text-sm font-extrabold">
                     {tr(lesson.title)}
                   </span>
                   {stars > 0 && (
@@ -119,19 +109,13 @@ export function LearnPage() {
                   data-status={state === 'current' ? 'unlocked' : state}
                   style={{ transform: `translateX(${offset}rem)` }}
                 >
-                  {state === 'locked' ? (
-                    <div aria-disabled title={t('learn.locked')}>
-                      {node}
-                    </div>
-                  ) : (
-                    <Link
-                      to={lesson.route ?? `/learn/${lesson.id}`}
-                      aria-label={tr(lesson.title)}
-                      className="block rounded-3xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-secondary/40 active:translate-y-1"
-                    >
-                      {node}
-                    </Link>
-                  )}
+                  <Link
+                    to={lesson.route ?? `/learn/${lesson.id}`}
+                    aria-label={tr(lesson.title)}
+                    className="block rounded-3xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-secondary/40 active:translate-y-1"
+                  >
+                    {node}
+                  </Link>
                 </li>
               );
             })}

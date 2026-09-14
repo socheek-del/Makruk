@@ -3,7 +3,7 @@ import { type Browser, expect, type Page, test } from '@playwright/test';
 async function seeker(browser: Browser): Promise<Page> {
   const page = await (await browser.newContext()).newPage();
   await page.goto('/play/online');
-  await expect(page.getByTestId('identity')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'สร้างห้อง' })).toBeEnabled();
   return page;
 }
 

@@ -9,7 +9,7 @@ test('lesson engine: info, wrong and right answers, completion saved locally (le
   await page.goto('/');
   await page.getByRole('link', { name: 'เรียน', exact: true }).click();
   await expect(page.locator('[data-lesson="board"]')).toHaveAttribute('data-status', 'unlocked');
-  await expect(page.locator('[data-lesson="khun"]')).toHaveAttribute('data-status', 'locked');
+  await expect(page.locator('[data-lesson="khun"]')).toHaveAttribute('data-status', 'unlocked');
   await page.locator('[data-lesson="board"] a').click();
 
   await expect(prompt(page)).toContainText('นี่คือกระดานหมากรุกไทย');
