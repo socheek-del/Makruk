@@ -2,58 +2,59 @@
 
 ## Verified Now
 
-- **Makruk site:** unchanged and live at the address in `apps/web/site.config.ts`. The full E2E suite passes (65/65) on the refactored engine.
-- **Multi-game plan:** in `docs/PLATFORM.md`. Owner decisions:
-  - The repo becomes `chaturanga`.
-  - Each game is a separate product on its own subdomain.
-  - Sittuyin is next, in Burmese + English.
-- **Rules engines:**
-  - `packages/rules-core` (`@chaturanga/rules-core`) holds the Variant interface, shared 8x8 board/tables/attacks, rule errors, and `/testing` (ffish loader, conformance suite).
-  - `packages/engine` (Makruk) and `packages/sittuyin` both satisfy `Variant<Game>` at compile time and pass the conformance suite.
-  - The Sittuyin rules engine is complete and verified against Fairy-Stockfish (`docs/sittuyin-rules.md`).
-- **Verification that ran:**
-  - `npm run verify` green (web 112, worker 48, ai 20, engine 143, protocol 2, rules-core 6, sittuyin 174).
-  - Deep runs: engine 152/152, sittuyin 180/180.
-  - `npm run build` OK.
-  - `npm run e2e` 65/65.
+- **Repository:** GitHub `socheek-del/chaturanga` (renamed from `Makruk`; the old URL redirects). It is a family of games:
+  - Makruk (Thai chess) is live.
+  - The Sittuyin (Burmese chess) rules engine is done.
+  - Plan: `docs/PLATFORM.md`.
+- **Layout:**
+  - `apps/makruk/{web,worker}`: the Makruk product.
+  - `packages/rules-core`: Variant interface and conformance suite.
+  - `packages/makruk`, `packages/sittuyin`: rules engines, each with a `RULES.md`.
+  - `packages/ai`: Makruk AI.
+  - `packages/protocol`.
+  - Scope `@chaturanga/*`.
+- **Makruk site:** behaviour unchanged. The site address lives in `apps/makruk/web/site.config.ts`.
+- **Verification that ran on the new layout:**
+  - `npm run verify` exit 0
+  - `npm run build` OK
+  - `npm run e2e` 65/65 on a re-run
+  - `npm run e2e:pwa -w apps/makruk/web` 2/2
+  - Deep rules runs for both engines (before the move).
+- **CI and production:**
+  - Run 34820113721 on 1c3f632: verify and deploy both succeeded.
+  - Production pages and health returned 200, and the JSON-LD links to the chaturanga repo.
+  - A Playwright smoke test against production passed (bot game reply, online room with 2 moves).
 
 ## Changed This Session
 
-- Code or behaviour added:
-  - `packages/sittuyin` (setup, moves, promotion, game end, perft)
-  - `packages/rules-core` (Variant, board8, attacks, errors, testing)
-  - Makruk engine now imports shared code from rules-core and re-exports it under its old names. Its `Game` gained `hand()` and `legalUci()`.
-- Harness changes:
-  - `docs/PLATFORM.md` and `docs/sittuyin-rules.md`
-  - features plat-001..002 and sit-001..003 passing
-  - engine purity lint rule covers rules-core and sittuyin
-  - `AGENTS.md` layout lists the new packages
+- **Plan:** plat-001.
+- **Sittuyin rules engine:** sit-001..003.
+- **rules-core Variant interface:** plat-002.
+- **Rename and restructure:** plat-003.
+  - Root README, CONTRIBUTING and AGENTS now describe the platform.
+  - Makruk facts are in `apps/makruk/AGENTS.md`.
+  - Every feature has a `product` field.
 
 ## Broken Or Unverified
 
 - **Known defect:** none open.
+- **Flaky test:** E2E online-004 ("a player who reloads rejoins") timed out once under full-suite load because the opponent-disconnected bar's button covered square d6. It passes alone (3/3) and on re-run. Harden it if it recurs.
 - **Unverified path:** no app uses Sittuyin yet.
-- **Risks for the next session:**
-  - Commits since `7408fb1` are **not pushed**. The owner has not answered whether to push (a push to `main` runs the CI deploy).
-  - Package scope is mixed (`@makruk/*` and `@chaturanga/*`) until plat-003.
-  - Run npm and vitest under the `.nvmrc` Node (`. ~/.nvm/nvm.sh && nvm use`). With the shell's default Node 20.13, npm skips rolldown's native binding and vitest fails.
+- **Risk:** run npm and vitest under the `.nvmrc` Node (`. ~/.nvm/nvm.sh && nvm use`). With the shell's default Node 20.13, npm skips native bindings and vitest fails.
 
 ## Next Best Step
 
-- **Highest-priority unfinished feature:** `plat-003`, rename to chaturanga and move Makruk into `apps/makruk/`.
-- **Why it is next:** plat-004/005 and the Sittuyin app need the per-product app layout.
-- **Needs the owner:** renaming the GitHub repository (public URL change) and pushing. Confirm before doing it.
-- **Survey already done:**
-  - About 45 files use `@makruk/`.
-  - Repo URL appears in the READMEs, CONTRIBUTING, AboutPage.tsx and about.spec.ts, index.html JSON-LD, AGENTS and PLAN.
-  - Moving `apps/web` and `apps/worker` together keeps `../web/dist` (wrangler) and `cwd: '../worker'` (Playwright) valid, but `tsconfig` extends paths, root scripts (`-w apps/web`), the eslint `apps/web/**` glob and the workspaces glob must change.
-  - CI workflows only reference `packages/ai`.
-- **What counts as passing:** see plat-003 in `feature_list.json` (verify, e2e, e2e:pwa, CI deploy, production smoke).
+- **Highest-priority unfinished feature:** `plat-004`, per-product languages.
+- **Why it is next:** the Sittuyin app needs Burmese + English while Makruk stays Thai + English, loading only its own locales.
+- **What counts as passing:**
+  - A `product.config` declares locales, default and fonts.
+  - The locale test fails on any missing key in any declared locale.
+  - The Makruk i18n E2E is unchanged.
+  - The Makruk build contains no Burmese strings.
 - **What must not change:** Makruk behaviour, the worker name and D1 database `makruk`, and the no-accounts / open-lessons decisions.
 
 ## Commands
 
 - Startup: `./init.sh`
-- Verification: `npm run verify` · `npm run e2e`
-- Deep rules checks: `npm run test:deep -w packages/engine` · `npm run test:deep -w packages/sittuyin`
-- Regenerate the Sittuyin perft reference: `npm run perft:reference -w packages/sittuyin`
+- Verification: `npm run verify` · `npm run e2e` · `npm run e2e:pwa -w apps/makruk/web`
+- Deep rules checks: `npm run test:deep -w packages/makruk` · `npm run test:deep -w packages/sittuyin`

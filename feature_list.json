@@ -974,14 +974,20 @@
       "milestone": "M10",
       "title": "Rename to chaturanga and move Makruk into apps/makruk",
       "user_visible_behavior": "The repository is the chaturanga family: a root README about the games, Makruk's README/AGENTS facts in apps/makruk, neutral package scope. The Makruk site behaves exactly as before.",
-      "status": "in_progress",
+      "status": "passing",
       "verification": [
         "GitHub repository renamed to chaturanga (old URL redirects); local remote uses the github-socheek-del alias.",
         "npm scope changed from @makruk to a neutral scope; apps/web and apps/worker live under apps/makruk/.",
         "Root README describes the family; apps/makruk/README.md and README.th.md keep the Makruk showcase; root AGENTS.md holds platform rules and apps/makruk/AGENTS.md holds Makruk facts; features carry a product field.",
         "npm run verify, npm run e2e and npm run e2e:pwa pass; CI deploys and production Makruk smoke checks (home, computer game, online room, /api/health) pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-14 (1c3f632): git mv packages/engine → packages/makruk, apps/web + apps/worker → apps/makruk/{web,worker}, docs/rules.md → packages/makruk/RULES.md, docs/sittuyin-rules.md → packages/sittuyin/RULES.md, docs/{design,i18n-review,PLAN}.md + docs/media + README(.th).md → apps/makruk/. Untracked local state (.dev.vars, .wrangler, dist, node_modules) moved with the folders. Packages renamed to @chaturanga/{makruk, makruk-ai, makruk-web, makruk-worker, protocol}; workspaces apps/*/* + packages/*; root scripts dev/build/deploy delegate to :makruk variants; eslint globs and app tsconfig extends updated; @makruk/ imports renamed in 52 source files (56 edits).",
+        "2026-09-14: docs split — root README (family: games table, layout, run locally), CONTRIBUTING and AGENTS (platform rules: one layout rule, separate products, per-product languages, Variant conformance) at the root; Makruk facts in apps/makruk/AGENTS.md (+ CLAUDE.md importing it); Makruk READMEs link back to the family README with paths relative to apps/makruk; About page, about.spec, index.html JSON-LD, README badges/links point at socheek-del/chaturanga; every feature carries product (makruk 42, platform 7, sittuyin 11). A final git grep for apps/web, apps/worker, packages/engine, @makruk/, socheek-del/Makruk and the old doc paths finds only correct relative paths (historical PLAN.md and progress logs excluded).",
+        "2026-09-14: local verification on the new layout — npm install (npm 11, .nvmrc Node) links all 7 @chaturanga workspaces; npm run verify exit 0 (makruk-web 112, makruk-worker 48, makruk-ai 20, makruk 143, protocol 2, rules-core 6, sittuyin 174); npm run build exit 0 (wrangler dry-run 903.97 KiB); npm run e2e:pwa -w apps/makruk/web 2/2; npm run e2e first run 64/65 — online-004 'a player who reloads rejoins' timed out because the opponent-disconnected bar's button covered d6 under full-suite load; that spec alone passed 3/3 (--repeat-each=3) and the full suite re-run passed 65/65.",
+        "2026-09-14: GitHub repository renamed socheek-del/Makruk → socheek-del/chaturanga with gh (socheek-del token, active gh account untouched); origin set to git@github-socheek-del:socheek-del/chaturanga.git; description and topics (sittuyin, burmese-chess, chaturanga) updated, homepage unchanged; pushed 5e5921f..1c3f632. gh api repos/socheek-del/Makruk resolves to socheek-del/chaturanga (old URL redirects).",
+        "2026-09-14: GitHub Actions run 34820113721 on 1c3f632 — verify success, deploy success. Production after deploy: home 200 with the Thai title, JSON-LD codeRepository https://github.com/socheek-del/chaturanga, /api/health 200 {ok:true, service:makruk}, /about /play/computer /play/online /learn 200. Playwright smoke against production (scratchpad script, domain passed via env): level-1 bot game e3e4 → bot replied (2 plies); online 5+0 room created by one context and joined by another, e4 / d5 played through the server, both move lists [e4, d5]."
+      ],
       "notes": "Worker name and D1 database stay 'makruk' (they are Makruk's)."
     },
     {

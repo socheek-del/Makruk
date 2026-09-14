@@ -8,16 +8,16 @@ handoff; no agent updates it automatically.
 
 ## Current Verified State
 
-- Repository root: `t-chess/` (GitHub `socheek-del/Makruk`, public, GPL-3.0)
+- Repository root: `t-chess/` (GitHub `socheek-del/chaturanga`, renamed from `Makruk` on 2026-09-14, public, GPL-3.0). Makruk product in `apps/makruk/{web,worker}`, rules in `packages/makruk`.
 - Production: https://th-chess.beanroti.com — Worker `makruk` (static assets + `/api/*` + `/ws/*`, Durable Objects `GameRoom`, `Matchmaker`), auto-deployed by GitHub Actions on push to `main`
 - Standard startup path: `./init.sh` then `npm run dev` (web :5173 proxies to wrangler :8787)
 - Standard verification path: `npm run verify` (lint + typecheck + unit tests in all workspaces, incl. workerd tests)
-- E2E: `npm run e2e` (Playwright starts vite + wrangler dev) · PWA/offline: `npm run e2e:pwa -w apps/web`
-- Deep engine checks: `npm run test:deep -w packages/engine` · Bot ladder: `npm run test:strength -w packages/ai` (slow; `STRENGTH_PAIR=n`)
+- E2E: `npm run e2e` (Playwright starts vite + wrangler dev) · PWA/offline: `npm run e2e:pwa -w apps/makruk/web`
+- Deep engine checks: `npm run test:deep -w packages/makruk` · `npm run test:deep -w packages/sittuyin` · Bot ladder: `npm run test:strength -w packages/ai` (slow; `STRENGTH_PAIR=n`)
 - Milestones: M0 infra ✓, M1 engine ✓, M2 local play ✓, M3 vs computer ✓ (ai-002 ladder verified on GitHub Actions), M4 learning ✓, M5 online ✓ (incl. quick match), M6 accounts (acct-001 anonymous seat token ✓; acct-002/acct-003 deferred — accounts removed by the owner), M8 owner requests (play-006, about-001, docs-001 ✓; seo-001 awaiting Search Console), M7 polish (PWA, sounds, themes, art ✓; polish-002 blocked)
-- D1 database `makruk` (id 9e084ac6-9749-411d-867d-c89e8421ed78); migrations in `apps/worker/migrations`, applied by `npm run deploy` (CI) and by the Playwright wrangler command locally
+- D1 database `makruk` (id 9e084ac6-9749-411d-867d-c89e8421ed78); migrations in `apps/makruk/worker/migrations`, applied by `npm run deploy` (CI) and by the Playwright wrangler command locally
 - Remaining: `polish-002` (native Thai review) and `seo-001` (Search Console submission) — both need the owner; `acct-002`/`acct-003` deferred (accounts removed from the product for now)
-- Multi-game platform (session 003): plan in `docs/PLATFORM.md` (repo → `chaturanga`, one product per game on its own subdomain, Sittuyin next in Burmese + English). `packages/sittuyin` engine complete (M9): sit-001 ✓ setup, sit-002 ✓ moves + promotion, sit-003 ✓ game end + ASEAN counting (`docs/sittuyin-rules.md`). plat-002: `packages/rules-core` holds the Variant interface and shared 8x8 code, and both engines pass its conformance suite. Next: plat-003 (rename to chaturanga and move Makruk into `apps/makruk`).
+- Multi-game platform (session 003): plan in `docs/PLATFORM.md` (repo → `chaturanga`, one product per game on its own subdomain, Sittuyin next in Burmese + English). `packages/sittuyin` engine complete (M9): sit-001 ✓ setup, sit-002 ✓ moves + promotion, sit-003 ✓ game end + ASEAN counting (`docs/sittuyin-rules.md`). plat-002: `packages/rules-core` holds the Variant interface and shared 8x8 code, and both engines pass its conformance suite. plat-003: the repo is renamed to chaturanga, Makruk lives in `apps/makruk`, and the scope is `@chaturanga/*`. Next: plat-004 (per-product languages).
 - Shell pitfall: run npm/vitest under the `.nvmrc` Node (`. ~/.nvm/nvm.sh && nvm use`). The default shell Node 20.13 makes npm skip rolldown's native binding, and vitest then fails with "Cannot find native binding". `init.sh` already switches Node.
 - Current blockers (owner action needed):
   - `seo-001`: verify the site in Google Search Console and submit `https://th-chess.beanroti.com/sitemap.xml`
@@ -97,4 +97,12 @@ handoff; no agent updates it automatically.
   - Both engines satisfy it at compile time and pass the shared conformance suite. A mutation check (an undo that does nothing) proved the suite catches violations.
   - Makruk re-exports the moved code under its old names, so the ai, web and worker packages did not change.
   - Verification: verify, deep runs for both engines, build, E2E. Results are in `feature_list.json`.
-- Next best step: `plat-003`. It needs the owner for the GitHub rename, which changes the public URL: rename the repo to `chaturanga`, change the npm scope, move `apps/web` and `apps/worker` to `apps/makruk/`, and split the README and AGENTS files.
+- Owner answered: push now, and do all of plat-003 including the GitHub rename.
+- Pushed 7408fb1..5e5921f. CI verify + deploy succeeded, and the production home page and `/api/health` returned 200.
+- `plat-003` (commit 1c3f632):
+  - Moved the Makruk app, rules engine and docs into product folders, and renamed the scope to `@chaturanga/*`.
+  - Split the root and Makruk README, CONTRIBUTING and AGENTS files, and added `product` to all features.
+  - Verification: verify, build, e2e:pwa, and E2E 65/65 on a re-run (the first run had one timing flake, recorded in the evidence).
+  - Renamed the GitHub repo to `chaturanga` and updated the remote, description and topics, then pushed.
+- Known flake: in E2E online-004 (reload rejoins), the opponent-disconnected bar can cover the board under full-suite load. It passes alone and on re-run. Worth hardening if it recurs.
+- Next best step: `plat-004`, per-product languages. Add a `product.config` with locales, default and fonts; the locale test must cover every declared language.
