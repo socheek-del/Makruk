@@ -12,6 +12,7 @@ import {
   type GameStatus,
   IllegalMoveError,
   pressClock,
+  runFor,
   stopClock,
   timesAt,
   type Variant,
@@ -70,7 +71,7 @@ export function createRoom(
     nextCode: null,
     disconnect: null,
   };
-  return options.opponent ? startIfReady(room, options.now) : room;
+  return options.opponent ? startIfReady(variant, room, options.now) : room;
 }
 
 export function roomStatus(room: RoomState): GameSnapshot['status'] {
@@ -90,9 +91,20 @@ export function seatOf(room: RoomState, userId: string): Color | null {
   return null;
 }
 
-function startIfReady(room: RoomState, now: number): RoomState {
+/** True while pieces are still being placed from hand (the Sittuyin setup phase). */
+function inSetup(game: VariantGame): boolean {
+  return game.hand('w').length + game.hand('b').length > 0;
+}
+
+/**
+ * Both seats are taken: create the clock. Clocks do not run while pieces are being placed, so a game
+ * that opens with a setup phase gets a stopped clock that starts after the last placement.
+ */
+function startIfReady(variant: Variant, room: RoomState, now: number): RoomState {
   if (!room.players.w || !room.players.b || room.clock || !room.timeControl) return room;
-  return { ...room, clock: createClock(room.timeControl.initialMs, now, 'w') };
+  const game = replay(variant, room);
+  const clock = createClock(room.timeControl.initialMs, now, game.turn);
+  return { ...room, clock: inSetup(game) ? stopClock(clock, now) : clock };
 }
 
 function finish(room: RoomState, result: GameResult, now: number): RoomState {
@@ -112,7 +124,7 @@ function resultFromStatus(status: GameStatus): GameResult | null {
 }
 
 /** Joins or rejoins a room. Returns the user's seat (null = spectator). */
-export function join(room: RoomState, user: PublicUser, now: number): { room: RoomState; color: Color | null } {
+export function join(variant: Variant, room: RoomState, user: PublicUser, now: number): { room: RoomState; color: Color | null } {
   const seated = seatOf(room, user.id);
   if (seated) {
     const back = room.disconnect?.color === seated ? { ...room, disconnect: null } : room;
@@ -121,7 +133,7 @@ export function join(room: RoomState, user: PublicUser, now: number): { room: Ro
   if (roomStatus(room) !== 'waiting') return { room, color: null };
   const color: Color = room.players.w ? 'b' : 'w';
   const seatedRoom = { ...room, players: { ...room.players, [color]: user } };
-  return { room: startIfReady(seatedRoom, now), color };
+  return { room: startIfReady(variant, seatedRoom, now), color };
 }
 
 /** Applies time-based outcomes: flag fall and abandonment after the reconnect grace period. */
@@ -170,6 +182,7 @@ export function applyMessage(
       const game = replay(variant, room);
       if (game.turn !== color) return { room, error: 'not_your_turn' };
       if (message.ply !== room.moves.length) return { room, error: 'stale_ply' };
+      const placing = inSetup(game);
       let uci: string;
       try {
         uci = game.move(message.uci).uci;
@@ -177,12 +190,13 @@ export function applyMessage(
         if (err instanceof IllegalMoveError) return { room, error: 'illegal_move' };
         throw err;
       }
-      const moved: RoomState = {
-        ...room,
-        moves: [...room.moves, uci],
-        clock: room.clock && room.timeControl ? pressClock(room.clock, color, now, room.timeControl.incrementMs) : room.clock,
-        drawOfferBy: null,
-      };
+      let clock = room.clock;
+      if (clock && room.timeControl) {
+        // A placement never presses the clock; the last one starts it for the side to move.
+        if (!placing) clock = pressClock(clock, color, now, room.timeControl.incrementMs);
+        else if (!inSetup(game)) clock = runFor(clock, game.turn, now);
+      }
+      const moved: RoomState = { ...room, moves: [...room.moves, uci], clock, drawOfferBy: null };
       const result = resultFromStatus(game.status());
       return { room: result ? finish(moved, result, now) : moved };
     }

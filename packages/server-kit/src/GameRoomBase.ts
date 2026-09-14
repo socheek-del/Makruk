@@ -105,7 +105,7 @@ export abstract class GameRoomBase<E extends RoomEnv> extends DurableObject<E> {
     const stored = await this.load();
     if (!stored) return new Response('Room not found', { status: 404 });
     const now = Date.now();
-    const { room, color } = join(settle(stored, now), user, now);
+    const { room, color } = join(this.variant, settle(stored, now), user, now);
 
     const pair = new WebSocketPair();
     const [client, server] = Object.values(pair) as [WebSocket, WebSocket];

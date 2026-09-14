@@ -10,14 +10,14 @@ const code = () => 'NEXT23';
 
 function playingRoom(timeControl = { initialMs: 60_000, incrementMs: 2_000 }) {
   const created = createRoom(makruk, { code: 'ABCDEF', creator: alice, color: 'w', timeControl, now: 0 });
-  return join(created, bob, 1_000).room;
+  return join(makruk, created, bob, 1_000).room;
 }
 
 describe('seating', () => {
   it('waits for a second player, then starts with White on the clock', () => {
     const room = createRoom(makruk, { code: 'ABCDEF', creator: alice, color: 'b', timeControl: { initialMs: 60_000, incrementMs: 0 }, now: 0 });
     expect(roomStatus(room)).toBe('waiting');
-    const joined = join(room, bob, 5_000);
+    const joined = join(makruk, room, bob, 5_000);
     expect(joined.color).toBe('w');
     expect(roomStatus(joined.room)).toBe('playing');
     expect(joined.room.clock?.running).toBe('w');
@@ -25,8 +25,8 @@ describe('seating', () => {
 
   it('reseats a returning player and makes a third person a spectator', () => {
     const room = playingRoom();
-    expect(join(room, alice, 2_000).color).toBe('w');
-    expect(join(room, { id: 'u-carol', name: 'Carol', kind: 'guest' }, 2_000).color).toBeNull();
+    expect(join(makruk, room, alice, 2_000).color).toBe('w');
+    expect(join(makruk, room, { id: 'u-carol', name: 'Carol', kind: 'guest' }, 2_000).color).toBeNull();
   });
 });
 
@@ -107,7 +107,7 @@ describe('resign, draw, rematch, abandonment (online-004)', () => {
     let room = leave(playingRoom(), 'w', 10_000, 30_000);
     expect(room.disconnect).toEqual({ color: 'w', at: 40_000 });
     expect(settle(room, 39_000).result).toBeNull();
-    room = join(room, alice, 39_000).room;
+    room = join(makruk, room, alice, 39_000).room;
     expect(room.disconnect).toBeNull();
   });
 
@@ -132,7 +132,7 @@ describe('snapshot', () => {
 describe('any variant', () => {
   function sittuyinRoom() {
     const created = createRoom(sittuyin, { code: 'ABCDEF', creator: alice, color: 'w', timeControl: null, now: 0 });
-    return join(created, bob, 1_000).room;
+    return join(sittuyin, created, bob, 1_000).room;
   }
 
   it('starts from the variant it was created with', () => {
@@ -152,6 +152,34 @@ describe('any variant', () => {
     expect(applyMessage(makruk, { ...room, startFen: makruk.startFen }, 'w', { type: 'move', uci: drop, ply: 0 }, 2_000, code).error).toBe(
       'illegal_move',
     );
+  });
+
+  it('rejects a Yahhta placed off the back rank', () => {
+    expect(applyMessage(sittuyin, sittuyinRoom(), 'w', { type: 'move', uci: 'R@d2', ply: 0 }, 2_000, code).error).toBe('illegal_move');
+  });
+
+  it('keeps the clock stopped during setup and starts it for the side to move after the last placement', () => {
+    const timeControl = { initialMs: 60_000, incrementMs: 2_000 };
+    let room = join(sittuyin, createRoom(sittuyin, { code: 'ABCDEF', creator: alice, color: 'w', timeControl, now: 0 }), bob, 1_000).room;
+    expect(room.clock?.running).toBeNull();
+    expect(nextAlarm(room)).toBeNull();
+
+    let now = 1_000;
+    for (let ply = 0; ply < 16; ply++) {
+      const game = replay(sittuyin, room);
+      const drop = game.legalUci().find((uci) => uci.includes('@'))!;
+      now += 5_000;
+      const applied = applyMessage(sittuyin, room, game.turn, { type: 'move', uci: drop, ply }, now, code);
+      expect(applied.error, drop).toBeUndefined();
+      room = applied.room;
+      if (ply < 15) expect(room.clock?.running, `after placement ${ply + 1}`).toBeNull();
+    }
+
+    const game = replay(sittuyin, room);
+    expect(game.hand('w').length + game.hand('b').length).toBe(0);
+    // No time was charged for the 80 seconds of setup, and no increment was added.
+    expect(room.clock).toEqual({ remaining: { w: 60_000, b: 60_000 }, running: game.turn, since: now });
+    expect(nextAlarm(room)).toBe(now + 60_000);
   });
 
   it('accepts the drop and the in-place promotion move strings', () => {

@@ -12,6 +12,10 @@ export { GameOverModal, type GameOverModalProps, resultTitleKey } from './GameOv
 export { GameScreen, type GameScreenProps, undoAllowed } from './GameScreen';
 export { LessonPlayer, type LessonMood, type LessonPlayerProps, type LessonSound } from './LessonPlayer';
 export { MoveList, type MoveListProps } from './MoveList';
+export { type OnlineColorChoice, OnlineLobby, type OnlineLobbyProps } from './OnlineLobby';
+export { OnlineRoom, type OnlineRoomContext, type OnlineRoomProps, type OnlineScreenProps } from './OnlineRoom';
 export { PlayerBar, type PlayerBarProps } from './PlayerBar';
+export { QuickMatch, type QuickMatchProps } from './QuickMatch';
 export { TimeControlPicker, type TimeControlPickerProps } from './TimeControlPicker';
+export { useIdentity } from './useIdentity';
 export { useNow } from './useNow';

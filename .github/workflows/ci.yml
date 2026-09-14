@@ -20,6 +20,8 @@ jobs:
       - run: npm ci
       - run: npm run verify
       - run: npm run build
+      # Sittuyin is not deployed yet (sit-009); building it here keeps its web bundle and Worker honest.
+      - run: npm run build:sittuyin
 
   deploy:
     needs: verify

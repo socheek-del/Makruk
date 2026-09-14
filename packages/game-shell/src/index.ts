@@ -15,6 +15,10 @@ export {
   type ResultReason,
   resultFromStatus,
 } from './result';
+export { createRoom, fetchRoom } from './online/api';
+export { type ConnectionStatus, type GameConnection, openGameConnection } from './online/connection';
+export { createIdentity, type Identity, type IdentitySource } from './online/identity';
+export { clockFromSnapshot, createOnlineSession, type OnlineSessionState, type OnlineSessionStore } from './online/session';
 export { applySeo, localizedUrl, type SeoTarget } from './seo';
 export { createGameSession, type GameSessionState, type GameSessionStore, inSetupPhase } from './session';
 export {

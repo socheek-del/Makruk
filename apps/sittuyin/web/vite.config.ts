@@ -51,12 +51,26 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff,woff2}'],
         navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api\//, /^\/ws\//],
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
       },
     }),
   ],
-  server: { port: 5174 },
-  preview: { port: 4174 },
+  // Online play needs the Sittuyin Worker (wrangler dev on :8788, not Makruk's :8787).
+  server: {
+    port: 5174,
+    proxy: {
+      '/api': 'http://127.0.0.1:8788',
+      '/ws': { target: 'ws://127.0.0.1:8788', ws: true },
+    },
+  },
+  preview: {
+    port: 4174,
+    proxy: {
+      '/api': 'http://127.0.0.1:8788',
+      '/ws': { target: 'ws://127.0.0.1:8788', ws: true },
+    },
+  },
   test: {
     include: ['src/**/*.test.{ts,tsx}'],
     environment: 'happy-dom',

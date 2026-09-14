@@ -1181,13 +1181,19 @@
       "milestone": "M11",
       "title": "Sittuyin online play",
       "user_visible_behavior": "Two users play Sittuyin online by room code or quick match, including the setup phase, with server-validated moves and clocks. No chat.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Worker tests in workerd: setup drops and moves validated with the Sittuyin Variant; illegal drop rejected.",
         "Playwright with two contexts: create room, join by code, complete setup, play 4 moves, both boards match."
       ],
-      "evidence": [],
-      "notes": ""
+      "evidence": [
+        "2026-09-14 (session 006): apps/sittuyin/worker — Worker 'sittuyin' with its own GameRoom (GameRoomBase playing the sittuyin Variant, finished games stored in its own D1 'sittuyin', migration 0001_games) and Matchmaker. Routes come from server-kit registerPlayRoutes (health service 'sittuyin', guest seat token, rooms, quick match, room socket); seat-token signing moved from the Makruk worker into server-kit.",
+        "server-kit roomLogic: a room whose game opens with a setup phase creates a stopped clock; placements never press it and the last placement starts it for the side to move. Unit tests (server-kit 19): a Yahhta placed on d2 is illegal_move; 16 placements leave the clock at 60000/60000 with no time charged for 80s of setup and no increment, running for the side to move, next alarm at its flag time. Makruk room tests unchanged apart from join() taking the variant.",
+        "Workerd tests apps/sittuyin/worker 9/9: rooms start from the Sittuyin setup FEN; K@a8 and R@d2 rejected illegal_move, a board move during setup rejected, Black placing first rejected not_your_turn, K@e1 broadcast to both sockets; timed game shows clock running null through the setup, 'w' after the 16th placement with Black untouched at 300000, then a board move is accepted and the clock passes to Black; a half-finished setup survives Durable Object hibernation; chat is bad_message; a resigned game is stored with variant 'sittuyin'; quick match pairs two players into a Sittuyin room with 5+0 and a stopped clock; health names 'sittuyin'.",
+        "E2E apps/sittuyin/web/e2e/online.spec.ts 4/4 (vite + wrangler dev on :8788): host creates a 5+0 room as White, friend joins by typing the code in lower case, orientations w/b, both hands shown and the clock does not move during setup, each player presses Auto-arrange for their own pieces, both reach 16 placements, then a3a4 e6e5 b3b4 f6f5 alternate across the two contexts; move lists equal, all 32 pieces on identical squares on both boards (a4/b4 wp, e5/f5 bp), the clock runs after setup, no textbox (no chat). Unknown code shows ဤအခန်းကို ရှာမတွေ့ပါ; quick match 3+2 pairs two contexts into one room in the setup phase with 3:00 clocks; the English lobby works and the seat token is stored as sittuyin.identity with no makruk.* key. Screenshot e2e-evidence/online-game.png reviewed.",
+        "The online client and lobby/room UI moved from the Makruk app into @chaturanga/game-shell (createIdentity, createOnlineSession(variant), OnlineLobby, OnlineRoom, QuickMatch; keys in packages/game-shell/KEYS.md) so both products share it. Regression: Makruk e2e 64/65 — the one failure was clock.spec (local fake-clock countdown, untouched), which passed 12/12 re-run with --repeat-each 3; Makruk online and quick-match specs all passed. Full Sittuyin e2e 26/26, e2e:pwa 2/2, npm run verify exit 0, npm run build and npm run build:sittuyin OK (Sittuyin Worker dry-run 884.61 KiB)."
+      ],
+      "notes": "Not deployed: wrangler.jsonc has a placeholder D1 database_id and no routes until the owner names the subdomain (sit-009). Protocol HealthResponse.service became a non-empty string (was the literal 'makruk'); its test now checks missing/empty names instead of a wrong name, because each product has its own Worker."
     },
     {
       "id": "sit-009",

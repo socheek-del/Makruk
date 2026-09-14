@@ -227,4 +227,23 @@ handoff; no agent updates it automatically.
   - `npm run capture` now also writes four lesson screenshots; all evidence PNGs were re-captured because
     the nav gained Learn.
 - No Chrome DevTools MCP server is connected in this environment; visual checks use Playwright Chromium.
-- Next: `sit-008` (Sittuyin Worker and online play).
+- `sit-008` is now `passing`.
+  - `apps/sittuyin/worker`: Worker `sittuyin`, its own Durable Objects and D1 `sittuyin` (migration 0001
+    `games`). Its `database_id` is a placeholder and it has no routes; both wait for sit-009.
+  - server-kit: rooms keep the clock stopped during a setup phase and start it after the last placement.
+    `join` now takes the variant. Seat tokens (`auth.ts`, moved from the Makruk worker) and
+    `registerPlayRoutes` are shared, so each product's `app.ts` is a few lines.
+  - game-shell: the online client (seat token, room API, socket, online session) and the lobby and room UI
+    moved out of the Makruk app. Makruk's online pages are now thin wrappers, and its e2e tests are unchanged.
+  - Protocol `HealthResponse.service` is any non-empty string now. Its test changed from "rejects a wrong
+    name" to "rejects a missing or empty name", because each product has its own Worker.
+  - Sittuyin web: `/play/online` and `/play/online/:code`, Auto-arrange for your own pieces online, and
+    my/en strings. Dev: `npm run dev:sittuyin` (Worker :8788 + web). CI also runs `build:sittuyin`.
+  - Verification:
+    - Sittuyin worker (workerd) 9 tests, server-kit 19, and Sittuyin online e2e 4/4.
+    - Full Sittuyin e2e 26/26, PWA 2/2, and Makruk e2e 64/65. The one failure is `clock.spec`, a local
+      fake-clock test this change does not touch; it passed 12/12 when re-run with `--repeat-each 3`.
+    - `npm run verify` exit 0, `npm run build` and `npm run build:sittuyin` OK.
+- Known flake: Makruk `clock.spec` "clock counts down…" can fail under full-suite load, like online-004.
+- Next: `sit-009` needs the owner to name the Sittuyin subdomain. After that come `plat-006` (links
+  between the games) and `sit-010` (SEO, About and README; its media must be captured from production).

@@ -3,7 +3,9 @@
  * matchmaker Durable Objects, and room codes. Everything is driven by a rules Variant, so a product
  * supplies its own rules, bindings, identity and database and nothing else.
  */
+export { newGuest, signPayload, signToken, verifyPayload, verifyToken } from './auth';
 export { GameRoomBase, type InitOptions, type RoomEnv, type RoomStub, USER_HEADER } from './GameRoomBase';
+export { currentUser, type PlayEnv, registerPlayRoutes } from './routes';
 export { MatchmakerBase } from './MatchmakerBase';
 export { generateRoomCode } from './roomCode';
 export {

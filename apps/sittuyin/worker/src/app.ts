@@ -1,15 +1,12 @@
 import { registerPlayRoutes } from '@chaturanga/server-kit';
 import { Hono } from 'hono';
-import { registerAccountRoutes } from './accounts/routes';
 import type { Env } from './env';
 
 export type { Env } from './env';
 
 export const app = new Hono<{ Bindings: Env }>();
 
-/** Health, seat tokens (acct-001), rooms by code (online-002), quick match (online-005), room sockets. */
-registerPlayRoutes(app, { service: 'makruk' });
-
-registerAccountRoutes(app);
+/** Health, seat tokens, rooms by code, quick match and room sockets — the shared online-play routes. */
+registerPlayRoutes(app, { service: 'sittuyin' });
 
 app.all('/api/*', (c) => c.json({ error: 'not_found' }, 404));

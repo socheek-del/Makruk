@@ -18,7 +18,7 @@ import {
 } from '@chaturanga/protocol';
 import type { Context, Hono } from 'hono';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
-import { signToken, verifyToken } from '../auth';
+import { signToken, verifyToken } from '@chaturanga/server-kit';
 import type { Env } from '../env';
 import { emailAvailable, type Lang, renderEmail, sendEmail } from './email';
 import { DUMMY_HASH, hashPassword, verifyPassword } from './password';

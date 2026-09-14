@@ -1,15 +1,19 @@
 import { MatchServerMessage, QuickPool } from '@chaturanga/protocol';
+import { Button, Card } from '@chaturanga/ui';
 import { LoaderCircle, Timer } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Button, Card } from '@chaturanga/ui';
-import type { Identity } from './identity';
+import type { Identity } from '../online/identity';
+
+export interface QuickMatchProps {
+  identity: Identity | null;
+  /** Called with the room code once an opponent is found. */
+  onMatched: (code: string) => void;
+}
 
 /** online-005: pick a pool, wait in the queue, jump into the game when paired. */
-export function QuickMatch({ identity }: { identity: Identity | null }) {
+export function QuickMatch({ identity, onMatched }: QuickMatchProps) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [searching, setSearching] = useState<QuickPool | null>(null);
   const [failed, setFailed] = useState(false);
   const socket = useRef<WebSocket | null>(null);
@@ -36,7 +40,7 @@ export function QuickMatch({ identity }: { identity: Identity | null }) {
       if (!parsed.success) return;
       if (parsed.data.type === 'matched') {
         socket.current = null;
-        navigate(`/play/online/${parsed.data.code}`);
+        onMatched(parsed.data.code);
       } else if (parsed.data.type === 'error') {
         setFailed(true);
         setSearching(null);

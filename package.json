@@ -13,7 +13,7 @@
   "scripts": {
     "dev": "npm run dev:makruk",
     "dev:makruk": "concurrently -n worker,web -c yellow,green \"npm run dev -w apps/makruk/worker\" \"npm run dev -w apps/makruk/web\"",
-    "dev:sittuyin": "npm run dev -w apps/sittuyin/web",
+    "dev:sittuyin": "concurrently -n worker,web -c yellow,green \"npm run dev -w apps/sittuyin/worker\" \"npm run dev -w apps/sittuyin/web\"",
     "lint": "eslint .",
     "format": "prettier --write .",
     "typecheck": "npm run typecheck --workspaces --if-present",
@@ -22,6 +22,7 @@
     "e2e": "npm run e2e -w apps/makruk/web",
     "build": "npm run build:makruk",
     "build:makruk": "npm run build -w apps/makruk/web && npm run build -w apps/makruk/worker",
+    "build:sittuyin": "npm run build -w apps/sittuyin/web && npm run build -w apps/sittuyin/worker",
     "deploy": "npm run deploy:makruk",
     "deploy:makruk": "npm run build -w apps/makruk/web && npm run deploy -w apps/makruk/worker"
   },

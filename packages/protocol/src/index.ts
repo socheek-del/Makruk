@@ -9,7 +9,8 @@ export * from './game';
 
 export const HealthResponse = z.object({
   ok: z.literal(true),
-  service: z.literal('makruk'),
+  /** The product's Worker, e.g. 'makruk' or 'sittuyin'. */
+  service: z.string().min(1),
   time: z.iso.datetime(),
 });
 export type HealthResponse = z.infer<typeof HealthResponse>;

@@ -15,8 +15,10 @@
   },
   "dependencies": {
     "@chaturanga/board-ui": "*",
+    "@chaturanga/protocol": "*",
     "@chaturanga/rules-core": "*",
     "@chaturanga/ui": "*",
+    "qrcode": "^1.5.4",
     "zustand": "^5.0.15"
   },
   "peerDependencies": {
@@ -26,6 +28,7 @@
   },
   "devDependencies": {
     "@chaturanga/makruk": "*",
-    "@chaturanga/sittuyin": "*"
+    "@chaturanga/sittuyin": "*",
+    "@types/qrcode": "^1.5.6"
   }
 }

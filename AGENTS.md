@@ -79,7 +79,8 @@ broken starting state.
     tables and attacks; rule errors. Its `/testing` export has the ffish loader and the conformance suite.
   - `packages/makruk` (`@chaturanga/makruk`): pure Makruk rules (`RULES.md`). The single source of truth
     for the Makruk web app, AI and worker.
-  - `packages/sittuyin` (`@chaturanga/sittuyin`): pure Sittuyin rules (`RULES.md`), not yet used by an app.
+  - `packages/sittuyin` (`@chaturanga/sittuyin`): pure Sittuyin rules (`RULES.md`). The single source of
+    truth for the Sittuyin web app, AI and worker.
   - `packages/ai-core` (`@chaturanga/ai-core`): game-independent alpha-beta search over a `SearchAdapter`,
     bot personas and root-move picking.
   - `packages/ai` (`@chaturanga/makruk-ai`): Makruk computer opponents, run in a Web Worker. It keeps its own
@@ -97,14 +98,18 @@ broken starting state.
     generates its classes.
   - `packages/game-shell` (`@chaturanga/game-shell`): shared app layer for the sites. `ProductConfig`
     (languages, default, language names, Open Graph locales, fonts, storage prefix), locale helpers, SEO
-    tags, results, time controls and `createGameSession(variant)`; `/testing` has `describeLocales`.
-    `/ui` has the game screen (board, hand trays, player bars, move list, controls, result dialog) with the
-    product's art, words, sounds and counting injected — the keys it reads are in `packages/game-shell/KEYS.md`.
-    Each app declares its product in `apps/<game>/web/product.config.ts` and `@source`s `game-shell/src/ui`.
+    tags, results, time controls, `createGameSession(variant)`, lesson shapes and progress, and the online
+    client (`createIdentity(storageKey)`, room API, WebSocket connection, `createOnlineSession(variant)`);
+    `/testing` has `describeLocales` and `describeLessons`. `/ui` has the game screen (board, hand trays,
+    player bars, move list, controls, result dialog), the lesson player, and the online lobby and room,
+    with the product's art, words, sounds and counting injected — the keys they read are in
+    `packages/game-shell/KEYS.md`. Each app declares its product in `apps/<game>/web/product.config.ts` and
+    `@source`s `game-shell/src/ui`.
   - `packages/server-kit` (`@chaturanga/server-kit`): the online-play Worker layer — the room state
-    machine, room codes, and the `GameRoomBase` and `MatchmakerBase` Durable Objects, all driven by a
-    `Variant`. A product subclasses `GameRoomBase`, names its variant, and stores finished games in its
-    own D1.
+    machine (clocks wait for a setup phase), room codes, seat tokens, `registerPlayRoutes` (health, guest
+    token, rooms, quick match, room socket), and the `GameRoomBase` and `MatchmakerBase` Durable Objects,
+    all driven by a `Variant`. A product subclasses `GameRoomBase`, names its variant, and stores finished
+    games in its own D1.
   - `apps/makruk/web`, `apps/makruk/worker`: the Makruk product (`apps/makruk/AGENTS.md`).
 - **Commands:**
   - `npm run verify`: lint, typecheck and unit tests in every workspace.

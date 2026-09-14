@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "@chaturanga/protocol": "*",
-    "@chaturanga/rules-core": "*"
+    "@chaturanga/rules-core": "*",
+    "hono": "^4.13.7"
   },
   "devDependencies": {
     "@chaturanga/makruk": "*",

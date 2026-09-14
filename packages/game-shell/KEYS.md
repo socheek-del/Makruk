@@ -60,3 +60,26 @@ locale files, because a step's prompt, hint and choices only make sense together
 
 A product whose lessons teach a setup phase also passes `handLabel` and `describeHandPiece`, the same
 props the game screen's trays take.
+
+# Online lobby and room
+
+Only a product with online play needs these (`OnlineLobby`, `OnlineRoom`, `QuickMatch`). The room's game
+screen also reads every game-screen key above.
+
+| Key | Used for |
+| --- | --- |
+| `modes.online` | Lobby heading and the online game screen's title |
+| `computer.sideWhite`, `computer.sideBlack`, `computer.sideRandom` | Colour choice when creating a room |
+| `computer.you`, `online.opponent` | Player names (there are no accounts) |
+| `online.quickTitle`, `online.quickHint`, `online.searching` (`{{pool}}`) | Quick match |
+| `online.createTitle`, `online.color`, `online.create` | Create a private room |
+| `online.joinTitle`, `online.codeLabel`, `online.join`, `online.invalidCode`, `online.notFound` | Join by code |
+| `online.serverError`, `online.connecting`, `online.reconnecting` | Connection states |
+| `online.waitingTitle`, `online.shareHint`, `online.copyLink`, `online.copied`, `online.qrAlt`, `online.waitingFor` | Waiting room |
+| `online.spectating` | Shown to a third visitor |
+| `online.offerDraw`, `online.drawOffered`, `online.drawOfferReceived`, `online.accept`, `online.decline` | Draw offers |
+| `online.opponentDisconnected` (`{{seconds}}`) | Reconnect grace period |
+| `online.rematchOffered`, `online.rematchReceived` | Rematch |
+| `play.cancel` | Cancels a quick-match search |
+
+There is no chat key, because there is no chat.
