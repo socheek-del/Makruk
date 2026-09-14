@@ -128,6 +128,11 @@ handoff; no agent updates it automatically.
   - `@chaturanga/board-ui` provides Board, HandTray and useMoveInput with drops and promotion, 18 tests.
   - Makruk is migrated onto it.
   - Web unit 109, E2E 65/65, PWA 2/2; built CSS contains the board-ui classes.
+- board-ui on production: CI run 34825066575 green, and the production smoke test passed (bot game, online room).
+- `plat-005` slice b1 (sessions) done.
+  - Clock arithmetic moved to rules-core.
+  - game-shell gained results with `fifty-move`, time controls, and `createGameSession(variant)`, whose clock is setup-aware. 15 tests.
+  - Makruk's session, result and time-control modules are now wrappers over game-shell.
 - plat-005 stays `in_progress`.
 - Next best step:
   - Record the sit-004 pair 5 verdict when run 34823317321 finishes.

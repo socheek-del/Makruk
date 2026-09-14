@@ -1,7 +1,28 @@
 /**
  * Shared app layer for the game sites. Each site declares a ProductConfig (languages, fonts, storage
- * identity); these helpers turn it into language handling and search-engine tags. Game-specific content
- * never lives here.
+ * identity) and passes its rules Variant; these modules turn them into language handling, search-engine
+ * tags, game results, time controls and game sessions. Game-specific content never lives here.
  */
 export { isLocale, localeFromSearch, type ProductConfig, resolveLocale, storageKey } from './product';
+export {
+  capturedBy,
+  FINAL_REASONS,
+  type GameResult,
+  isUndoableResult,
+  materialBalance,
+  type ResultReason,
+  resultFromStatus,
+} from './result';
 export { applySeo, localizedUrl, type SeoTarget } from './seo';
+export { createGameSession, type GameSessionState, type GameSessionStore, inSetupPhase } from './session';
+export {
+  CUSTOM_LIMITS,
+  PRESETS,
+  QUICK_MATCH_PRESET_IDS,
+  TIME_CATEGORIES,
+  type TimeCategory,
+  type TimeControl,
+  type TimeControlChoice,
+  type TimeControlPreset,
+  toTimeControl,
+} from './timeControls';
