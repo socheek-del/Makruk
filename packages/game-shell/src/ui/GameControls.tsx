@@ -1,7 +1,7 @@
+import { Button } from '@chaturanga/ui';
 import { ArrowUpDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Flag, Undo2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@chaturanga/ui';
 
 export interface GameControlsProps {
   canBack: boolean;

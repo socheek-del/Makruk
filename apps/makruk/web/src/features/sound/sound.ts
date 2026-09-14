@@ -1,11 +1,13 @@
-import type { GameStatus, MoveRecord } from '@chaturanga/makruk';
+import type { GameSound } from '@chaturanga/game-shell/ui';
 import { useSettings } from '../../stores/settings';
 
 /**
  * polish-003: tiny synthesized sound effects (Web Audio, no audio files) plus phone vibration.
  * Everything is best-effort: missing APIs or autoplay restrictions simply mean silence.
+ *
+ * The game screen asks for a GameSound; the lessons add their own two.
  */
-export type SoundName = 'move' | 'capture' | 'check' | 'gameEnd' | 'correct' | 'wrong';
+export type SoundName = GameSound | 'correct' | 'wrong';
 
 declare global {
   interface Window {
@@ -97,10 +99,4 @@ export function playSound(name: SoundName): void {
   } catch {
     // Audio unavailable.
   }
-}
-
-export function soundForMove(record: MoveRecord, status: GameStatus): SoundName {
-  if (status.kind !== 'ongoing') return 'gameEnd';
-  if (record.san.endsWith('+')) return 'check';
-  return record.captured ? 'capture' : 'move';
 }

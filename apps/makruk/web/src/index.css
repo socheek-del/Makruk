@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 /* Shared UI packages live outside this app folder; let Tailwind see their classes. */
 @source '../../../../packages/board-ui/src';
+@source '../../../../packages/game-shell/src/ui';
 @source '../../../../packages/ui/src';
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));

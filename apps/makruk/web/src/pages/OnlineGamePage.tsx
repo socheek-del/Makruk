@@ -10,7 +10,7 @@ import { Button, Card } from '@chaturanga/ui';
 import { GameScreen } from '../features/game/GameScreen';
 import { openGameConnection } from '../features/online/connection';
 import { useIdentity } from '../features/online/identity';
-import { useNow } from '../hooks/useNow';
+import { useNow } from '@chaturanga/game-shell/ui';
 import { createOnlineSession, type OnlineSessionState } from '../stores/onlineSession';
 
 type OnlineStore = UseBoundStore<StoreApi<OnlineSessionState>>;

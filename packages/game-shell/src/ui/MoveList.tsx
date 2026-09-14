@@ -1,10 +1,10 @@
-import type { MoveRecord } from '@chaturanga/makruk';
+import type { VariantMoveRecord } from '@chaturanga/rules-core';
+import { cn } from '@chaturanga/ui';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { cn } from '@chaturanga/ui';
 
 export interface MoveListProps {
-  records: readonly MoveRecord[];
+  records: ReadonlyArray<Pick<VariantMoveRecord, 'color' | 'san'>>;
   /** Ply currently shown on the board (0 = start). */
   currentPly: number;
   onSelect: (ply: number) => void;
@@ -25,9 +25,10 @@ export function MoveList({ records, currentPly, onSelect }: MoveListProps) {
     else if (top + item.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = top + item.offsetHeight - list.clientHeight;
   }, [currentPly, records.length]);
 
+  type Cell = Pick<VariantMoveRecord, 'color' | 'san'>;
   const offset = records[0]?.color === 'b' ? 1 : 0;
-  const cells: Array<MoveRecord | null> = [...Array<null>(offset).fill(null), ...records];
-  const rows: Array<Array<MoveRecord | null>> = [];
+  const cells: Array<Cell | null> = [...Array<null>(offset).fill(null), ...records];
+  const rows: Array<Array<Cell | null>> = [];
   for (let i = 0; i < cells.length; i += 2) rows.push(cells.slice(i, i + 2));
 
   return (

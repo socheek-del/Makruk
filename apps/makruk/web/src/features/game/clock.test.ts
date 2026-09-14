@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createClock, flaggedSide, formatClock, pressClock, runFor, stopClock, timesAt } from './clock';
+import { createClock, flaggedSide, pressClock, runFor, stopClock, timesAt } from './clock';
 import { PRESETS, toTimeControl } from './timeControls';
 
 describe('clock', () => {
@@ -33,14 +33,6 @@ describe('clock', () => {
     expect(stopped.running).toBeNull();
     expect(timesAt(stopped, 9_000)).toEqual({ w: 8_000, b: 10_000 });
     expect(timesAt(runFor(stopped, 'b', 9_000), 10_000)).toEqual({ w: 8_000, b: 9_000 });
-  });
-
-  it('formats minutes and tenths', () => {
-    expect(formatClock(600_000)).toBe('10:00');
-    expect(formatClock(61_500)).toBe('1:02');
-    expect(formatClock(10_000)).toBe('0:10');
-    expect(formatClock(9_450)).toBe('9.4');
-    expect(formatClock(-5)).toBe('0.0');
   });
 });
 
