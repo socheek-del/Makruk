@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@fontsource/prompt": "^5.3.0",
+    "@chaturanga/board-ui": "*",
     "@chaturanga/game-shell": "*",
     "@chaturanga/makruk": "*",
     "@chaturanga/makruk-ai": "*",

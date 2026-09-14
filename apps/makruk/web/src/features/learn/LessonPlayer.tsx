@@ -1,3 +1,4 @@
+import { useMoveInput } from '@chaturanga/board-ui';
 import { Game, parseSquare, squareName } from '@chaturanga/makruk';
 import { CheckCircle2, Star, X, XCircle } from 'lucide-react';
 import { type ReactNode, useEffect, useState } from 'react';
@@ -10,7 +11,6 @@ import { useSettings } from '../../stores/settings';
 import { playSound } from '../sound/sound';
 import { Board } from '../board/Board';
 import { boardTheme } from '../board/themes';
-import { useMoveInput } from '../board/useMoveInput';
 import { Mascot, type MascotPose } from './Mascot';
 import { type L10n, type Lesson, type LessonStep, useL10n } from './types';
 

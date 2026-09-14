@@ -123,6 +123,16 @@ handoff; no agent updates it automatically.
   - `@chaturanga/game-shell` holds the product config, locale helpers, SEO tags and `describeLocales`.
   - Makruk is driven by `apps/makruk/web/product.config.ts`.
   - Build ships 0 Myanmar characters, sitemap identical to production, E2E 65/65, PWA 2/2, verify green.
+- plat-004 is live on production: CI run 34824222210 green, and production home shows `lang=th`, the `makruk.settings` key and locales `["th","en"]`.
+- `plat-005` slice a (board) is done.
+  - `@chaturanga/board-ui` provides Board, HandTray and useMoveInput with drops and promotion, 18 tests.
+  - Makruk is migrated onto it.
+  - Web unit 109, E2E 65/65, PWA 2/2; built CSS contains the board-ui classes.
+- plat-005 stays `in_progress`.
 - Next best step:
-  - Record the sit-004 ladder verdicts when pair 5 (L6 vs L5) finishes; tune and re-run on failure.
-  - Then `plat-005a`: board-ui with drops, hands and in-place promotion, with Makruk migrated.
+  - Record the sit-004 pair 5 verdict when run 34823317321 finishes.
+  - Continue plat-005 slice b in three steps, each verified by the full Makruk E2E suite:
+    - b1: clock math into rules-core; generic `result.ts` with `fifty-move`; a session factory on a Variant whose clock starts after setup.
+    - b2: `components/ui` into a shared ui package.
+    - b3: GameScreen with the board, hand trays, sounds and settings injected.
+  - Owner decision still open for sit-005: the Sittuyin design direction.

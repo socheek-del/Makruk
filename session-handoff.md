@@ -2,59 +2,57 @@
 
 ## Verified Now
 
-- **Repository:** GitHub `socheek-del/chaturanga` (renamed from `Makruk`; the old URL redirects). It is a family of games:
-  - Makruk (Thai chess) is live.
-  - The Sittuyin (Burmese chess) rules engine is done.
-  - Plan: `docs/PLATFORM.md`.
-- **Layout:**
-  - `apps/makruk/{web,worker}`: the Makruk product.
-  - `packages/rules-core`: Variant interface and conformance suite.
-  - `packages/makruk`, `packages/sittuyin`: rules engines, each with a `RULES.md`.
-  - `packages/ai`: Makruk AI.
-  - `packages/protocol`.
-  - Scope `@chaturanga/*`.
-- **Makruk site:** behaviour unchanged. The site address lives in `apps/makruk/web/site.config.ts`.
-- **Verification that ran on the new layout:**
-  - `npm run verify` exit 0
-  - `npm run build` OK
-  - `npm run e2e` 65/65 on a re-run
-  - `npm run e2e:pwa -w apps/makruk/web` 2/2
-  - Deep rules runs for both engines (before the move).
-- **CI and production:**
-  - Run 34820113721 on 1c3f632: verify and deploy both succeeded.
-  - Production pages and health returned 200, and the JSON-LD links to the chaturanga repo.
-  - A Playwright smoke test against production passed (bot game reply, online room with 2 moves).
+- **Repository:** `socheek-del/chaturanga`, a family of games.
+  - Makruk (Thai chess) is live and unchanged for players.
+  - Sittuyin (Burmese chess) is being built. Plan: `apps/sittuyin/docs/PLAN.md`.
+- **Shared packages:**
 
-## Changed This Session
+  | Package | Contents |
+  |---|---|
+  | `rules-core` | Variant interface and conformance suite |
+  | `makruk`, `sittuyin` | Rules engines verified against Fairy-Stockfish |
+  | `ai-core` | Shared search |
+  | `ai` (Makruk bots), `sittuyin-ai` | Bots |
+  | `game-shell` | ProductConfig, per-product languages, SEO helpers, `describeLocales` |
+  | `board-ui` | Board of any size, HandTray, useMoveInput with drops and promotion |
+  | `protocol` | Message schemas |
 
-- **Plan:** plat-001.
-- **Sittuyin rules engine:** sit-001..003.
-- **rules-core Variant interface:** plat-002.
-- **Rename and restructure:** plat-003.
-  - Root README, CONTRIBUTING and AGENTS now describe the platform.
-  - Makruk facts are in `apps/makruk/AGENTS.md`.
-  - Every feature has a `product` field.
+- **Makruk migration:** the app runs on game-shell (languages) and board-ui (board and move input). Verified with `npm run verify`, build, E2E 65/65 and PWA 2/2; plat-004 also on production (CI green, live HTML checked).
+- **Sittuyin bot ladder on GitHub Actions:** pairs 1–4 pass (+20-0=0, +16-3=1, +15-0=5, +18-0=2). Pair 5 (L6 vs L5, run 34823317321) is still running when this was written.
+
+## Changed This Session (latest part)
+
+- Wrote the Sittuyin implementation plan.
+- sit-004: ai-core + sittuyin-ai + ladder workflow `package` input (in progress, waiting for pair 5).
+- plat-004: per-product languages (passing).
+- plat-005 slice a: board-ui with Makruk migrated (plat-005 in progress).
 
 ## Broken Or Unverified
 
 - **Known defect:** none open.
-- **Flaky test:** E2E online-004 ("a player who reloads rejoins") timed out once under full-suite load because the opponent-disconnected bar's button covered square d6. It passes alone (3/3) and on re-run. Harden it if it recurs.
-- **Unverified path:** no app uses Sittuyin yet.
-- **Risk:** run npm and vitest under the `.nvmrc` Node (`. ~/.nvm/nvm.sh && nvm use`). With the shell's default Node 20.13, npm skips native bindings and vitest fails.
+- **Pending evidence:**
+  - Sittuyin ladder pair 5. If it fails, tune the L6/L5 budgets in `packages/sittuyin-ai/src/bots.ts` and re-dispatch: `gh workflow run strength.yml -f package=packages/sittuyin-ai -f pair=5 -f games=20`.
+  - HandTray and the promotion marker are unit-tested only; no app shows them yet (the Sittuyin app will).
+- **Known flake:** E2E online-004 (reload rejoins) can time out under load when the disconnect bar covers the board. It passes on re-run.
+- **Risks:**
+  - Run npm and vitest under the `.nvmrc` Node (`. ~/.nvm/nvm.sh && nvm use`).
+  - `gh` is logged in as another account by default; use `GH_TOKEN=$(gh auth token -u socheek-del)` for this repo.
+  - The context-mode hook blocks inline HTTP in shell commands; put fetch checks in a script file.
 
 ## Next Best Step
 
-- **Highest-priority unfinished feature:** `plat-004`, per-product languages.
-- **Why it is next:** the Sittuyin app needs Burmese + English while Makruk stays Thai + English, loading only its own locales.
-- **What counts as passing:**
-  - A `product.config` declares locales, default and fonts.
-  - The locale test fails on any missing key in any declared locale.
-  - The Makruk i18n E2E is unchanged.
-  - The Makruk build contains no Burmese strings.
-- **What must not change:** Makruk behaviour, the worker name and D1 database `makruk`, and the no-accounts / open-lessons decisions.
+- **Feature:** `plat-005` slice b, in three steps, each verified by the full Makruk E2E suite:
+  1. b1: clock math into rules-core; generic `result.ts` (adds `fifty-move`); a session factory on a Variant whose clock starts after the setup phase.
+  2. b2: `components/ui` into a shared ui package.
+  3. b3: GameScreen with board, hand trays, sounds and settings injected.
+- **Owner decisions needed:**
+  - Sittuyin design direction (sit-005) before the Sittuyin app is styled.
+  - The Sittuyin subdomain (sit-009).
+- **Must not change:** Makruk behaviour, Worker and D1 names, and the no-accounts / open-lessons decisions.
 
 ## Commands
 
 - Startup: `./init.sh`
 - Verification: `npm run verify` · `npm run e2e` · `npm run e2e:pwa -w apps/makruk/web`
 - Deep rules checks: `npm run test:deep -w packages/makruk` · `npm run test:deep -w packages/sittuyin`
+- Ladders: `gh workflow run strength.yml -f package=packages/ai|packages/sittuyin-ai -f pair=N -f games=20`

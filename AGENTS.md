@@ -87,6 +87,10 @@ broken starting state.
   - `packages/sittuyin-ai` (`@chaturanga/sittuyin-ai`): Sittuyin bots (ai-core search, evaluation, setup
     placement policy). Product plan: `apps/sittuyin/docs/PLAN.md`.
   - `packages/protocol` (`@chaturanga/protocol`): Zod schemas for REST and WebSocket messages.
+  - `packages/board-ui` (`@chaturanga/board-ui`): React board of any size (piece art, colours and labels
+    passed in), `HandTray` for pieces in hand, and `useMoveInput` over `legalUci()` (board moves, drops,
+    diagonal and in-place promotion). Apps must list it in an `@source` line in their `index.css` so Tailwind
+    generates its classes.
   - `packages/game-shell` (`@chaturanga/game-shell`): shared app layer for the sites. `ProductConfig`
     (languages, default, language names, Open Graph locales, fonts, storage prefix), locale helpers and SEO
     tags; `/testing` has `describeLocales`. Each app declares its product in `apps/<game>/web/product.config.ts`.

@@ -1008,7 +1008,8 @@
         "2026-09-14: new @chaturanga/game-shell. ProductConfig covers id, locales, defaultLocale, languageNames, ogLocales, fonts and storagePrefix. Helpers: isLocale, resolveLocale, localeFromSearch, storageKey, localizedUrl, and applySeo (one hreflang per declared language plus x-default). /testing exposes describeLocales and localeProblems. 7 unit tests on a my+en demo product cover language fallback, ?lang parsing, storage keys, URLs, head tags, and localeProblems reporting a missing key, an extra key, an empty text, a missing dictionary and an undeclared one.",
         "2026-09-14: apps/makruk/web/product.config.ts (th default, en; Prompt; makruk.) now drives everything language-related.",
         "What reads product.config: settings (Language type, default, storage key, migrate resolves unknown languages), i18n (fallback language), seo.ts / SeoController (wrappers over game-shell), sitemap.ts (all declared languages, node-safe for vite.config), SettingsPage (language options from languageNames; the duplicate settings.languageTh/En keys were removed from both locales), lesson L10n (Record over declared languages; lessons.test requires every language), locales.test (describeLocales), index.html (lang, pre-paint settings key and locale list via %DEFAULT_LOCALE% / %SETTINGS_KEY% / %LOCALES_JSON%) and the PWA manifest lang. The new src/product.test.ts checks the declared font is loaded and the placeholders are used.",
-        "2026-09-14 verification: npm run verify exit 0 (makruk-web 115 incl. describeLocales th/en; game-shell 7; all other workspaces unchanged). npm run build: 11 dist text files contain 0 Myanmar characters; dist/index.html has lang=th, no placeholders left, settings key makruk.settings, locales [\"th\",\"en\"]; manifest lang th; the generated sitemap.xml is byte-identical to production. npm run e2e 65/65, including i18n.spec (Thai default, English persists, makruk.settings) and seo.spec, both unchanged. npm run e2e:pwa 2/2."
+        "2026-09-14 verification: npm run verify exit 0 (makruk-web 115 incl. describeLocales th/en; game-shell 7; all other workspaces unchanged). npm run build: 11 dist text files contain 0 Myanmar characters; dist/index.html has lang=th, no placeholders left, settings key makruk.settings, locales [\"th\",\"en\"]; manifest lang th; the generated sitemap.xml is byte-identical to production. npm run e2e 65/65, including i18n.spec (Thai default, English persists, makruk.settings) and seo.spec, both unchanged. npm run e2e:pwa 2/2.",
+        "2026-09-14 production (1c75df4): GitHub Actions run 34824222210 verify success, deploy success. Live home HTML: lang=th, no placeholders left, pre-paint settings key makruk.settings, locales [\"th\",\"en\"]. /api/health 200 {ok:true, service:makruk}. sitemap.xml has 12 URLs with 12 English alternates. /learn, /play/computer and /settings return 200."
       ],
       "notes": ""
     },
@@ -1020,14 +1021,22 @@
       "milestone": "M10",
       "title": "Shared UI, board, game shell and server kit",
       "user_visible_behavior": "Game screen, clocks, move list, online play, lessons player and server rooms come from shared packages; the board supports other sizes and pieces in hand. Makruk still behaves exactly as before.",
-      "status": "not_started",
+      "status": "in_progress",
       "verification": [
         "packages ui, board-ui, game-shell, ai-core and server-kit exist; apps/makruk contains only Makruk identity and wiring.",
         "Protocol messages and D1 games/ratings rows carry variant (migration defaults existing rows to makruk); the server validates moves with the room's Variant.",
         "Board unit tests render a 9x9 board and a hand zone.",
         "npm run verify and full Makruk E2E pass; production smoke after deploy."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-14 slice plat-005a (board): new @chaturanga/board-ui.",
+        "Board: any files×ranks; piece art, colours and accessible names passed in; lastMove / hint / animate without a from square; promotionTargets badge; a handle exposing squareAt. Same data attributes as before (data-square, data-piece, data-target, data-last-move, data-check, data-hint, data-animating).",
+        "HandTray: pieces grouped by type with counts, tap to select, drag onto the board through the handle.",
+        "useMoveInput over legalUci(): board moves, drops, diagonal and in-place promotion (promoteInPlace), and a plain move preferred when a promotion on the same squares is optional.",
+        "18 board-ui tests. With Makruk: the 6 old app tests ported, plus a forced promotion played by tap. With Sittuyin: setup selects only hand pieces with their drop squares, tap placement refuses illegal squares, drag from hand, diagonal promotion marked and played (d5c4f), in-place promotion (d5d5f), a push still plain, and a blocked Ne still selectable. Board rendering: 8x8 from both sides, 9x9 with 81 cells, a drop as last move, markers, and squareAt mapping (e4 / e5). HandTray grouping, selection and disabled state.",
+        "Makruk migrated: features/board/Board.tsx is a thin wrapper (PieceSvg art, i18n square names); BoardTheme extends the shared type; GameScreen and LessonPlayer use the shared useMoveInput; the app's hook and its tests were removed; index.css gains @source for board-ui.",
+        "Verification: web typecheck clean, 109 unit tests (6 moved to board-ui), lint clean. npm run build OK, and the built CSS contains board-ui-only classes (min-h-14 from HandTray, the promotion badge's border-[3px]), so Tailwind scans the package. npm run e2e 65/65 (moves tap/drag/snap-back, board layout, art, history, learn, computer, online); npm run e2e:pwa 2/2."
+      ],
       "notes": ""
     },
     {

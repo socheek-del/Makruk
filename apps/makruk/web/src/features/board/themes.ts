@@ -1,13 +1,8 @@
+import type { BoardTheme as BoardColors } from '@chaturanga/board-ui';
+
 /** Makruk boards are un-checkered: one board colour, grid lines between squares. */
-export interface BoardTheme {
+export interface BoardTheme extends BoardColors {
   id: string;
-  board: string;
-  line: string;
-  coordinate: string;
-  lastMove: string;
-  selected: string;
-  check: string;
-  hint: string;
 }
 
 /** Highlights use the "Wat" palette: temple gold (last move), indigo or jade (selection), lacquer red (check). */
