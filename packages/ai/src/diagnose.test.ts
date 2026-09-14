@@ -5,10 +5,10 @@
 import { appendFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Game } from '@makruk/engine';
+import { Game } from '@chaturanga/makruk';
 import { describe, it } from 'vitest';
 import { chooseMove, evaluate, mulberry32, positionKey } from './index';
-import * as core from '@makruk/engine/core';
+import * as core from '@chaturanga/makruk/core';
 
 const STRONG = Number(process.env.DIAG_STRONG ?? 0);
 const WEAK = Number(process.env.DIAG_WEAK ?? 0);

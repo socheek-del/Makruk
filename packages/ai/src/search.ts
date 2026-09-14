@@ -1,4 +1,4 @@
-import * as core from '@makruk/engine/core';
+import * as core from '@chaturanga/makruk/core';
 import { evaluate, PIECE_VALUE } from './evaluate';
 
 const { generateLegalMoves, inCheck, isPromotion, makeRaw, moveFrom, moveTo, placementOf, TYPE_MASK, unmakeRaw } = core;

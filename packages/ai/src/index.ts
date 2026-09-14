@@ -2,7 +2,7 @@
  * Makruk computer opponent: alpha-beta search on the engine's core API.
  * Runs in a Web Worker in the browser; pure and deterministic given `rng`.
  */
-import * as core from '@makruk/engine/core';
+import * as core from '@chaturanga/makruk/core';
 import { type BotLevel, botById } from './bots';
 import { materialBalance } from './evaluate';
 import { MATE, search } from './search';

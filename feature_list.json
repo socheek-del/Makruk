@@ -1,5 +1,5 @@
 {
-  "project": "Makruk (Thai chess)",
+  "project": "Chaturanga — family of traditional chess games (Makruk live, Sittuyin in progress)",
   "last_updated": "2026-09-14",
   "rules": {
     "single_active_feature": true,
@@ -16,6 +16,7 @@
   "features": [
     {
       "id": "infra-001",
+      "product": "makruk",
       "priority": 1,
       "area": "infra",
       "milestone": "M0",
@@ -37,6 +38,7 @@
     },
     {
       "id": "infra-002",
+      "product": "platform",
       "priority": 2,
       "area": "infra",
       "milestone": "M0",
@@ -54,6 +56,7 @@
     },
     {
       "id": "infra-003",
+      "product": "makruk",
       "priority": 3,
       "area": "infra",
       "milestone": "M0",
@@ -77,6 +80,7 @@
     },
     {
       "id": "engine-001",
+      "product": "makruk",
       "priority": 4,
       "area": "engine",
       "milestone": "M1",
@@ -95,6 +99,7 @@
     },
     {
       "id": "engine-002",
+      "product": "makruk",
       "priority": 5,
       "area": "engine",
       "milestone": "M1",
@@ -114,6 +119,7 @@
     },
     {
       "id": "engine-003",
+      "product": "makruk",
       "priority": 6,
       "area": "engine",
       "milestone": "M1",
@@ -131,6 +137,7 @@
     },
     {
       "id": "engine-004",
+      "product": "makruk",
       "priority": 7,
       "area": "engine",
       "milestone": "M1",
@@ -148,6 +155,7 @@
     },
     {
       "id": "engine-005",
+      "product": "makruk",
       "priority": 8,
       "area": "engine",
       "milestone": "M1",
@@ -167,6 +175,7 @@
     },
     {
       "id": "engine-006",
+      "product": "makruk",
       "priority": 9,
       "area": "engine",
       "milestone": "M1",
@@ -186,6 +195,7 @@
     },
     {
       "id": "design-001",
+      "product": "makruk",
       "priority": 10,
       "area": "design",
       "milestone": "M2",
@@ -207,6 +217,7 @@
     },
     {
       "id": "i18n-001",
+      "product": "makruk",
       "priority": 11,
       "area": "i18n",
       "milestone": "M2",
@@ -228,6 +239,7 @@
     },
     {
       "id": "play-001",
+      "product": "makruk",
       "priority": 12,
       "area": "play",
       "milestone": "M2",
@@ -247,6 +259,7 @@
     },
     {
       "id": "play-002",
+      "product": "makruk",
       "priority": 13,
       "area": "play",
       "milestone": "M2",
@@ -267,6 +280,7 @@
     },
     {
       "id": "play-003",
+      "product": "makruk",
       "priority": 14,
       "area": "play",
       "milestone": "M2",
@@ -286,6 +300,7 @@
     },
     {
       "id": "play-004",
+      "product": "makruk",
       "priority": 15,
       "area": "play",
       "milestone": "M2",
@@ -304,6 +319,7 @@
     },
     {
       "id": "play-005",
+      "product": "makruk",
       "priority": 16,
       "area": "play",
       "milestone": "M2",
@@ -323,6 +339,7 @@
     },
     {
       "id": "theme-001",
+      "product": "makruk",
       "priority": 17,
       "area": "theme",
       "milestone": "M2",
@@ -342,6 +359,7 @@
     },
     {
       "id": "ai-001",
+      "product": "makruk",
       "priority": 18,
       "area": "ai",
       "milestone": "M3",
@@ -362,6 +380,7 @@
     },
     {
       "id": "ai-002",
+      "product": "makruk",
       "priority": 19,
       "area": "ai",
       "milestone": "M3",
@@ -379,6 +398,7 @@
     },
     {
       "id": "ai-003",
+      "product": "makruk",
       "priority": 20,
       "area": "ai",
       "milestone": "M3",
@@ -397,6 +417,7 @@
     },
     {
       "id": "learn-001",
+      "product": "makruk",
       "priority": 21,
       "area": "learn",
       "milestone": "M4",
@@ -416,6 +437,7 @@
     },
     {
       "id": "learn-002",
+      "product": "makruk",
       "priority": 22,
       "area": "learn",
       "milestone": "M4",
@@ -434,6 +456,7 @@
     },
     {
       "id": "learn-003",
+      "product": "makruk",
       "priority": 23,
       "area": "learn",
       "milestone": "M4",
@@ -450,6 +473,7 @@
     },
     {
       "id": "learn-004",
+      "product": "makruk",
       "priority": 24,
       "area": "learn",
       "milestone": "M4",
@@ -467,6 +491,7 @@
     },
     {
       "id": "learn-005",
+      "product": "makruk",
       "priority": 25,
       "area": "learn",
       "milestone": "M4",
@@ -487,6 +512,7 @@
     },
     {
       "id": "online-001",
+      "product": "makruk",
       "priority": 26,
       "area": "online",
       "milestone": "M5",
@@ -506,6 +532,7 @@
     },
     {
       "id": "online-002",
+      "product": "makruk",
       "priority": 27,
       "area": "online",
       "milestone": "M5",
@@ -523,6 +550,7 @@
     },
     {
       "id": "online-003",
+      "product": "makruk",
       "priority": 28,
       "area": "online",
       "milestone": "M5",
@@ -540,6 +568,7 @@
     },
     {
       "id": "online-004",
+      "product": "makruk",
       "priority": 29,
       "area": "online",
       "milestone": "M5",
@@ -559,6 +588,7 @@
     },
     {
       "id": "acct-001",
+      "product": "makruk",
       "priority": 30,
       "area": "account",
       "milestone": "M5",
@@ -578,6 +608,7 @@
     },
     {
       "id": "acct-002",
+      "product": "makruk",
       "priority": 31,
       "area": "account",
       "milestone": "M6",
@@ -601,6 +632,7 @@
     },
     {
       "id": "online-005",
+      "product": "makruk",
       "priority": 32,
       "area": "online",
       "milestone": "M6",
@@ -620,6 +652,7 @@
     },
     {
       "id": "acct-003",
+      "product": "makruk",
       "priority": 33,
       "area": "account",
       "milestone": "M6",
@@ -639,6 +672,7 @@
     },
     {
       "id": "play-006",
+      "product": "makruk",
       "priority": 40,
       "area": "play",
       "milestone": "M8",
@@ -658,6 +692,7 @@
     },
     {
       "id": "about-001",
+      "product": "makruk",
       "priority": 41,
       "area": "content",
       "milestone": "M8",
@@ -674,6 +709,7 @@
     },
     {
       "id": "seo-001",
+      "product": "makruk",
       "priority": 42,
       "area": "growth",
       "milestone": "M8",
@@ -694,6 +730,7 @@
     },
     {
       "id": "docs-001",
+      "product": "makruk",
       "priority": 43,
       "area": "docs",
       "milestone": "M8",
@@ -712,6 +749,7 @@
     },
     {
       "id": "theme-002",
+      "product": "makruk",
       "priority": 34,
       "area": "theme",
       "milestone": "M7",
@@ -729,6 +767,7 @@
     },
     {
       "id": "art-001",
+      "product": "makruk",
       "priority": 35,
       "area": "art",
       "milestone": "M7",
@@ -748,6 +787,7 @@
     },
     {
       "id": "art-002",
+      "product": "makruk",
       "priority": 36,
       "area": "art",
       "milestone": "M7",
@@ -766,6 +806,7 @@
     },
     {
       "id": "polish-001",
+      "product": "makruk",
       "priority": 37,
       "area": "polish",
       "milestone": "M7",
@@ -785,6 +826,7 @@
     },
     {
       "id": "polish-002",
+      "product": "makruk",
       "priority": 38,
       "area": "polish",
       "milestone": "M7",
@@ -802,6 +844,7 @@
     },
     {
       "id": "polish-003",
+      "product": "makruk",
       "priority": 39,
       "area": "polish",
       "milestone": "M7",
@@ -819,6 +862,7 @@
     },
     {
       "id": "plat-001",
+      "product": "platform",
       "priority": 44,
       "area": "platform",
       "milestone": "M9",
@@ -836,6 +880,7 @@
     },
     {
       "id": "sit-001",
+      "product": "sittuyin",
       "priority": 45,
       "area": "engine",
       "milestone": "M9",
@@ -857,6 +902,7 @@
     },
     {
       "id": "sit-002",
+      "product": "sittuyin",
       "priority": 46,
       "area": "engine",
       "milestone": "M9",
@@ -878,6 +924,7 @@
     },
     {
       "id": "sit-003",
+      "product": "sittuyin",
       "priority": 47,
       "area": "engine",
       "milestone": "M9",
@@ -898,6 +945,7 @@
     },
     {
       "id": "plat-002",
+      "product": "platform",
       "priority": 48,
       "area": "platform",
       "milestone": "M10",
@@ -920,12 +968,13 @@
     },
     {
       "id": "plat-003",
+      "product": "platform",
       "priority": 49,
       "area": "platform",
       "milestone": "M10",
       "title": "Rename to chaturanga and move Makruk into apps/makruk",
       "user_visible_behavior": "The repository is the chaturanga family: a root README about the games, Makruk's README/AGENTS facts in apps/makruk, neutral package scope. The Makruk site behaves exactly as before.",
-      "status": "not_started",
+      "status": "in_progress",
       "verification": [
         "GitHub repository renamed to chaturanga (old URL redirects); local remote uses the github-socheek-del alias.",
         "npm scope changed from @makruk to a neutral scope; apps/web and apps/worker live under apps/makruk/.",
@@ -937,6 +986,7 @@
     },
     {
       "id": "plat-004",
+      "product": "platform",
       "priority": 50,
       "area": "i18n",
       "milestone": "M10",
@@ -953,6 +1003,7 @@
     },
     {
       "id": "plat-005",
+      "product": "platform",
       "priority": 51,
       "area": "platform",
       "milestone": "M10",
@@ -970,6 +1021,7 @@
     },
     {
       "id": "plat-006",
+      "product": "platform",
       "priority": 52,
       "area": "platform",
       "milestone": "M10",
@@ -985,6 +1037,7 @@
     },
     {
       "id": "sit-004",
+      "product": "sittuyin",
       "priority": 53,
       "area": "ai",
       "milestone": "M11",
@@ -1000,6 +1053,7 @@
     },
     {
       "id": "sit-005",
+      "product": "sittuyin",
       "priority": 54,
       "area": "design",
       "milestone": "M11",
@@ -1015,6 +1069,7 @@
     },
     {
       "id": "sit-006",
+      "product": "sittuyin",
       "priority": 55,
       "area": "play",
       "milestone": "M11",
@@ -1031,6 +1086,7 @@
     },
     {
       "id": "sit-007",
+      "product": "sittuyin",
       "priority": 56,
       "area": "learn",
       "milestone": "M11",
@@ -1046,6 +1102,7 @@
     },
     {
       "id": "sit-008",
+      "product": "sittuyin",
       "priority": 57,
       "area": "online",
       "milestone": "M11",
@@ -1061,6 +1118,7 @@
     },
     {
       "id": "sit-009",
+      "product": "sittuyin",
       "priority": 58,
       "area": "infra",
       "milestone": "M11",
@@ -1077,6 +1135,7 @@
     },
     {
       "id": "sit-010",
+      "product": "sittuyin",
       "priority": 59,
       "area": "growth",
       "milestone": "M11",
@@ -1092,6 +1151,7 @@
     },
     {
       "id": "sit-011",
+      "product": "sittuyin",
       "priority": 60,
       "area": "polish",
       "milestone": "M11",

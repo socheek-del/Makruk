@@ -19,7 +19,8 @@ needs work.
 
 | Domain | Grade | Verification | Agent Legibility | Test Stability | Key Gaps | Last Updated |
 |--------|-------|-------------|-----------------|---------------|----------|-------------|
-| Rules engine (Makruk) | A | Unit + perft + lock-step vs Fairy-Stockfish | docs/rules.md, typed API | Deterministic seeds | Array-scan movegen limits AI depth | 2026-09-13 |
+| Rules engine (Makruk) | A | Unit + perft + lock-step vs Fairy-Stockfish + Variant conformance | packages/makruk/RULES.md, typed API | Deterministic seeds | Array-scan movegen limits AI depth | 2026-09-14 |
+| Rules engine (Sittuyin) | A | Unit + perft + lock-step (FEN, counting, game over) vs Fairy-Stockfish + Variant conformance | packages/sittuyin/RULES.md, every rule an ffish-probed test | Deterministic seeds | Not used by any app yet | 2026-09-14 |
 | Local play & pass-and-play | A | Unit + E2E (moves, history, views, clocks) | GameScreen shared by all modes | Stable; fake clock for timers | — | 2026-09-13 |
 | Single player (AI) | A | Unit (tactics, repetition incl. opponent reply, root window, conversion) + E2E (worker, hints, takeback) + 20-game ladder per level pair on Actions | search/evaluate/bots split; ladder logs end reason + FEN per game | Ladder deterministic (node budgets, seeded openings); ~2 h for L6 vs L5 on Actions | No transposition table; Met-only mates vs bare Khun sometimes run out the count; browser strength follows time budgets, ladder follows node budgets | 2026-09-13 |
 | Tutorials & gamification | A | Lesson content validated against engine; E2E lesson/path/guided | Lessons are plain TS data | Stable (no date-dependent logic) | Content reviewed by engineer, not a Makruk teacher | 2026-09-13 |
@@ -33,11 +34,13 @@ needs work.
 
 | Layer | Grade | Boundary Enforcement | Agent Legibility | Key Gaps | Last Updated |
 |-------|-------|---------------------|-----------------|----------|-------------|
-| `packages/engine` | A | ESLint no-restricted-globals for src; clock is pure (`now` injected) | board, movegen, fen, game, clock, perft | ffish is devDependency only | 2026-09-13 |
-| `packages/ai` | B | Uses `@makruk/engine/core` only | search/evaluate/bots/index | Strength ladder slow | 2026-09-13 |
-| `packages/protocol` | A | Zod schemas only | game.ts | — | 2026-09-13 |
-| `apps/web` | A | No rules logic outside engine; sessions share one interface | features/, pages/, stores/ | Bundle not code-split per route | 2026-09-13 |
-| `apps/worker` | A | All moves validated via engine; room rules are pure functions; dev email outbox only when DEV_EMAIL_OUTBOX=1 | room/, match/, accounts/, ratings/ | — | 2026-09-13 |
+| `packages/rules-core` | A | Engine purity lint rule; Variant enforced by `satisfies` + shared conformance suite | variant, board8, attacks, errors, testing/ | — | 2026-09-14 |
+| `packages/makruk` | A | ESLint no-restricted-globals for src; clock is pure (`now` injected) | board, movegen, fen, game, clock, perft, variant | ffish is devDependency only | 2026-09-14 |
+| `packages/sittuyin` | A | Engine purity lint rule; depends only on rules-core | board, fen, movegen, game, perft, variant | — | 2026-09-14 |
+| `packages/ai` | B | Uses `@chaturanga/makruk/core` only | search/evaluate/bots/index | Strength ladder slow; Makruk-only until ai-core (plat-005) | 2026-09-14 |
+| `packages/protocol` | A | Zod schemas only | game.ts | No `variant` field yet (plat-005) | 2026-09-14 |
+| `apps/makruk/web` | A | No rules logic outside engine; sessions share one interface | features/, pages/, stores/ | Bundle not code-split per route | 2026-09-14 |
+| `apps/makruk/worker` | A | All moves validated via engine; room rules are pure functions; dev email outbox only when DEV_EMAIL_OUTBOX=1 | room/, match/, accounts/, ratings/ | — | 2026-09-14 |
 | CI & deploy | A | verify + deploy on main; scoped token; AUTH_SECRET as secret | .github/workflows/ci.yml | E2E not run in CI (needs browsers + wrangler) | 2026-09-13 |
 
 ## Change History

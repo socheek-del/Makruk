@@ -1,5 +1,5 @@
-import { Game, moveToUci, START_FEN } from '@makruk/engine';
-import * as core from '@makruk/engine/core';
+import { Game, moveToUci, START_FEN } from '@chaturanga/makruk';
+import * as core from '@chaturanga/makruk/core';
 import { describe, expect, it } from 'vitest';
 import { bestMove, BOTS, chooseMove, inConversion, MATE, mulberry32, positionKey, search } from './index';
 

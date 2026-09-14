@@ -17,7 +17,7 @@ export default defineConfig(
     },
   },
   {
-    files: ['apps/web/**/*.{ts,tsx}'],
+    files: ['apps/*/web/**/*.{ts,tsx}'],
     languageOptions: { globals: globals.browser },
     plugins: { 'react-hooks': reactHooks },
     rules: {
@@ -36,7 +36,7 @@ export default defineConfig(
   },
   { ignores: ['**/dev-dist/**'] },
   {
-    files: ['packages/engine/src/**/*.ts', 'packages/sittuyin/src/**/*.ts', 'packages/rules-core/src/**/*.ts'],
+    files: ['packages/makruk/src/**/*.ts', 'packages/sittuyin/src/**/*.ts', 'packages/rules-core/src/**/*.ts'],
     ignores: ['packages/*/src/**/*.test.ts', 'packages/*/src/testing/**'],
     rules: {
       // Engine must stay pure: no DOM, network, or timers.

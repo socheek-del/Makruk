@@ -11,7 +11,7 @@
 import { appendFileSync, existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Game } from '@makruk/engine';
+import { Game } from '@chaturanga/makruk';
 import { describe, expect, it } from 'vitest';
 import { BOTS, chooseMove, mulberry32, positionKey } from './index';
 

@@ -1,4 +1,4 @@
-import * as core from '@makruk/engine/core';
+import * as core from '@chaturanga/makruk/core';
 
 const { BLACK, KHON, KING, KNIGHT, MET, PAWN, ROOK, TYPE_MASK, fileOf, rankOf } = core;
 

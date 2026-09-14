@@ -1,95 +1,99 @@
 # AGENTS.md
 
-Makruk (Thai chess) — web PWA with single player, pass-and-play, online play,
-game-like tutorials and themes in its own "Wat" (Thai temple) design system (`docs/design.md`). Do not copy
-Duolingo's look (fonts, colours, chunky buttons, zig-zag path) — owner decision, legal risk. Full product
-plan: `docs/PLAN.md`.
+Chaturanga is a family of traditional chess games. Each game is its own web PWA product:
 
-**Becoming a multi-game monorepo** (owner decision 2026-09-14): repo will be renamed `chaturanga`; Sittuyin
-(Burmese chess, `my` + `en`) is the next game, each game a separate product on its own subdomain. Plan,
-target layout and order of work: `docs/PLATFORM.md`. Until the restructure (plat-003) lands, the Makruk
-facts below still describe the code.
+- **Makruk** (Thai chess): live.
+- **Sittuyin** (Burmese chess): rules engine done, app planned.
+- Shogi, Xiangqi and others may follow.
 
-This repository is designed for long-running coding-agent work. The goal is not
-to maximize raw code output. The goal is to leave the repo in a state where the
-next session can continue without guessing.
+Owner decisions, target layout and order of work are in `docs/PLATFORM.md`. Facts about a single game live next
+to that game: `apps/makruk/AGENTS.md` for the Makruk product, and `packages/<game>/RULES.md` for the rules
+as implemented.
+
+This repository is designed for long-running coding-agent work. The goal is not to maximize raw code output.
+The goal is to leave the repo in a state where the next session can continue without guessing.
 
 ## Startup Workflow
 
 Before writing code:
 
-1. Confirm the working directory with `pwd` (repo root contains `feature_list.json`).
+1. Confirm the working directory with `pwd`. The repo root contains `feature_list.json`.
 2. Read `claude-progress.md` for the latest verified state and next step.
 3. Read `feature_list.json` and choose the highest-priority unfinished feature.
 4. Review recent commits with `git log --oneline -5`.
-5. Run `./init.sh` (installs deps, runs `npm run verify`).
-6. Run the smoke / end-to-end verification relevant to the area before new work.
+5. Run `./init.sh`. It installs dependencies and runs `npm run verify`.
+6. Run the smoke or end-to-end verification relevant to the area before new work.
 
-If baseline verification is already failing, fix that first. Do not stack new
-feature work on top of a broken starting state.
+If baseline verification is already failing, fix that first. Do not stack new feature work on top of a
+broken starting state.
 
 ## Working Rules
 
-- Work on one feature at a time (`single_active_feature`).
-- Do not mark a feature `passing` just because code was added — run its
-  `verification` steps and record `evidence`.
-- Keep changes within the selected feature scope unless a blocker forces a
-  narrow supporting fix.
-- Do not silently change verification rules, weaken tests, or rewrite the
-  feature list to hide unfinished work.
+- Work on one feature at a time (`single_active_feature`). Each feature names its `product` (`platform`,
+  `makruk`, `sittuyin`).
+- Do not mark a feature `passing` just because code was added. Run its `verification` steps and record
+  `evidence`.
+- Keep changes within the selected feature scope unless a blocker forces a narrow supporting fix.
+- Do not silently change verification rules, weaken tests, or rewrite the feature list to hide unfinished work.
 - Prefer durable repo artifacts over chat summaries.
+
+## Platform Rules
+
+- **One rule for the layout.** Nothing game-specific lives at the repository root or in a shared package.
+  A game's identity lives in its own folders (`apps/<game>/`, `packages/<game>/`):
+  - rules
+  - piece art, theme
+  - lessons
+  - locale content and its list of languages
+  - PWA manifest, site address
+  - README
+  - Worker and D1 database
+
+  Adding a game must never edit another game's files.
+- **Separate products.** Each game has its own site on its own subdomain, brand, PWA, languages, Worker and
+  D1. Games link to each other only through a "more games" section (plat-006).
+- **Design.** Each game has its own design identity built on shared component primitives. Never copy
+  Duolingo's look (fonts, colours, chunky buttons, zig-zag path). This is an owner decision because of legal risk.
+- **Languages per product.** Makruk is Thai (default) and English. Sittuyin is Burmese (default, Unicode
+  only) and English. Every user-visible string goes through i18n keys, complete in every language the
+  product declares.
+- **Online play.** No chat of any kind. The server validates every online move with the game's rules
+  engine.
+- **Rules engines.**
+  - Each engine follows the matching Fairy-Stockfish variant (`makruk`, `sittuyin`) and is verified against
+    ffish.
+  - Each implements `Variant` from `@chaturanga/rules-core` and runs `describeVariantConformance`.
+  - None uses DOM, network, timers, or randomness without an injected seed.
+- **Site addresses are temporary.** Never hardcode a domain. Each app reads its address from its own single
+  setting, and screenshots and GIFs must not show the domain.
 
 ## Project Facts
 
-- **Stack:** npm workspaces · TypeScript · React 19 + Vite · Tailwind v4 ·
-  Cloudflare Workers + Durable Objects + D1 · Vitest · Playwright.
-- **Node:** version in `.nvmrc` (`nvm use`).
+- **Stack:** npm workspaces · TypeScript · React 19 + Vite · Tailwind v4 · Cloudflare Workers + Durable
+  Objects + D1 · Vitest · Playwright.
+- **Node:** version in `.nvmrc`. Run npm and vitest under it (`. ~/.nvm/nvm.sh && nvm use`). With the
+  shell's default Node 20.13, npm skips rolldown's native binding and vitest fails to start. `init.sh` and
+  CI already switch Node.
 - **Layout:**
-  - `packages/rules-core` (`@chaturanga/rules-core`) — Variant interface, shared 8x8 board/tables/attacks,
-    rule errors; `/testing` has the ffish loader and the Variant conformance suite every engine runs.
-  - `packages/engine` — pure Makruk rules. No DOM, no network, no randomness
-    without an injected seed. Single source of truth used by web, AI and worker.
-  - `packages/sittuyin` (`@chaturanga/sittuyin`) — pure Sittuyin rules (`docs/sittuyin-rules.md`), not yet
-    used by any app.
-  - `packages/ai` — search/eval, runs in a Web Worker (created in M3).
-  - `packages/protocol` — Zod schemas for REST + WebSocket messages.
-  - `apps/web` — React PWA.
-  - `apps/worker` — Cloudflare Worker: static assets, `/api/*`, `/ws/*`, Durable Objects, D1.
-- **Commands:** `npm run dev` · `npm run verify` (lint + typecheck + unit tests) ·
-  `npm run e2e` · `npm run build` · `npm run deploy`.
-- **Language:** Thai is the default UI language; English is the alternative.
-  Every user-visible string goes through i18n keys (`th` and `en` both required).
-- **Product constraints:** no chat of any kind in online play. Server validates
-  every online move with `packages/engine`.
-- **Rules reference:** Makruk start FEN `rnsmksnr/8/pppppppp/8/8/PPPPPPPP/8/RNSKMSNR w - - 0 1`.
-  Rule questions are settled against Fairy-Stockfish's `makruk` variant.
+  - `packages/rules-core` (`@chaturanga/rules-core`): the Variant interface; the shared 8x8 board, move
+    tables and attacks; rule errors. Its `/testing` export has the ffish loader and the conformance suite.
+  - `packages/makruk` (`@chaturanga/makruk`): pure Makruk rules (`RULES.md`). The single source of truth
+    for the Makruk web app, AI and worker.
+  - `packages/sittuyin` (`@chaturanga/sittuyin`): pure Sittuyin rules (`RULES.md`), not yet used by an app.
+  - `packages/ai` (`@chaturanga/makruk-ai`): Makruk computer opponents, run in a Web Worker. It is split
+    into a shared ai-core plus per-game evaluation in plat-005.
+  - `packages/protocol` (`@chaturanga/protocol`): Zod schemas for REST and WebSocket messages.
+  - `apps/makruk/web`, `apps/makruk/worker`: the Makruk product (`apps/makruk/AGENTS.md`).
+- **Commands:**
+  - `npm run verify`: lint, typecheck and unit tests in every workspace.
+  - `npm run dev` / `npm run e2e` / `npm run build` / `npm run deploy`: currently run the Makruk product.
+    `dev:makruk`, `build:makruk` and `deploy:makruk` name it explicitly.
+  - `npm run test:deep -w packages/<game>`: perft to every depth plus 400 lock-step games against ffish.
 - **License:** GPL-3.0 (public repo; Fairy-Stockfish WASM is allowed).
-- **Source control:** remote `git@github-socheek-del:socheek-del/Makruk.git`.
-  Branch `main`. Conventional Commits.
-- **Site address:** the domain is temporary. Never hardcode it — web code reads `SITE_URL` from
-  `apps/web/site.config.ts` (injected as `__SITE_URL__`, `%SITE_URL%` in index.html; robots.txt and
-  sitemap.xml are generated). Other places: `apps/worker/wrangler.jsonc` routes/PUBLIC_ORIGIN and the
-  `[play]` link in the READMEs. Screenshots and GIFs must not show the domain.
-- **Deploy:** production currently at `https://th-chess.beanroti.com` (Worker custom domain
-  on Cloudflare zone `beanroti.com`). GitHub Actions deploys on push to `main`;
-  `npm run deploy` applies D1 migrations (`apps/worker/migrations`) first.
-- **Accounts:** removed from the product for now (owner decision 2026-09-14) — the site is open to
-  everyone with no sign-in, ratings or history. Online play uses an invisible anonymous seat token
-  (`features/online/identity.ts`). The worker still contains the dormant account code (username + password
-  with PBKDF2, email confirmation, password reset; no Google/OAuth) and its tests.
-- **Lessons:** all lessons are open (no locking) and there is no daily streak.
-- **Worker config:** secrets `AUTH_SECRET` (required) and `RESEND_API_KEY` (email delivery via Resend;
-  registration is disabled until set). `EMAIL_FROM` is a var in `wrangler.jsonc` (beanroti.com sender). `DEV_EMAIL_OUTBOX=1` stores emails in D1 and exposes
-  `/api/dev/outbox` — only for local dev, workerd tests and Playwright; never in production.
-- **Tests:** worker tests run inside workerd (`@cloudflare/vitest-plugin`, D1 migrations applied in
-  `apps/worker/test/apply-migrations.ts`); `npm run e2e` starts vite + wrangler dev with local D1;
-  `npm run e2e:pwa -w apps/web` checks installability/offline on a production build; the bot ladder
-  (`npm run test:strength -w packages/ai`) is slow and writes results to `packages/ai/strength-results.log`.
-  It is resumable (finished games go to `packages/ai/strength-games.log`, keyed by bot config) and can be
-  split with `STRENGTH_PAIR=n STRENGTH_SHARD=k/count`; run once more without a shard to record the verdict.
-  L6 vs L5 takes ~15 min per game on one core — run it on GitHub Actions instead (`gh workflow run
-  strength.yml -f pair=5 -f games=20`; the verdict job's `strength-verdict` artifact has the per-game log).
-  Games start from seeded paired 6-ply openings because noise-free bots are deterministic.
+- **Source control:** remote `git@github-socheek-del:socheek-del/chaturanga.git` (renamed from `Makruk`;
+  the old URL redirects). Branch `main`. Conventional Commits.
+- **CI:** `.github/workflows/ci.yml` runs verify and build on every push and PR, and deploys Makruk on push
+  to `main`. `.github/workflows/strength.yml` runs the Makruk bot ladder on demand.
 
 ## Required Artifacts
 
@@ -119,5 +123,4 @@ Before ending a session:
 3. Record any unresolved risk or blocker.
 4. Walk through `clean-state-checklist.md`.
 5. Commit with a descriptive message once the work is in a safe state.
-6. Leave the repo clean enough for the next session to run `./init.sh`
-   immediately.
+6. Leave the repo clean enough for the next session to run `./init.sh` immediately.

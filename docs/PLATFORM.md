@@ -29,7 +29,7 @@ Adding a game must never edit another game's files.
 ```
 packages/
   rules-core/     Variant interface + shared 8x8 helpers (squares, leaper tables)
-  makruk/         Makruk rules (today's packages/engine), implements Variant
+  makruk/         Makruk rules, implements Variant
   sittuyin/       Sittuyin rules, implements Variant
   ai-core/        alpha-beta search over Variant; each game supplies evaluation + bot configs
   protocol/       REST/WebSocket schemas with a `variant` field and generic move strings

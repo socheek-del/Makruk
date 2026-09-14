@@ -1,0 +1,146 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/*
+ * "Wat" design tokens (apps/makruk/docs/design.md): temple paper, indigo, jade, lacquer red, saffron and temple gold.
+ * Light is the default; [data-theme] may be set on <html> or any subtree. `-shadow` = stronger shade.
+ */
+:root,
+[data-theme='light'] {
+  --canvas: #f8f4ec;
+  --surface: #fffdf9;
+  --surface-2: #f1eadf;
+  --line: #e3d9c8;
+  --ink: #1f1d36;
+  --muted: #625e78;
+  --subtle: #a49fb4;
+
+  --primary: #3a3f9b;
+  --primary-shadow: #2b2f78;
+  --primary-soft: #e6e7f7;
+  --secondary: #17866b;
+  --secondary-shadow: #11664f;
+  --secondary-soft: #dcf0e9;
+  --danger: #b63a2b;
+  --danger-shadow: #8e2c20;
+  --danger-soft: #f6e0db;
+  --warning: #d99a1e;
+  --warning-shadow: #a87414;
+  --warning-soft: #f8eccf;
+  --gold: #b7862a;
+  --gold-shadow: #8c6620;
+  --on-accent: #fffdf9;
+
+  --card-shadow: 0 1px 2px rgb(31 29 54 / 0.06), 0 8px 24px -12px rgb(31 29 54 / 0.18);
+
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --canvas: #121226;
+  --surface: #1a1a33;
+  --surface-2: #24254a;
+  --line: #34365e;
+  --ink: #f2eee4;
+  --muted: #aba8c4;
+  --subtle: #6e6b8e;
+
+  --primary: #9ea4f4;
+  --primary-shadow: #7c83e6;
+  --primary-soft: #2a2c5a;
+  --secondary: #4fc29f;
+  --secondary-shadow: #33a281;
+  --secondary-soft: #173a32;
+  --danger: #f08a7a;
+  --danger-shadow: #d26a5a;
+  --danger-soft: #3f2025;
+  --warning: #f0c055;
+  --warning-shadow: #d4a23a;
+  --warning-soft: #3a3019;
+  --gold: #e2b65a;
+  --gold-shadow: #c4973f;
+  --on-accent: #121226;
+
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 28px -14px rgb(0 0 0 / 0.6);
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: 'Prompt', ui-sans-serif, system-ui, sans-serif;
+  /* Confident headings without a chunky look: extrabold renders at 700. */
+  --font-weight-extrabold: 700;
+  --shadow-card: var(--card-shadow);
+
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-primary: var(--primary);
+  --color-primary-shadow: var(--primary-shadow);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-shadow: var(--secondary-shadow);
+  --color-secondary-soft: var(--secondary-soft);
+  --color-danger: var(--danger);
+  --color-danger-shadow: var(--danger-shadow);
+  --color-danger-soft: var(--danger-soft);
+  --color-warning: var(--warning);
+  --color-warning-shadow: var(--warning-shadow);
+  --color-warning-soft: var(--warning-soft);
+  --color-gold: var(--gold);
+  --color-gold-shadow: var(--gold-shadow);
+  --color-on-accent: var(--on-accent);
+}
+
+html,
+body {
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Gold temple-lattice ornament for banners and hero areas; the element needs `relative overflow-hidden`. */
+.motif-diamonds::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 55%;
+  pointer-events: none;
+  background:
+    linear-gradient(45deg, transparent 44%, rgb(255 255 255 / 0.2) 44% 56%, transparent 56%),
+    linear-gradient(-45deg, transparent 44%, rgb(255 255 255 / 0.2) 44% 56%, transparent 56%);
+  background-size: 22px 22px;
+  mask-image: linear-gradient(to left, black 10%, transparent);
+}
+
+/* polish-003: the moved piece slides in from its origin square. */
+@keyframes piece-slide {
+  from {
+    transform: translate(var(--dx), var(--dy));
+  }
+  to {
+    transform: translate(0, 0);
+  }
+}
+
+.piece-slide {
+  animation: piece-slide 170ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
