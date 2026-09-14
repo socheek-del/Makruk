@@ -1219,7 +1219,7 @@
         "CI: a changes job (dorny/paths-filter) gates deploy (Makruk) and deploy-sittuyin on each product's folders, shared packages and the lock file. Push 8590056..a5e32a7 → run 34860305355: verify success (npm ci on linux, verify, build, build:sittuyin), changes success, deploy success, deploy-sittuyin success (npm run deploy:sittuyin applies D1 migrations, then publishes).",
         "Production smoke (Playwright script against both live sites), 11/11 PASS: Sittuyin /api/health service 'sittuyin'; POST /api/guest issues a token; home html lang=my with h1 စစ်တုရင်, Burmese title and canonical; more-games links to the Makruk address; computer game: Auto-arrange finishes 16 placements, a3a4 and the bot replies (18 plies); robots.txt, 12-URL sitemap and og-image.png served; online room created in one browser, joined by code in another, both Auto-arrange, host's a3a4 reaches the friend. Makruk: /api/health service 'makruk'; home lang=th with more-games link to the Sittuyin address; computer game replies; online room created."
       ],
-      "notes": "Makruk is only redeployed when its own paths, a shared package, a site/product config or the lock file change. Worker 'sittuyin' and D1 'sittuyin' are separate from Makruk's."
+      "notes": "Makruk is only redeployed when its own paths, a shared package, a site/product config or the lock file change — proven on push a5e32a7..9d82827 (Sittuyin README and docs only): run 34861733782 verify success, changes success, deploy-sittuyin success, deploy (Makruk) skipped. Worker 'sittuyin' and D1 'sittuyin' are separate from Makruk's."
     },
     {
       "id": "sit-010",
