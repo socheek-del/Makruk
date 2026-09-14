@@ -1,0 +1,399 @@
+import { Board, type BoardTheme, parseUci, useMoveInput } from '@chaturanga/board-ui';
+import { parseSquare, type Piece, type Square, squareName, type Variant, type VariantGame } from '@chaturanga/rules-core';
+import { Button, Card, cn, ProgressBar } from '@chaturanga/ui';
+import { CheckCircle2, Star, X, XCircle } from 'lucide-react';
+import { type ReactNode, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { type L10n, type Lesson, type LessonStep, starsFor } from '../lessons';
+
+type Feedback = null | 'correct' | 'wrong';
+
+/** How the product's mascot (if it has one) should look at this moment. */
+export type LessonMood = 'explaining' | 'thinking' | 'correct' | 'wrong' | 'complete';
+
+export type LessonSound = 'correct' | 'wrong' | 'complete';
+
+export interface LessonPlayerProps<G extends VariantGame, Verify = never> {
+  variant: Variant<G>;
+  lesson: Lesson<Verify>;
+  onExit: () => void;
+  onFinish: (stars: 1 | 2 | 3) => void;
+  /** Resolves lesson text to the language the learner is reading. */
+  translate: (text: L10n) => string;
+
+  /* The product's identity. */
+  theme: BoardTheme;
+  showCoordinates?: boolean;
+  renderPiece: (piece: Piece, className: string) => ReactNode;
+  boardLabel: string;
+  describeSquare: (square: string, piece: Piece | null) => string;
+  /** Drawn beside the prompt; omit for a product without a mascot. */
+  renderMascot?: (mood: LessonMood, className: string) => ReactNode;
+  /** Markings drawn across the board, such as the diagonals a Sittuyin Ne promotes on. */
+  boardOverlay?: ReactNode;
+  /** Plays a sound; omit for a silent product. */
+  onSound?: (sound: LessonSound) => void;
+}
+
+/**
+ * Plays one lesson step by step. Every game-specific thing — the rules engine, piece art, board
+ * colours, mascot and sounds — is a prop. The words it reads are listed in
+ * `packages/game-shell/KEYS.md`.
+ */
+export function LessonPlayer<G extends VariantGame, Verify = never>(props: LessonPlayerProps<G, Verify>) {
+  const { lesson, onFinish } = props;
+  const { t } = useTranslation();
+  const [index, setIndex] = useState(0);
+  const [attempt, setAttempt] = useState(0);
+  const [mistakes, setMistakes] = useState(0);
+  const [feedback, setFeedback] = useState<Feedback>(null);
+  const [done, setDone] = useState(false);
+  const step = lesson.steps[index]!;
+
+  const answer = (correct: boolean) => {
+    setFeedback(correct ? 'correct' : 'wrong');
+    props.onSound?.(correct ? 'correct' : 'wrong');
+    if (!correct) setMistakes((m) => m + 1);
+  };
+  const next = () => {
+    setFeedback(null);
+    if (index + 1 >= lesson.steps.length) setDone(true);
+    else setIndex(index + 1);
+  };
+  const retry = () => {
+    setFeedback(null);
+    setAttempt((a) => a + 1);
+  };
+
+  if (done) return <LessonComplete {...props} stars={starsFor(mistakes)} onContinue={() => onFinish(starsFor(mistakes))} />;
+
+  const completed = index + (feedback === 'correct' || step.kind === 'info' ? 1 : 0);
+
+  return (
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-5" data-testid="lesson-player" data-step={index} data-step-kind={step.kind}>
+      <header className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" aria-label={t('learn.exit')} onClick={props.onExit}>
+          <X aria-hidden className="h-6 w-6 text-muted" />
+        </Button>
+        <ProgressBar value={completed / lesson.steps.length} label={t('learn.progress')} />
+      </header>
+      <StepView
+        key={`${index}-${attempt}`}
+        {...props}
+        step={step}
+        feedback={feedback}
+        onAnswer={answer}
+        onContinue={next}
+        onRetry={retry}
+      />
+    </div>
+  );
+}
+
+type StepProps<G extends VariantGame, Verify, S extends LessonStep<Verify>> = LessonPlayerProps<G, Verify> & {
+  step: S;
+  feedback: Feedback;
+  onAnswer: (correct: boolean) => void;
+  onContinue: () => void;
+  onRetry: () => void;
+};
+
+function StepView<G extends VariantGame, Verify>(props: StepProps<G, Verify, LessonStep<Verify>>) {
+  switch (props.step.kind) {
+    case 'info':
+      return <InfoStep {...(props as StepProps<G, Verify, Extract<LessonStep<Verify>, { kind: 'info' }>>)} />;
+    case 'move':
+      return <MoveStep {...(props as StepProps<G, Verify, Extract<LessonStep<Verify>, { kind: 'move' }>>)} />;
+    case 'squares':
+      return <SquaresStep {...(props as StepProps<G, Verify, Extract<LessonStep<Verify>, { kind: 'squares' }>>)} />;
+    case 'quiz':
+      return <QuizStep {...(props as StepProps<G, Verify, Extract<LessonStep<Verify>, { kind: 'quiz' }>>)} />;
+  }
+}
+
+/** The mascot reacts to the learner: explains, thinks along, cheers or commiserates. */
+function moodFor(kind: LessonStep['kind'], feedback: Feedback): LessonMood {
+  if (feedback === 'correct') return 'correct';
+  if (feedback === 'wrong') return 'wrong';
+  return kind === 'info' ? 'explaining' : 'thinking';
+}
+
+function Prompt({
+  text,
+  mood,
+  translate,
+  renderMascot,
+}: {
+  text: L10n;
+  mood: LessonMood;
+  translate: (text: L10n) => string;
+  renderMascot?: (mood: LessonMood, className: string) => ReactNode;
+}) {
+  return (
+    <div className="flex items-end gap-3">
+      {renderMascot?.(mood, 'h-20 w-20 shrink-0 sm:h-24 sm:w-24')}
+      <h1
+        data-testid="lesson-prompt"
+        className="relative flex-1 rounded-[1.25rem] border border-line bg-surface px-4 py-3 text-xl font-semibold leading-snug shadow-card sm:text-2xl"
+      >
+        {translate(text)}
+      </h1>
+    </div>
+  );
+}
+
+function LessonBoard({ children }: { children: ReactNode }) {
+  return <div className="mx-auto w-full max-w-[min(100%,calc(100dvh-22rem),28rem)]">{children}</div>;
+}
+
+/** The lesson board never animates or shows a hand tray: every step starts from its own FEN. */
+function StepBoard<G extends VariantGame, Verify>({
+  props,
+  game,
+  ...rest
+}: {
+  props: LessonPlayerProps<G, Verify>;
+  game: G;
+  targets?: Square[];
+  selected?: Square | null;
+  lastMove?: { from?: Square | null; to: Square } | null;
+  checkSquare?: Square | null;
+  onSquareClick?: (square: Square) => void;
+  canDrag?: (square: Square) => boolean;
+  onDrop?: (from: Square, to: Square) => boolean;
+}) {
+  return (
+    <LessonBoard>
+      <Board
+        files={props.variant.files}
+        ranks={props.variant.ranks}
+        pieces={game.pieces()}
+        theme={props.theme}
+        showCoordinates={props.showCoordinates}
+        renderPiece={props.renderPiece}
+        label={props.boardLabel}
+        describeSquare={props.describeSquare}
+        overlay={props.boardOverlay}
+        {...rest}
+      />
+    </LessonBoard>
+  );
+}
+
+function Footer({
+  feedback,
+  onCheck,
+  canCheck = true,
+  onContinue,
+  onRetry,
+  hint,
+  success,
+  translate,
+}: {
+  feedback: Feedback;
+  onCheck?: () => void;
+  canCheck?: boolean;
+  onContinue: () => void;
+  onRetry: () => void;
+  hint?: L10n;
+  success?: L10n;
+  translate: (text: L10n) => string;
+}) {
+  const { t } = useTranslation();
+  if (feedback === 'correct') {
+    return (
+      <Card tone="secondary" role="status" data-testid="feedback" data-result="correct" className="flex flex-col gap-3">
+        <p className="flex items-center gap-2 text-xl font-bold text-secondary-shadow dark:text-secondary">
+          <CheckCircle2 aria-hidden className="h-6 w-6" />
+          {t('learn.correct')}
+        </p>
+        {success && <p className="font-medium">{translate(success)}</p>}
+        <Button block size="lg" variant="secondary" onClick={onContinue}>
+          {t('learn.continue')}
+        </Button>
+      </Card>
+    );
+  }
+  if (feedback === 'wrong') {
+    return (
+      <Card tone="danger" role="status" data-testid="feedback" data-result="wrong" className="flex flex-col gap-3">
+        <p className="flex items-center gap-2 text-xl font-bold text-danger">
+          <XCircle aria-hidden className="h-6 w-6" />
+          {t('learn.wrong')}
+        </p>
+        {hint && <p className="font-medium">{translate(hint)}</p>}
+        <Button block size="lg" variant="danger" onClick={onRetry}>
+          {t('learn.tryAgain')}
+        </Button>
+      </Card>
+    );
+  }
+  return onCheck ? (
+    <Button block size="lg" onClick={onCheck} disabled={!canCheck}>
+      {t('learn.check')}
+    </Button>
+  ) : (
+    <Button block size="lg" onClick={onContinue}>
+      {t('learn.continue')}
+    </Button>
+  );
+}
+
+function InfoStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, Extract<LessonStep<Verify>, { kind: 'info' }>>) {
+  const { step, feedback } = props;
+  const [game] = useState(() => (step.fen ? props.variant.createGame(step.fen) : null));
+  return (
+    <>
+      <Prompt text={step.text} mood={moodFor(step.kind, feedback)} translate={props.translate} renderMascot={props.renderMascot} />
+      {game && <StepBoard props={props} game={game} targets={(step.highlight ?? []).map(parseSquare)} />}
+      <Footer feedback={feedback} onContinue={props.onContinue} onRetry={props.onRetry} translate={props.translate} />
+    </>
+  );
+}
+
+function MoveStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, Extract<LessonStep<Verify>, { kind: 'move' }>>) {
+  const { step, feedback, onAnswer } = props;
+  const [game] = useState(() => props.variant.createGame(step.fen));
+  const [version, setVersion] = useState(0);
+  const input = useMoveInput({
+    game,
+    version,
+    canMove: feedback === null,
+    files: props.variant.files,
+    onMove: (move) => {
+      const record = game.move(move);
+      setVersion((v) => v + 1);
+      // Compare the squares only: a lesson accepts the move, whichever promotion letter it carries.
+      onAnswer(step.solutions.some((s) => s.slice(0, 4) === record.uci.slice(0, 4)));
+    },
+  });
+  const last = game.lastMove();
+  // A record names only its destination, because a drop has no origin; the origin comes from the move string.
+  const parsedLast = last ? parseUci(last.uci, props.variant.files) : null;
+  return (
+    <>
+      <Prompt text={step.text} mood={moodFor(step.kind, feedback)} translate={props.translate} renderMascot={props.renderMascot} />
+      <StepBoard
+        props={props}
+        game={game}
+        lastMove={last ? { from: parsedLast?.kind === 'move' ? parsedLast.from : null, to: last.to } : null}
+        checkSquare={game.checkedKingSquare()}
+        selected={input.selected}
+        targets={input.targets}
+        onSquareClick={input.onSquareClick}
+        canDrag={input.canDrag}
+        onDrop={input.onDrop}
+      />
+      {feedback !== null && (
+        <Footer
+          feedback={feedback}
+          onContinue={props.onContinue}
+          onRetry={props.onRetry}
+          hint={step.hint}
+          success={step.success}
+          translate={props.translate}
+        />
+      )}
+    </>
+  );
+}
+
+function SquaresStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, Extract<LessonStep<Verify>, { kind: 'squares' }>>) {
+  const { step, feedback, onAnswer } = props;
+  const [game] = useState(() => props.variant.createGame(step.fen));
+  const [picked, setPicked] = useState<string[]>([]);
+  const toggle = (square: Square) => {
+    if (feedback !== null) return;
+    const name = squareName(square);
+    setPicked((p) => (p.includes(name) ? p.filter((s) => s !== name) : [...p, name]));
+  };
+  return (
+    <>
+      <Prompt text={step.text} mood={moodFor(step.kind, feedback)} translate={props.translate} renderMascot={props.renderMascot} />
+      <StepBoard props={props} game={game} targets={picked.map(parseSquare)} onSquareClick={toggle} />
+      <Footer
+        feedback={feedback}
+        onCheck={() => onAnswer([...picked].sort().join() === [...step.answer].sort().join())}
+        canCheck={picked.length > 0}
+        onContinue={props.onContinue}
+        onRetry={props.onRetry}
+        hint={step.hint}
+        translate={props.translate}
+      />
+    </>
+  );
+}
+
+function QuizStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, Extract<LessonStep<Verify>, { kind: 'quiz' }>>) {
+  const { step, feedback, onAnswer, translate } = props;
+  const [game] = useState(() => (step.fen ? props.variant.createGame(step.fen) : null));
+  const [choice, setChoice] = useState<number | null>(null);
+  return (
+    <>
+      <Prompt text={step.text} mood={moodFor(step.kind, feedback)} translate={translate} renderMascot={props.renderMascot} />
+      {game && <StepBoard props={props} game={game} />}
+      <div role="radiogroup" aria-label={translate(step.text)} className="flex flex-col gap-3">
+        {step.choices.map((c, i) => (
+          <button
+            key={i}
+            type="button"
+            role="radio"
+            aria-checked={choice === i}
+            data-choice={i}
+            disabled={feedback !== null}
+            onClick={() => setChoice(i)}
+            className={cn(
+              'rounded-2xl border px-4 py-3 text-left text-lg font-medium shadow-card transition-colors',
+              choice === i ? 'border-primary bg-primary-soft text-primary ring-1 ring-primary' : 'border-line bg-surface hover:bg-surface-2',
+            )}
+          >
+            {translate(c)}
+          </button>
+        ))}
+      </div>
+      <Footer
+        feedback={feedback}
+        onCheck={() => onAnswer(choice === step.correct)}
+        canCheck={choice !== null}
+        onContinue={props.onContinue}
+        onRetry={props.onRetry}
+        hint={step.hint}
+        translate={translate}
+      />
+    </>
+  );
+}
+
+function LessonComplete<G extends VariantGame, Verify>({
+  lesson,
+  stars,
+  onContinue,
+  translate,
+  renderMascot,
+  onSound,
+}: LessonPlayerProps<G, Verify> & { stars: 1 | 2 | 3; onContinue: () => void }) {
+  const { t } = useTranslation();
+  useEffect(() => onSound?.('complete'), [onSound]);
+  return (
+    <div data-testid="lesson-complete" data-stars={stars} className="mx-auto flex w-full max-w-md flex-col items-center gap-6 py-8 text-center">
+      {renderMascot?.('complete', 'h-36 w-36')}
+      <p className="text-lg font-bold text-muted">{translate(lesson.title)}</p>
+      <h1 className="text-4xl font-extrabold text-gold">{t('learn.complete')}</h1>
+      <div className="flex gap-2" role="img" aria-label={t('learn.stars', { count: stars })}>
+        {[1, 2, 3].map((i) => (
+          <Star
+            key={i}
+            aria-hidden
+            className={cn('h-16 w-16 transition-transform', i <= stars ? 'scale-100 fill-gold text-gold' : 'scale-90 text-line')}
+          />
+        ))}
+      </div>
+      <Card tone="warning" className="px-6 text-2xl font-extrabold text-gold">
+        +{lesson.xp} XP
+      </Card>
+      <Button size="lg" block onClick={onContinue}>
+        {t('learn.continue')}
+      </Button>
+    </div>
+  );
+}

@@ -3,7 +3,9 @@
  * identity) and passes its rules Variant; these modules turn them into language handling, search-engine
  * tags, game results, time controls and game sessions. Game-specific content never lives here.
  */
+export { type L10n, type Lesson, type LessonStep, starsFor, type Unit } from './lessons';
 export { isLocale, localeFromSearch, type ProductConfig, resolveLocale, storageKey } from './product';
+export { createProgressStore, type LessonProgress, type ProgressState, type ProgressStore, REPLAY_XP } from './progress';
 export {
   capturedBy,
   FINAL_REASONS,

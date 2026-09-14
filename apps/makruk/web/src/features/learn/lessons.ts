@@ -431,7 +431,7 @@ const counting: Lesson = {
     {
       kind: 'info',
       fen: '4k3/3m4/8/8/8/2N5/8/R3K3 b - 128 0 1',
-      counting: { fen: '4k3/3m4/8/8/8/8/8/RN2K3 w - - 0 1', move: 'b1c3', limitMoves: 64, kind: 'board' },
+      verify: { fen: '4k3/3m4/8/8/8/8/8/RN2K3 w - - 0 1', move: 'b1c3', limitMoves: 64, kind: 'board' },
       text: {
         th: 'เมื่อไม่มีเบี้ยเหลือบนกระดาน ฝ่ายที่เสียเปรียบนับได้ถึง 64 ตา เรียกว่า "นับศักดิ์กระดาน" ถ้ารุกจนไม่ได้ภายในนั้น เกมเสมอ',
         en: "When no Bia are left, the weaker side counts up to 64 moves — the board's honour count. If there is no checkmate in time, the game is drawn.",
@@ -440,7 +440,7 @@ const counting: Lesson = {
     {
       kind: 'info',
       fen: '4k3/8/8/8/8/8/R7/4K3 b - 32 6 1',
-      counting: { fen: '4k3/8/8/8/8/8/8/R3K3 w - - 0 1', move: 'a1a2', limitMoves: 16, kind: 'pieces' },
+      verify: { fen: '4k3/8/8/8/8/8/8/R3K3 w - - 0 1', move: 'a1a2', limitMoves: 16, kind: 'pieces' },
       text: {
         th: 'ถ้าฝ่ายหนึ่งเหลือขุนตัวเดียว จะ "นับศักดิ์หมาก" ตามหมากของอีกฝ่าย เช่น เจอเรือหนึ่งลำ นับได้ 16 ตา โดยเริ่มนับจากจำนวนหมากบนกระดาน',
         en: "If one side has only its Khun left, it counts by pieces' honour: the limit depends on the attacker's pieces — 16 moves against one Ruea — and the count starts from the number of pieces on the board.",
@@ -448,7 +448,7 @@ const counting: Lesson = {
     },
     {
       kind: 'quiz',
-      counting: { fen: '4k3/8/8/8/8/8/8/RR2K3 w - - 0 1', move: 'b1b2', limitMoves: 8, kind: 'pieces' },
+      verify: { fen: '4k3/8/8/8/8/8/8/RR2K3 w - - 0 1', move: 'b1b2', limitMoves: 8, kind: 'pieces' },
       text: { th: 'ขุนเดี่ยวสู้กับเรือสองลำ นับได้กี่ตา?', en: 'A lone Khun against two Ruea may count how many moves?' },
       choices: [moves(8), moves(16), moves(64)],
       correct: 0,
@@ -456,7 +456,7 @@ const counting: Lesson = {
     },
     {
       kind: 'quiz',
-      counting: { fen: '4k3/8/8/8/8/8/8/S3K3 w - - 0 1', move: 'a1a2', limitMoves: 44, kind: 'pieces' },
+      verify: { fen: '4k3/8/8/8/8/8/8/S3K3 w - - 0 1', move: 'a1a2', limitMoves: 44, kind: 'pieces' },
       text: { th: 'ขุนเดี่ยวสู้กับโคนตัวเดียว (ไม่มีเรือ) นับได้กี่ตา?', en: 'A lone Khun against one Khon (no Ruea) may count how many moves?' },
       choices: [moves(22), moves(44), moves(64)],
       correct: 1,
@@ -464,14 +464,14 @@ const counting: Lesson = {
     },
     {
       kind: 'quiz',
-      counting: { fen: '4k3/8/8/8/8/8/8/NN2K3 w - - 0 1', move: 'b1d2', limitMoves: 32, kind: 'pieces' },
+      verify: { fen: '4k3/8/8/8/8/8/8/NN2K3 w - - 0 1', move: 'b1d2', limitMoves: 32, kind: 'pieces' },
       text: { th: 'ขุนเดี่ยวสู้กับม้าสองตัว (ไม่มีเรือหรือโคน) นับได้กี่ตา?', en: 'A lone Khun against two Ma (no Ruea or Khon) may count how many moves?' },
       choices: [moves(32), moves(44), moves(16)],
       correct: 0,
     },
     {
       kind: 'quiz',
-      counting: { fen: START, move: 'e3e4', limitMoves: 0 },
+      verify: { fen: START, move: 'e3e4', limitMoves: 0 },
       text: { th: 'ถ้ายังมีเบี้ยเหลืออยู่บนกระดาน ต้องนับศักดิ์หรือไม่?', en: 'If any Bia are still on the board, does counting apply?' },
       choices: [
         { th: 'ต้องนับ', en: 'Yes' },

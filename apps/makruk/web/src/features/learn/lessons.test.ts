@@ -1,85 +1,19 @@
-import { Game, moveToUci, parseSquare, squareName } from '@chaturanga/makruk';
+import { describeLessons } from '@chaturanga/game-shell/testing';
+import { Game, makruk } from '@chaturanga/makruk';
 import { describe, expect, it } from 'vitest';
 import { ALL_LESSONS, UNITS } from './lessons';
 import { PRODUCT } from '../../../product.config';
-import type { L10n, LessonStep } from './types';
+import type { L10n } from './types';
 
-/** Lesson text must exist in every language the product declares (plat-004). */
-const filled = (text: L10n | undefined) => !text || PRODUCT.locales.every((lang) => text[lang].trim().length > 0);
+/** Positions parse, solutions are legal, and every string exists in th and en. */
+describeLessons(PRODUCT, makruk, ALL_LESSONS);
 
-describe('lesson content', () => {
-  it('lesson ids are unique', () => {
-    const ids = ALL_LESSONS.map((l) => l.id);
-    expect(new Set(ids).size).toBe(ids.length);
-  });
+const filled = (text: L10n) => PRODUCT.locales.every((lang) => (text[lang] ?? '').trim().length > 0);
 
+describe('Makruk lesson content', () => {
   for (const unit of UNITS) {
     it(`unit ${unit.id} has both languages`, () => {
       expect(filled(unit.title)).toBe(true);
-    });
-  }
-
-  for (const lesson of ALL_LESSONS) {
-    describe(`lesson ${lesson.id}`, () => {
-      it('has titles and XP in both languages', () => {
-        expect(filled(lesson.title) && filled(lesson.summary)).toBe(true);
-        expect(lesson.xp).toBeGreaterThan(0);
-        expect(lesson.route || lesson.steps.length > 0).toBeTruthy();
-      });
-
-      lesson.steps.forEach((step: LessonStep, i) => {
-        it(`step ${i + 1} (${step.kind}) is valid`, () => {
-          expect(filled(step.text)).toBe(true);
-          if ('hint' in step) expect(filled(step.hint)).toBe(true);
-          const fen = 'fen' in step ? step.fen : undefined;
-          const game = fen ? new Game(fen) : null;
-
-          if ('counting' in step && step.counting) {
-            const example = new Game(step.counting.fen);
-            example.move(step.counting.move);
-            const state = example.counting();
-            if (step.counting.limitMoves === 0) {
-              expect(state).toBeNull();
-            } else {
-              expect(state?.limitPlies).toBe(step.counting.limitMoves * 2);
-              if (step.counting.kind) expect(state?.kind).toBe(step.counting.kind);
-            }
-            // The position shown to the learner (if any) is the engine's position after the example move.
-            if (fen) expect(fen.replace(/~/g, '')).toBe(example.fen().replace(/~/g, ''));
-          }
-
-          switch (step.kind) {
-            case 'info':
-              for (const sq of step.highlight ?? []) expect(parseSquare(sq)).toBeGreaterThanOrEqual(0);
-              break;
-            case 'move': {
-              const legal = game!.legalMoves().map(moveToUci);
-              expect(step.solutions.length).toBeGreaterThan(0);
-              for (const s of step.solutions) expect(legal.map((m) => m.slice(0, 4))).toContain(s.slice(0, 4));
-              expect(legal.length, 'there must be a wrong move to make').toBeGreaterThan(step.solutions.length);
-              if (step.success) expect(filled(step.success)).toBe(true);
-              break;
-            }
-            case 'squares':
-              expect(step.answer.length).toBeGreaterThan(0);
-              for (const sq of step.answer) expect(parseSquare(sq)).toBeGreaterThanOrEqual(0);
-              if (step.targetsOf) {
-                const targets = game!
-                  .legalMovesFrom(parseSquare(step.targetsOf))
-                  .map((m) => squareName(m.to))
-                  .sort();
-                expect([...step.answer].sort()).toEqual(targets);
-              }
-              break;
-            case 'quiz':
-              expect(step.choices.length).toBeGreaterThanOrEqual(2);
-              expect(step.correct).toBeGreaterThanOrEqual(0);
-              expect(step.correct).toBeLessThan(step.choices.length);
-              for (const c of step.choices) expect(filled(c)).toBe(true);
-              break;
-          }
-        });
-      });
     });
   }
 
@@ -89,18 +23,37 @@ describe('lesson content', () => {
     );
   });
 
-  it('counting lesson answers match the engine limits (learn-003)', () => {
+  it('counting examples match the engine (learn-003)', () => {
+    const examples = ALL_LESSONS.flatMap((l) => l.steps).filter((s) => s.verify);
+    expect(examples.length).toBeGreaterThan(0);
+    for (const step of examples) {
+      const example = step.verify!;
+      const game = new Game(example.fen);
+      game.move(example.move);
+      const state = game.counting();
+      if (example.limitMoves === 0) {
+        expect(state).toBeNull();
+      } else {
+        expect(state?.limitPlies).toBe(example.limitMoves * 2);
+        if (example.kind) expect(state?.kind).toBe(example.kind);
+      }
+      // The position shown to the learner (if any) is the engine's position after the example move.
+      const fen = 'fen' in step ? step.fen : undefined;
+      if (fen) expect(fen.replace(/~/g, '')).toBe(game.fen().replace(/~/g, ''));
+    }
+  });
+
+  it('counting lesson answers name the engine limits (learn-003)', () => {
     const lesson = ALL_LESSONS.find((l) => l.id === 'counting')!;
     const quizzes = lesson.steps.filter((s) => s.kind === 'quiz');
     expect(quizzes.length).toBeGreaterThanOrEqual(4);
     for (const quiz of quizzes) {
-      if (quiz.kind !== 'quiz' || !quiz.counting) throw new Error('counting quiz needs an engine example');
-      const game = new Game(quiz.counting.fen);
-      game.move(quiz.counting.move);
+      if (quiz.kind !== 'quiz' || !quiz.verify) throw new Error('a counting quiz needs an engine example');
+      const game = new Game(quiz.verify.fen);
+      game.move(quiz.verify.move);
       const limit = (game.counting()?.limitPlies ?? 0) / 2;
       const answer = quiz.choices[quiz.correct]!;
-      if (limit > 0) expect(answer.en).toBe(`${limit} moves`);
-      else expect(answer.en).toBe('No');
+      expect(answer.en).toBe(limit > 0 ? `${limit} moves` : 'No');
     }
   });
 

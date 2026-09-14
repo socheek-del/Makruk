@@ -1,10 +1,9 @@
-import { resolveLocale } from '@chaturanga/game-shell';
+import { type L10n, type Lesson as SharedLesson, type LessonStep as SharedStep, type Unit as SharedUnit, resolveLocale } from '@chaturanga/game-shell';
 import type { PieceType } from '@chaturanga/makruk';
 import { useTranslation } from 'react-i18next';
-import { type Language, PRODUCT } from '../../../product.config';
+import { PRODUCT } from '../../../product.config';
 
-/** Lesson text lives with the lesson data, in every language the product declares. */
-export type L10n = Record<Language, string>;
+export type { L10n };
 
 /** A counting-rule example the engine must agree with (checked in lessons.test.ts). */
 export interface CountingExample {
@@ -15,40 +14,15 @@ export interface CountingExample {
   kind?: 'board' | 'pieces';
 }
 
-export type LessonStep =
-  /** Explanation, optionally with a position and highlighted squares. */
-  | { kind: 'info'; text: L10n; fen?: string; highlight?: string[]; counting?: CountingExample }
-  /** Play one of the solution moves (coordinate notation). */
-  | { kind: 'move'; text: L10n; fen: string; solutions: string[]; hint?: L10n; success?: L10n }
-  /**
-   * Tap exactly the answer squares, then check. When `targetsOf` is set, the answer must equal
-   * that piece's legal destinations (enforced by lessons.test.ts).
-   */
-  | { kind: 'squares'; text: L10n; fen: string; answer: string[]; targetsOf?: string; hint?: L10n }
-  /** Multiple choice. */
-  | { kind: 'quiz'; text: L10n; choices: L10n[]; correct: number; fen?: string; hint?: L10n; counting?: CountingExample };
+/** Makruk lessons carry counting examples, so the shared step types verify against them. */
+export type LessonStep = SharedStep<CountingExample>;
+export type Lesson = SharedLesson<CountingExample>;
+export type Unit = SharedUnit<CountingExample>;
 
 export type LessonIcon = PieceType | 'board' | 'promotion' | 'check' | 'mate' | 'count' | 'game';
-
-export interface Lesson {
-  id: string;
-  icon: LessonIcon;
-  title: L10n;
-  summary: L10n;
-  xp: number;
-  steps: LessonStep[];
-  /** Special lessons open a dedicated route instead of the step player. */
-  route?: string;
-}
-
-export interface Unit {
-  id: string;
-  title: L10n;
-  lessons: Lesson[];
-}
 
 export function useL10n() {
   const { i18n } = useTranslation();
   const lang = resolveLocale(PRODUCT, i18n.language);
-  return (text: L10n) => text[lang];
+  return (text: L10n) => text[lang]!;
 }

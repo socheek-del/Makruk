@@ -10,6 +10,7 @@ export { formatClock, type GameSound, soundForMove } from './format';
 export { GameControls, type GameControlsProps } from './GameControls';
 export { GameOverModal, type GameOverModalProps, resultTitleKey } from './GameOverModal';
 export { GameScreen, type GameScreenProps, undoAllowed } from './GameScreen';
+export { LessonPlayer, type LessonMood, type LessonPlayerProps, type LessonSound } from './LessonPlayer';
 export { MoveList, type MoveListProps } from './MoveList';
 export { PlayerBar, type PlayerBarProps } from './PlayerBar';
 export { TimeControlPicker, type TimeControlPickerProps } from './TimeControlPicker';
