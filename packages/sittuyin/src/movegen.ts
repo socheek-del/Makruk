@@ -18,6 +18,7 @@ import {
   MET_TARGETS,
   PAWN,
   PAWN_CAPTURES,
+  parseSquare,
   PROMOTED,
   ROOK,
   ROOK_RAYS,
@@ -46,6 +47,18 @@ export interface Position {
 
 const isOwn = (code: number, bits: number): boolean => code !== 0 && (code & BLACK) === bits;
 
+function squareSet(names: string): Uint8Array {
+  const set = new Uint8Array(64);
+  for (const name of names.split(' ')) set[parseSquare(name)] = 1;
+  return set;
+}
+
+/** Where a Ne may promote while its side has more than one Ne: the long diagonals in the opponent's half. */
+export const PROMOTION_SQUARES: readonly [Uint8Array, Uint8Array] = [
+  squareSet('a8 b7 c6 d5 e5 f6 g7 h8'),
+  squareSet('a1 b2 c3 d4 e4 f3 g2 h1'),
+];
+
 export function generateDrops(pos: Position, out: number[] = []): number[] {
   const c = pos.turn;
   const hand = pos.hands[c];
@@ -62,14 +75,34 @@ function pushLeaper(board: Board, from: Square, targets: readonly Square[], bits
   for (const to of targets) if (!isOwn(board[to]!, bits)) out.push(encodeMove(from, to));
 }
 
-/** Moves of pieces already on the board. */
+/**
+ * Ne promotion to Sit-ke (Fairy-Stockfish sittuyin): only while the side has no Sit-ke, from a
+ * promotion square unless it is the side's last Ne, onto the Ne's own square or an empty diagonal
+ * neighbour, and never where the new Sit-ke would attack an enemy piece (so it never checks).
+ */
+function generatePromotions(board: Board, c: ColorIndex, pawns: readonly Square[], out: number[]): void {
+  const bits = colorBits(c);
+  if (pawns.length === 0 || board.some((p) => isOwn(p, bits) && (p & TYPE_MASK) === MET)) return;
+  const enemy = colorBits(c === 0 ? 1 : 0);
+  const attacksEnemy = (sq: Square) => MET_TARGETS[sq]!.some((s) => isOwn(board[s]!, enemy));
+  for (const from of pawns) {
+    if (pawns.length > 1 && !PROMOTION_SQUARES[c][from]) continue;
+    for (const to of [from, ...MET_TARGETS[from]!]) {
+      if ((to === from || board[to] === 0) && !attacksEnemy(to)) out.push(encodeMove(from, to, PROMOTION_FLAG));
+    }
+  }
+}
+
+/** Moves of pieces already on the board, including promotions. */
 export function generatePieceMoves(board: Board, c: ColorIndex, out: number[] = []): number[] {
   const bits = colorBits(c);
+  const pawns: Square[] = [];
   for (let from = 0; from < 64; from++) {
     const p = board[from]!;
     if (!isOwn(p, bits)) continue;
     switch (p & TYPE_MASK) {
       case PAWN: {
+        pawns.push(from);
         const to = c === 0 ? from + 8 : from - 8;
         if (to >= 0 && to < 64 && board[to] === 0) out.push(encodeMove(from, to));
         for (const cap of PAWN_CAPTURES[c][from]!) {
@@ -105,6 +138,7 @@ export function generatePieceMoves(board: Board, c: ColorIndex, out: number[] = 
         break;
     }
   }
+  generatePromotions(board, c, pawns, out);
   return out;
 }
 
@@ -148,7 +182,8 @@ export function unmakeRaw(pos: Position, m: number, c: ColorIndex, moved: number
 export function isLegal(pos: Position, m: number, c: ColorIndex): boolean {
   const moved = isDrop(m) ? 0 : pos.board[moveFrom(m)]!;
   const captured = makeRaw(pos, m, c);
-  const legal = !inCheck(pos.board, c);
+  // A promotion may not give check, not even a discovered one.
+  const legal = !inCheck(pos.board, c) && !(isPromotion(m) && inCheck(pos.board, c === 0 ? 1 : 0));
   unmakeRaw(pos, m, c, moved, captured);
   return legal;
 }

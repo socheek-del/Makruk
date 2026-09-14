@@ -1,0 +1,138 @@
+{
+  "generator": "ffish@0.7.10 (Fairy-Stockfish)",
+  "positions": [
+    {
+      "name": "setup start",
+      "fen": "8/8/4pppp/pppp4/4PPPP/PPPP4/8/8[KSSFRRNNkssfrrnn] w - - 0 1",
+      "perft": [
+        88,
+        7744,
+        580096
+      ]
+    },
+    {
+      "name": "last placement",
+      "fen": "kn2r2r/2ns1f2/4pppp/pppp4/4PPPP/PPPPNS1K/3S3F/3R1N1R[s] b - - 0 8",
+      "perft": [
+        13,
+        364,
+        9589,
+        278861
+      ]
+    },
+    {
+      "name": "after setup",
+      "fen": "kn2rs1r/2ns1f2/4pppp/pppp4/4PPPP/PPPPNS1K/3S3F/3R1N1R[] w - - 0 9",
+      "perft": [
+        28,
+        705,
+        20503,
+        543575
+      ]
+    },
+    {
+      "name": "promotion squares",
+      "fen": "4k3/8/8/3P4/4p3/8/P6p/4K3[] w - - 0 1",
+      "perft": [
+        10,
+        97,
+        928,
+        9214,
+        90818
+      ]
+    },
+    {
+      "name": "last Ne promotes anywhere",
+      "fen": "4k3/8/8/8/P7/8/7p/4K3[] w - - 0 1",
+      "perft": [
+        9,
+        79,
+        743,
+        6824,
+        66453
+      ]
+    },
+    {
+      "name": "promotion may not attack",
+      "fen": "8/1k6/8/3P4/8/8/P7/4K3[] w - - 0 1",
+      "perft": [
+        11,
+        80,
+        926,
+        4900,
+        56888
+      ]
+    },
+    {
+      "name": "in check with block",
+      "fen": "4r2k/8/8/8/8/8/R7/4K3[] w - - 0 1",
+      "perft": [
+        5,
+        79,
+        1129,
+        17139,
+        271427
+      ]
+    },
+    {
+      "name": "random seed 11",
+      "fen": "2r2k2/s4f1n/s4Ppp/ppp5/6PP/PPp2r2/F5NS/1RS1K1R1[] w - - 1 16",
+      "perft": [
+        17,
+        526,
+        9387,
+        292215
+      ]
+    },
+    {
+      "name": "random seed 23",
+      "fen": "k4r2/5s1f/4p1pp/7P/2p1PP1S/2P5/3rFK2/S1N5[] w - - 0 26",
+      "perft": [
+        17,
+        457,
+        8126,
+        221964
+      ]
+    },
+    {
+      "name": "random seed 37",
+      "fen": "8/n2s3k/2rf4/2s2K2/1p6/3P4/1SF5/8[] w - - 6 36",
+      "perft": [
+        14,
+        281,
+        3715,
+        84393
+      ]
+    },
+    {
+      "name": "random seed 41",
+      "fen": "5s2/2k5/P7/5p2/1P4p1/2K4p/8/6F1[] w - - 5 46",
+      "perft": [
+        11,
+        141,
+        1613,
+        19967
+      ]
+    },
+    {
+      "name": "random seed 59",
+      "fen": "8/2k5/R7/8/1f6/1K6/4N3/7R[] w - - 3 56",
+      "perft": [
+        40,
+        348,
+        12937,
+        101351
+      ]
+    },
+    {
+      "name": "random seed 73",
+      "fen": "f3s3/8/2k2p1p/8/p2r4/8/1K6/8[] w - - 2 66",
+      "perft": [
+        7,
+        195,
+        692,
+        18102
+      ]
+    }
+  ]
+}

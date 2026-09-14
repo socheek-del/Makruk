@@ -202,9 +202,10 @@ export class Game {
 
     const from = moveFrom(m);
     const type = moved & TYPE_MASK;
-    const capture = from !== to && this.pos.board[to] !== 0;
-    const promo = isPromotion(m) ? '=F' : '';
-    if (type === PAWN) return (capture ? `${'abcdefgh'[fileOf(from)]}x` : '') + target + promo;
+    // Fairy-Stockfish names both squares of a promotion (`d5c4=F`), or one when it is in place (`d5=F`).
+    if (isPromotion(m)) return `${squareName(from)}${from === to ? '' : target}=F`;
+    const capture = this.pos.board[to] !== 0;
+    if (type === PAWN) return (capture ? `${'abcdefgh'[fileOf(from)]}x` : '') + target;
 
     const rivals = legal.filter(
       (o) => o !== m && !isDrop(o) && moveTo(o) === to && this.pos.board[moveFrom(o)] === moved,

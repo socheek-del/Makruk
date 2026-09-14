@@ -17,7 +17,7 @@ handoff; no agent updates it automatically.
 - Milestones: M0 infra ✓, M1 engine ✓, M2 local play ✓, M3 vs computer ✓ (ai-002 ladder verified on GitHub Actions), M4 learning ✓, M5 online ✓ (incl. quick match), M6 accounts (acct-001 anonymous seat token ✓; acct-002/acct-003 deferred — accounts removed by the owner), M8 owner requests (play-006, about-001, docs-001 ✓; seo-001 awaiting Search Console), M7 polish (PWA, sounds, themes, art ✓; polish-002 blocked)
 - D1 database `makruk` (id 9e084ac6-9749-411d-867d-c89e8421ed78); migrations in `apps/worker/migrations`, applied by `npm run deploy` (CI) and by the Playwright wrangler command locally
 - Remaining: `polish-002` (native Thai review) and `seo-001` (Search Console submission) — both need the owner; `acct-002`/`acct-003` deferred (accounts removed from the product for now)
-- Multi-game platform (session 003): plan in `docs/PLATFORM.md` (repo → `chaturanga`, one product per game on its own subdomain, Sittuyin next in Burmese + English). `packages/sittuyin` engine started: sit-001 ✓; next sit-002 (move generation + promotion), sit-003 (game end), then plat-002..006 and the Sittuyin app.
+- Multi-game platform (session 003): plan in `docs/PLATFORM.md` (repo → `chaturanga`, one product per game on its own subdomain, Sittuyin next in Burmese + English). `packages/sittuyin` engine: sit-001 ✓ (setup), sit-002 ✓ (moves + promotion); next sit-003 (game end), then plat-002..006 and the Sittuyin app.
 - Shell pitfall: run npm/vitest under the `.nvmrc` Node (`. ~/.nvm/nvm.sh && nvm use`). The default shell Node 20.13 makes npm skip rolldown's native binding, and vitest then fails with "Cannot find native binding". `init.sh` already switches Node.
 - Current blockers (owner action needed):
   - `seo-001`: verify the site in Google Search Console and submit `https://th-chess.beanroti.com/sitemap.xml`
@@ -88,4 +88,12 @@ handoff; no agent updates it automatically.
 - Known risk or unresolved issue:
   - The shell's default Node is 20.13; use nvm (see Current Verified State).
   - Package scope is mixed (`@makruk/*` plus `@chaturanga/sittuyin`) until plat-003.
-- Next best step: sit-002. Probe ffish for Sittuyin promotion (promotion squares, only without a Sit-ke, in place or diagonal step, check/capture restrictions, last-pawn rule), then lock-step full games.
+- Later in session: `sit-002` — move generation and Ne promotion verified against ffish (perft reference for 13 positions, lock-step full games). The promotion rules came from ffish probes; `packages/sittuyin/src/movegen.test.ts` lists each probed case.
+- Next best step: sit-003. Probe ffish sittuyin game end and write `docs/sittuyin-rules.md`:
+  - counting (ffish already shows `32 0` limits after a lone Min-gyi remains)
+  - insufficient material
+  - repetition
+  - stalemate result
+  - any 50-move rule
+
+  Then compare FEN counting fields and game over in `reference.test.ts`.

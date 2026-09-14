@@ -10,7 +10,8 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:deep": "PERFT_DEEP=1 vitest run"
+    "test:deep": "PERFT_DEEP=1 vitest run",
+    "perft:reference": "node scripts/perft-reference.cjs"
   },
   "dependencies": {
     "@makruk/engine": "*"

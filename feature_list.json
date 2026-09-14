@@ -862,14 +862,19 @@
       "milestone": "M9",
       "title": "Sittuyin move generation and promotion",
       "user_visible_behavior": "After setup the engine lists every legal move for Min-gyi, Sit-ke, Sin, Myin, Yahhta and Ne, including Ne promotion to Sit-ke as a separate move (diagonal step or in place).",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Unit tests per piece type and for promotion conditions from hand-built positions.",
         "Legal move sets equal ffish sittuyin on every ply of 400 seeded random games (deep run) and a fast subset in npm run verify.",
         "Perft depth 1-4 from the first post-setup position and 5+ tricky positions match ffish."
       ],
-      "evidence": [],
-      "notes": ""
+      "evidence": [
+        "2026-09-14: Ne promotion rules settled by ffish probes (10,688 offered promotions in 400 random games plus targeted positions), implemented in packages/sittuyin/src/movegen.ts. A side may promote only with no Sit-ke on the board; from its own long-diagonal promotion squares (White a8 b7 c6 d5 e5 f6 g7 h8, Black a1 b2 c3 d4 e4 f3 g2 h1) unless it is the last Ne; onto its own square or an empty diagonal neighbour in any direction; the new Sit-ke may not attack any enemy piece, and the promotion may not give check, even a discovered one. It may block a check; a pinned Ne only promotes in place. SAN d5c4=F / d5=F.",
+        "2026-09-14: src/movegen.test.ts — 27 passed: movement of all six pieces (both Sin directions, Ne push/capture), pins, check escapes, adjacent kings; 10 promotion cases, each copied from an ffish probe (the in-place-check case was corrected after the parser rightly rejected an illegal probe FEN); promotion record/FEN F~/halfmove reset/undo; 8 SAN cases (Nbd2, exd5, Fd4, Sf4, Kxe2, e5d4=F).",
+        "2026-09-14: perft reference from ffish 0.7.10 (scripts/perft-reference.cjs → src/testing/perft-reference.json), 13 positions including setup start (depth 3), last placement, after setup, promotion squares, last Ne, attack restriction, check block and 6 random games: fast depths ≤150k nodes in npm test; every depth with PERFT_DEEP=1.",
+        "2026-09-14: src/reference.test.ts — seeded random games including setup (promotions and captures preferred, asserts promotions > 0) compare legal move sets, SAN and placement/hand/side after every ply until ffish reports game over or 300 plies: 60 games in npm test, 400 in npm run test:deep. Deep run 135/135 passed; npm run verify exit 0 (sittuyin 129 passed, 6 deep-only skipped; other workspaces unchanged)."
+      ],
+      "notes": "Counting fields and game-over agreement are compared in sit-003."
     },
     {
       "id": "sit-003",
