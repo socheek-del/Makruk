@@ -22,16 +22,16 @@
     {
       "binding": "DB",
       "database_name": "sittuyin",
-      // Placeholder until the production database is created at deploy time (sit-009). Local dev and
-      // tests use a local database and never read this id.
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      // Production database, created 2026-09-14 (sit-009). Local dev and tests use a local database.
+      "database_id": "2645cb45-b6a3-4df2-b953-439d2648cd47",
       "migrations_dir": "migrations"
     }
   ],
   "vars": {
     "RECONNECT_GRACE_MS": "60000"
   },
-  // No routes yet: the subdomain is chosen by the owner at deploy time (sit-009), and never hardcoded
-  // anywhere else.
+  // The subdomain the owner chose (sit-009). Moving domains: change this and the default in
+  // apps/sittuyin/web/site.config.ts, nothing else.
+  "routes": [{ "pattern": "my-chess.beanroti.com", "custom_domain": true }],
   "observability": { "enabled": true }
 }

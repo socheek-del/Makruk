@@ -20,12 +20,51 @@ jobs:
       - run: npm ci
       - run: npm run verify
       - run: npm run build
-      # Sittuyin is not deployed yet (sit-009); building it here keeps its web bundle and Worker honest.
       - run: npm run build:sittuyin
 
-  deploy:
-    needs: verify
+  # Each product deploys only when its own folders, a shared package or the dependency lock changed.
+  # packages/family reads every game's site.config.ts, so a site address change redeploys every site.
+  changes:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      makruk: ${{ steps.filter.outputs.makruk }}
+      sittuyin: ${{ steps.filter.outputs.sittuyin }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            shared: &shared
+              - 'packages/rules-core/**'
+              - 'packages/ai-core/**'
+              - 'packages/protocol/**'
+              - 'packages/ui/**'
+              - 'packages/board-ui/**'
+              - 'packages/game-shell/**'
+              - 'packages/server-kit/**'
+              - 'packages/family/**'
+              - 'apps/*/web/site.config.ts'
+              - 'apps/*/web/product.config.ts'
+              - 'package.json'
+              - 'package-lock.json'
+              - '.nvmrc'
+              - '.github/workflows/ci.yml'
+            makruk:
+              - *shared
+              - 'apps/makruk/**'
+              - 'packages/makruk/**'
+              - 'packages/ai/**'
+            sittuyin:
+              - *shared
+              - 'apps/sittuyin/**'
+              - 'packages/sittuyin/**'
+              - 'packages/sittuyin-ai/**'
+
+  deploy:
+    needs: [verify, changes]
+    if: needs.changes.outputs.makruk == 'true'
     runs-on: ubuntu-latest
     concurrency:
       group: deploy-production
@@ -41,8 +80,33 @@ jobs:
           cache: npm
       - run: npm install -g npm@11
       - run: npm ci
-      # `npm run deploy` applies pending D1 migrations before publishing the Worker.
-      - run: npm run deploy
+      # `npm run deploy:makruk` applies pending D1 migrations before publishing the Worker.
+      - run: npm run deploy:makruk
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: 'false'
+
+  deploy-sittuyin:
+    needs: [verify, changes]
+    if: needs.changes.outputs.sittuyin == 'true'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-production-sittuyin
+      cancel-in-progress: false
+    environment:
+      name: production-sittuyin
+      url: https://my-chess.beanroti.com
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm install -g npm@11
+      - run: npm ci
+      # `npm run deploy:sittuyin` applies pending D1 migrations before publishing the Worker.
+      - run: npm run deploy:sittuyin
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
