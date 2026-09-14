@@ -36,7 +36,13 @@ export default defineConfig(
   },
   { ignores: ['**/dev-dist/**'] },
   {
-    files: ['packages/makruk/src/**/*.ts', 'packages/sittuyin/src/**/*.ts', 'packages/rules-core/src/**/*.ts'],
+    files: [
+      'packages/makruk/src/**/*.ts',
+      'packages/sittuyin/src/**/*.ts',
+      'packages/rules-core/src/**/*.ts',
+      'packages/ai-core/src/**/*.ts',
+      'packages/sittuyin-ai/src/**/*.ts',
+    ],
     ignores: ['packages/*/src/**/*.test.ts', 'packages/*/src/testing/**'],
     rules: {
       // Engine must stay pure: no DOM, network, or timers.

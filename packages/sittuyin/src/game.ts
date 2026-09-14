@@ -180,7 +180,7 @@ export class Game {
 
   /** Legal moves in coordinate notation (`K@h3`, `e3e4`, `h5g4f`). */
   legalUci(): string[] {
-    return generateLegalMoves(this.pos).map((m) => moveToUci(toMove(m)));
+    return generateLegalMoves(this.pos).map(encodedToUci);
   }
 
   legalMovesFrom(square: Square): Move[] {
@@ -362,6 +362,11 @@ function resolve(input: Move | string, legal: number[]): number | undefined {
 function toMove(m: number): Move {
   if (isDrop(m)) return { kind: 'drop', type: codeToPiece(dropType(m)).type, to: moveTo(m) };
   return { kind: 'move', from: moveFrom(m), to: moveTo(m), promotion: isPromotion(m) };
+}
+
+/** Coordinate notation of an encoded move (see movegen.ts). */
+export function encodedToUci(m: number): string {
+  return moveToUci(toMove(m));
 }
 
 export function moveToUci(m: Move): string {

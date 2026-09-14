@@ -37,7 +37,9 @@ needs work.
 | `packages/rules-core` | A | Engine purity lint rule; Variant enforced by `satisfies` + shared conformance suite | variant, board8, attacks, errors, testing/ | — | 2026-09-14 |
 | `packages/makruk` | A | ESLint no-restricted-globals for src; clock is pure (`now` injected) | board, movegen, fen, game, clock, perft, variant | ffish is devDependency only | 2026-09-14 |
 | `packages/sittuyin` | A | Engine purity lint rule; depends only on rules-core | board, fen, movegen, game, perft, variant | — | 2026-09-14 |
-| `packages/ai` | B | Uses `@chaturanga/makruk/core` only | search/evaluate/bots/index | Strength ladder slow; Makruk-only until ai-core (plat-005) | 2026-09-14 |
+| `packages/ai` | B | Uses `@chaturanga/makruk/core` only | search/evaluate/bots/index | Strength ladder slow; own copy of the search until it migrates to ai-core (ladder re-run needed) | 2026-09-14 |
+| `packages/ai-core` | A | Engine purity lint rule; SearchAdapter is the only game contact; tested on a toy game (Nim) | search, persona, random | — | 2026-09-14 |
+| `packages/sittuyin-ai` | B | Engine purity lint rule; uses sittuyin `/core` + ai-core | adapter, evaluate, setup, bots, index, strength ladder | Search ~55k nodes/s vs Makruk ~90–110k at equal budgets (adapter + hands overhead; browser bots are time-capped, so top level is shallower); ladder not yet verified | 2026-09-14 |
 | `packages/protocol` | A | Zod schemas only | game.ts | No `variant` field yet (plat-005) | 2026-09-14 |
 | `apps/makruk/web` | A | No rules logic outside engine; sessions share one interface | features/, pages/, stores/ | Bundle not code-split per route | 2026-09-14 |
 | `apps/makruk/worker` | A | All moves validated via engine; room rules are pure functions; dev email outbox only when DEV_EMAIL_OUTBOX=1 | room/, match/, accounts/, ratings/ | — | 2026-09-14 |

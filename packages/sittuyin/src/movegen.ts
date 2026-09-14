@@ -81,14 +81,16 @@ function pushLeaper(board: Board, from: Square, targets: readonly Square[], bits
  * neighbour, and never where the new Sit-ke would attack an enemy piece (so it never checks).
  */
 function generatePromotions(board: Board, c: ColorIndex, pawns: readonly Square[], out: number[]): void {
-  const bits = colorBits(c);
-  if (pawns.length === 0 || board.some((p) => isOwn(p, bits) && (p & TYPE_MASK) === FERZ)) return;
   const enemy = colorBits(c === 0 ? 1 : 0);
-  const attacksEnemy = (sq: Square) => FERZ_TARGETS[sq]!.some((s) => isOwn(board[s]!, enemy));
+  const attacksEnemy = (sq: Square) => {
+    for (const s of FERZ_TARGETS[sq]!) if (isOwn(board[s]!, enemy)) return true;
+    return false;
+  };
   for (const from of pawns) {
     if (pawns.length > 1 && !PROMOTION_SQUARES[c][from]) continue;
-    for (const to of [from, ...FERZ_TARGETS[from]!]) {
-      if ((to === from || board[to] === 0) && !attacksEnemy(to)) out.push(encodeMove(from, to, PROMOTION_FLAG));
+    if (!attacksEnemy(from)) out.push(encodeMove(from, from, PROMOTION_FLAG));
+    for (const to of FERZ_TARGETS[from]!) {
+      if (board[to] === 0 && !attacksEnemy(to)) out.push(encodeMove(from, to, PROMOTION_FLAG));
     }
   }
 }
@@ -97,6 +99,7 @@ function generatePromotions(board: Board, c: ColorIndex, pawns: readonly Square[
 export function generatePieceMoves(board: Board, c: ColorIndex, out: number[] = []): number[] {
   const bits = colorBits(c);
   const pawns: Square[] = [];
+  let hasFerz = false;
   for (let from = 0; from < 64; from++) {
     const p = board[from]!;
     if (!isOwn(p, bits)) continue;
@@ -118,6 +121,7 @@ export function generatePieceMoves(board: Board, c: ColorIndex, out: number[] = 
         pushLeaper(board, from, SILVER_TARGETS[c][from]!, bits, out);
         break;
       case FERZ:
+        hasFerz = true;
         pushLeaper(board, from, FERZ_TARGETS[from]!, bits, out);
         break;
       case KING:
@@ -138,7 +142,8 @@ export function generatePieceMoves(board: Board, c: ColorIndex, out: number[] = 
         break;
     }
   }
-  generatePromotions(board, c, pawns, out);
+  // A side may promote only while it has no Sit-ke on the board.
+  if (pawns.length > 0 && !hasFerz) generatePromotions(board, c, pawns, out);
   return out;
 }
 

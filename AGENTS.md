@@ -80,8 +80,12 @@ broken starting state.
   - `packages/makruk` (`@chaturanga/makruk`): pure Makruk rules (`RULES.md`). The single source of truth
     for the Makruk web app, AI and worker.
   - `packages/sittuyin` (`@chaturanga/sittuyin`): pure Sittuyin rules (`RULES.md`), not yet used by an app.
-  - `packages/ai` (`@chaturanga/makruk-ai`): Makruk computer opponents, run in a Web Worker. It is split
-    into a shared ai-core plus per-game evaluation in plat-005.
+  - `packages/ai-core` (`@chaturanga/ai-core`): game-independent alpha-beta search over a `SearchAdapter`,
+    bot personas and root-move picking.
+  - `packages/ai` (`@chaturanga/makruk-ai`): Makruk computer opponents, run in a Web Worker. It keeps its own
+    copy of the search until it migrates to ai-core with a ladder re-run.
+  - `packages/sittuyin-ai` (`@chaturanga/sittuyin-ai`): Sittuyin bots (ai-core search, evaluation, setup
+    placement policy). Product plan: `apps/sittuyin/docs/PLAN.md`.
   - `packages/protocol` (`@chaturanga/protocol`): Zod schemas for REST and WebSocket messages.
   - `apps/makruk/web`, `apps/makruk/worker`: the Makruk product (`apps/makruk/AGENTS.md`).
 - **Commands:**

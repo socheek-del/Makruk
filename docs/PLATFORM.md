@@ -113,6 +113,11 @@ Every step leaves Makruk green: `npm run verify`, `npm run e2e`, CI deploy.
    - SEO and README.
    - Native Burmese review.
 
+## Sittuyin product plan
+
+Implementation details, product defaults (setup UX, clocks after setup, promotion UX, font, bots) and the
+step-by-step work breakdown: `apps/sittuyin/docs/PLAN.md`.
+
 ## Sittuyin rules reference (from Fairy-Stockfish `sittuyin`, probed with ffish 0.7.10)
 
 - Start: `8/8/4pppp/pppp4/4PPPP/PPPP4/8/8[KFRRSSNNkfrrssnn] w - - 0 1`. Pawns are on the board; the other 16 pieces start in hand.

@@ -1,0 +1,20 @@
+{
+  "name": "@chaturanga/sittuyin-ai",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0-or-later",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --exclude src/strength.test.ts",
+    "test:strength": "vitest run src/strength.test.ts"
+  },
+  "dependencies": {
+    "@chaturanga/ai-core": "*",
+    "@chaturanga/rules-core": "*",
+    "@chaturanga/sittuyin": "*"
+  }
+}

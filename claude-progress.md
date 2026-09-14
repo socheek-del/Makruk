@@ -105,4 +105,16 @@ handoff; no agent updates it automatically.
   - Verification: verify, build, e2e:pwa, and E2E 65/65 on a re-run (the first run had one timing flake, recorded in the evidence).
   - Renamed the GitHub repo to `chaturanga` and updated the remote, description and topics, then pushed.
 - Known flake: in E2E online-004 (reload rejoins), the opponent-disconnected bar can cover the board under full-suite load. It passes alone and on re-run. Worth hardening if it recurs.
-- Next best step: `plat-004`, per-product languages. Add a `product.config` with locales, default and fonts; the locale test must cover every declared language.
+- Owner asked for a detailed Sittuyin implementation plan and to start implementing.
+- `apps/sittuyin/docs/PLAN.md` written.
+  - Product defaults: setup UX with hand trays and Auto-arrange, clocks start after setup, a Promote chip for in-place promotion, Noto Sans Myanmar, six bots, a separate Worker and D1.
+  - Seams found by an inventory of the Makruk web app and worker.
+  - A 10-step work breakdown mapped to sit-004..011 and plat-004..006.
+  - One inventory claim checked and rejected: that the index.html JSON-LD has a missing comma. It is valid.
+- `sit-004` in progress.
+  - `@chaturanga/ai-core` (Makruk search ported behind a `SearchAdapter`, 11 tests on Nim).
+  - `@chaturanga/sittuyin-ai` (adapter, evaluation, setup policy, 6 bots, 21 tests, strength ladder).
+  - `strength.yml` gained a `package` input.
+  - The Sittuyin engine got a `/core` export plus `encodedToUci`, and promotion generation no longer allocates. Its tests are unchanged and passing.
+  - Benchmark: Sittuyin search about 55k nodes/s vs Makruk 90–110k at the same budget.
+- Next best step: finish `sit-004`. Record the local ladder read, run all pairs on Actions (`-f package=packages/sittuyin-ai`), and tune bots if a pair fails. Then `plat-004`.

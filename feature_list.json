@@ -1049,7 +1049,7 @@
       "milestone": "M11",
       "title": "Sittuyin computer opponent and bot ladder",
       "user_visible_behavior": "A user plays Sittuyin against named bots of increasing strength, including sensible piece placement in the setup phase.",
-      "status": "not_started",
+      "status": "in_progress",
       "verification": [
         "ai-core search with a Sittuyin evaluation and setup-placement policy; unit tests (mate in one, hanging piece, legal setup).",
         "Bot ladder: each level beats the level below in a majority of 20 games (GitHub Actions strength workflow)."

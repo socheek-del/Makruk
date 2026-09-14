@@ -1,12 +1,21 @@
 name: Bot strength ladder
 
-# ai-002 evidence. The ladder is CPU-heavy (L6 vs L5 ≈ 15 min per game on one core), so it runs on
-# demand across parallel runners instead of on a laptop. Games are deterministic (node-limited
-# search, fixed seeds), so results match a local `npm run test:strength -w packages/ai`.
+# ai-002 (Makruk) and sit-004 (Sittuyin) evidence. The ladder is CPU-heavy (Makruk L6 vs L5 ≈ 15 min per
+# game on one core), so it runs on demand across parallel runners instead of on a laptop. Games are
+# deterministic (node-limited search, fixed seeds), so results match a local
+# `npm run test:strength -w <package>`.
 
 on:
   workflow_dispatch:
     inputs:
+      package:
+        description: 'Bot package whose ladder to run'
+        required: true
+        type: choice
+        default: packages/ai
+        options:
+          - packages/ai
+          - packages/sittuyin-ai
       pair:
         description: 'Pair n = level n+1 vs level n (1–5)'
         required: true
@@ -37,7 +46,7 @@ jobs:
       - run: npm install -g npm@11
       - run: npm ci
       - name: Play this job's shards
-        working-directory: packages/ai
+        working-directory: ${{ inputs.package }}
         env:
           STRENGTH_PAIR: ${{ inputs.pair }}
           STRENGTH_GAMES: ${{ inputs.games }}
@@ -60,7 +69,7 @@ jobs:
         if: always()
         with:
           name: strength-games-${{ matrix.job }}
-          path: packages/ai/strength-games.log
+          path: ${{ inputs.package }}/strength-games.log
 
   verdict:
     needs: play
@@ -79,7 +88,7 @@ jobs:
           pattern: strength-games-*
           path: games
       - name: Record the verdict from every shard's games
-        working-directory: packages/ai
+        working-directory: ${{ inputs.package }}
         env:
           STRENGTH_PAIR: ${{ inputs.pair }}
           STRENGTH_GAMES: ${{ inputs.games }}
@@ -88,7 +97,7 @@ jobs:
           npx vitest run src/strength.test.ts
       - name: Summary
         if: always()
-        working-directory: packages/ai
+        working-directory: ${{ inputs.package }}
         run: |
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           cat strength-results.log >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || echo 'no verdict recorded' >> "$GITHUB_STEP_SUMMARY"
@@ -103,5 +112,5 @@ jobs:
         with:
           name: strength-verdict
           path: |
-            packages/ai/strength-games.log
-            packages/ai/strength-results.log
+            ${{ inputs.package }}/strength-games.log
+            ${{ inputs.package }}/strength-results.log
