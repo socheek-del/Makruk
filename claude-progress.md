@@ -65,3 +65,7 @@ handoff; no agent updates it automatically.
     white-on-white lesson unit banners.
 - Verification run: web unit 110; full E2E 65/65 (plus focused re-runs); CI verify + deploy green through 248b653.
 - Known risk: SEO ranking depends on Search Console submission and time; README media must be re-captured when the UI changes.
+- Later the same day:
+  - Search Console domain property verified by the owner; sitemap read (Success, 12 pages); IndexNow submissions accepted; GitHub repo homepage/description/topics set; crawlable Makruk intro added to the home page.
+  - Domain made configurable (`apps/web/site.config.ts`); no domain in images, GIFs or README badges; README.th.md added.
+  - "Wat" redesign replaced the Duolingo-like look (legal risk flagged by the owner): own palette, Prompt font, pill buttons, temple-stairway lessons, recoloured icons and mascot; docs/design.md rewritten; full E2E 65/65.
