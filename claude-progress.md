@@ -153,16 +153,38 @@ handoff; no agent updates it automatically.
   - A token-contract test fails if any primitive regains a hex or rgb literal.
   - Verification: verify green (makruk-web 109 unchanged, ui 16 new), build OK with the package's own
     classes present in the built CSS, E2E 65/65, PWA 2/2.
+- `plat-005` slice b3 (game screen) done, then slice c (server kit), and `plat-005` is now `passing`.
+  - b3: `@chaturanga/game-shell/ui` holds GameScreen and its parts, generic over a Variant. It gained
+    what Sittuyin needs and Makruk never had: hand trays during the setup phase and a Promote action for
+    promotion in place. Makruk's GameScreen is a wrapper supplying the product's identity, so its pages
+    did not change. The shell's i18n keys are listed in `packages/game-shell/KEYS.md`.
+  - c: `@chaturanga/server-kit` holds the room state machine, room codes and the two Durable Objects,
+    driven by a Variant. The Makruk Worker keeps only its identity (about 480 lines of plumbing left it).
+    The protocol carries `variant`, gains `fifty-move`, and its move-string guard now accepts drops and
+    any promotion letter. Migration 0003 adds `games.variant`.
+- `sit-005` built and verified, but deliberately left `in_progress`: the owner still has to approve the
+  direction, which is what the feature's own verification asks for.
+  - Direction: "Daung" (peacock) — peacock teal and aubergine interface, Bagan lacquer board and pieces.
+  - `apps/sittuyin/web` now exists as a scaffold: product config (Burmese default, English), the token
+    set in light and dark, Noto Sans Myanmar, my/en locales, the "yun" piece set and a design showcase.
+  - `@chaturanga/board-ui` gained a generic `overlay` prop; Sittuyin draws the two promotion diagonals
+    with it.
+  - Screenshots for review: `apps/sittuyin/docs/evidence/design-{light,dark}-{390,1280}.png`.
 - Known risk or unresolved issue:
   - `package-lock.json` lost the `libc` field on the linux `sharp` / `rolldown` / `rollup` /
     `lightningcss` / `tailwindcss-oxide` entries. npm 11.19.1 — the version CI installs — rewrites the
     lock that way on any install, so this change did not choose it. `npx npm@11 ci --dry-run` resolves
     cleanly on macOS, but linux native-binding selection is only proven once CI runs. If CI fails with a
     missing native binding, look here first.
-  - Nothing is pushed. A push to `main` triggers the CI deploy of Makruk, so ask the owner first.
+  - Nothing is pushed since `8590056`. A push to `main` triggers the CI deploy of Makruk, so ask the
+    owner first. Four commits are waiting: ui, game screen, server kit, Sittuyin design.
+  - The Sittuyin app is not in CI, not deployed and has no Worker yet (sit-008/sit-009).
+- Feature order note: `plat-006` (links between the games) has priority 52, ahead of the sit-* features,
+  but `apps/sittuyin/docs/PLAN.md` — which the owner approved — puts it in step 10, after Sittuyin
+  exists. The plan wins: a "more games" link cannot be verified against a site that is not built. Do
+  plat-006 after sit-009.
 - Next best step:
-  - Push, confirm CI verify + deploy, then smoke production. The b2 change is visual, so check a gold
-    badge, a warning button and a modal in both themes.
-  - Continue plat-005: b3 (GameScreen with the board, hand trays, sounds and settings injected), then
-    c (server-kit + protocol variant/move-string generalisation).
-  - Owner decision still open for sit-005: the Sittuyin design direction.
+  - Owner: approve or redirect the Sittuyin design direction (the four screenshots above), and say
+    whether to push the four waiting commits.
+  - `sit-006`: the Sittuyin web app on top of the shared packages — setup phase with hand trays and
+    Auto-arrange, pass-and-play, vs computer, refresh restore, PWA.
