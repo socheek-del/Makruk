@@ -84,8 +84,8 @@ export function SettingsPage() {
                   data-board-theme={theme.id}
                   onClick={() => update({ boardTheme: theme.id })}
                   className={cn(
-                    'flex flex-col gap-2 rounded-2xl border-2 border-b-4 p-2 text-sm font-extrabold transition-colors active:translate-y-0.5 active:border-b-2',
-                    checked ? 'border-secondary bg-secondary-soft text-secondary' : 'border-line bg-surface hover:bg-surface-2',
+                    'flex flex-col gap-2 rounded-2xl border p-2 text-sm font-semibold transition-colors',
+                    checked ? 'border-primary bg-primary-soft text-primary ring-1 ring-primary' : 'border-line bg-surface hover:bg-surface-2',
                   )}
                 >
                   <BoardSwatch theme={theme} />
@@ -111,8 +111,8 @@ export function SettingsPage() {
                   data-piece-set={id}
                   onClick={() => update({ pieceSet: id })}
                   className={cn(
-                    'flex flex-col gap-2 rounded-2xl border-2 border-b-4 p-2 text-sm font-extrabold transition-colors active:translate-y-0.5 active:border-b-2',
-                    checked ? 'border-secondary bg-secondary-soft text-secondary' : 'border-line bg-surface hover:bg-surface-2',
+                    'flex flex-col gap-2 rounded-2xl border p-2 text-sm font-semibold transition-colors',
+                    checked ? 'border-primary bg-primary-soft text-primary ring-1 ring-primary' : 'border-line bg-surface hover:bg-surface-2',
                   )}
                 >
                   <span className="grid grid-cols-7 gap-0.5 rounded-lg p-1" style={{ background: theme.board }} aria-hidden>

@@ -9,7 +9,7 @@ it has not been reviewed.
 
 | Area | Where | What to check |
 |---|---|---|
-| App UI | `apps/web/src/locales/th.json` | Natural wording, consistent tone (friendly, Duolingo-style), no English leftovers |
+| App UI | `apps/web/src/locales/th.json` | Natural wording, consistent tone (friendly and encouraging), no English leftovers |
 | Lessons | `apps/web/src/features/learn/lessons.ts` (`th:` strings) | Correct rules explanations, beginner-friendly wording |
 | Coach tips | `th.json` → `coach.*` | Short, encouraging, accurate advice |
 | Bot personas | `th.json` → `bots.*` | Names and descriptions feel fun and respectful |

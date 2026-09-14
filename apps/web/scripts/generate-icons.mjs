@@ -14,12 +14,12 @@ function logo(size, { maskable }) {
   const scale = maskable ? 0.62 : 0.78;
   const offset = (1 - scale) * 50;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="${size}" height="${size}">
-  <rect width="100" height="100" rx="${maskable ? 0 : 22}" fill="#58cc02"/>
+  <rect width="100" height="100" rx="${maskable ? 0 : 22}" fill="#3a3f9b"/>
   <g transform="translate(${offset} ${offset}) scale(${scale})" fill="#fff8ec" stroke="#3b2a1a" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">
     <rect x="20" y="78" width="60" height="10" rx="5"/>
     <path d="M31 80 C31 62 36 52 40 45 H60 C64 52 69 62 69 80 Z"/>
     <path d="M36 45 L33 23 L43 31 L50 16 L57 31 L67 23 L64 45 Z"/>
-    <circle cx="50" cy="16" r="4" fill="#ff9600"/>
+    <circle cx="50" cy="16" r="4" fill="#e2b65a"/>
   </g>
 </svg>`;
 }

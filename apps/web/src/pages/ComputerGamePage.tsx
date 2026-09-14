@@ -76,15 +76,15 @@ function ComputerSetup() {
                 data-bot-level={bot.id}
                 onClick={() => update({ computerLevel: bot.id })}
                 className={cn(
-                  'flex items-center gap-3 rounded-2xl border-2 border-b-4 p-3 text-left transition-colors active:translate-y-0.5 active:border-b-2',
-                  checked ? 'border-secondary bg-secondary-soft' : 'border-line bg-surface hover:bg-surface-2',
+                  'flex items-center gap-3 rounded-2xl border p-3 text-left shadow-card transition-colors',
+                  checked ? 'border-primary bg-primary-soft ring-1 ring-primary' : 'border-line bg-surface hover:bg-surface-2',
                 )}
               >
                 <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-surface-2">
                   <PieceSvg piece={{ color: 'b', type: BOT_PIECE[bot.key]!, promoted: false }} className="h-11 w-11" />
                 </span>
                 <span className="flex min-w-0 flex-col">
-                  <span className={cn('font-extrabold', checked && 'text-secondary')}>{t(`bots.${bot.key}.name`)}</span>
+                  <span className={cn('font-semibold', checked && 'text-primary')}>{t(`bots.${bot.key}.name`)}</span>
                   <span className="text-xs font-bold text-gold">{t('computer.level', { level: bot.id })}</span>
                   <span className="text-sm text-muted">{t(`bots.${bot.key}.desc`)}</span>
                 </span>

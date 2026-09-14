@@ -5,18 +5,18 @@ export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger' | 'wa
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: 'bg-primary text-on-accent border-primary-shadow hover:brightness-105',
-  secondary: 'bg-secondary text-on-accent border-secondary-shadow hover:brightness-105',
-  outline: 'bg-surface text-secondary border-line hover:bg-surface-2',
-  danger: 'bg-danger text-white border-danger-shadow hover:brightness-105',
-  warning: 'bg-warning text-[#4b3a00] border-warning-shadow hover:brightness-105',
-  ghost: 'bg-transparent text-secondary border-transparent hover:bg-surface-2',
+  primary: 'bg-primary text-on-accent border-transparent shadow-card hover:brightness-110',
+  secondary: 'bg-secondary text-on-accent border-transparent shadow-card hover:brightness-110',
+  outline: 'bg-surface text-primary border-line hover:bg-surface-2',
+  danger: 'bg-danger text-on-accent border-transparent shadow-card hover:brightness-110',
+  warning: 'bg-warning text-[#2b2006] border-transparent shadow-card hover:brightness-105',
+  ghost: 'bg-transparent text-primary border-transparent hover:bg-surface-2',
 };
 
 const SIZES: Record<ButtonSize, string> = {
   sm: 'h-10 px-4 text-sm',
   md: 'h-12 px-5 text-base',
-  lg: 'h-14 px-6 text-lg',
+  lg: 'h-14 px-7 text-lg',
   icon: 'h-11 w-11 p-0',
 };
 
@@ -27,12 +27,12 @@ export interface ButtonStyleOptions {
   className?: string;
 }
 
-/** Duolingo-style "pressable" button: chunky bottom border that collapses when pressed. */
+/** Pill button (docs/design.md): soft shadow, lifts slightly on hover and settles when pressed. */
 export function buttonClasses({ variant = 'primary', size = 'md', block, className }: ButtonStyleOptions = {}) {
   return cn(
-    'inline-flex select-none items-center justify-center gap-2 rounded-2xl border-2 border-b-4 font-extrabold tracking-wide',
-    'transition-[transform,filter,background-color] duration-75 active:translate-y-0.5 active:border-b-2',
-    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-secondary/40',
+    'inline-flex select-none items-center justify-center gap-2 rounded-full border font-semibold',
+    'transition-[transform,filter,background-color,box-shadow] duration-150 hover:-translate-y-px active:translate-y-0 active:scale-[0.98]',
+    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30',
     'disabled:pointer-events-none disabled:opacity-50',
     VARIANTS[variant],
     SIZES[size],

@@ -1,5 +1,5 @@
 import { Game, parseSquare, squareName } from '@makruk/engine';
-import { Star, X } from 'lucide-react';
+import { CheckCircle2, Star, X, XCircle } from 'lucide-react';
 import { type ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../../components/ui/Button';
@@ -102,7 +102,7 @@ function Prompt({ text, pose }: { text: L10n; pose: MascotPose }) {
       <Mascot pose={pose} className="h-20 w-20 shrink-0 sm:h-24 sm:w-24" />
       <h1
         data-testid="lesson-prompt"
-        className="relative flex-1 rounded-2xl border-2 border-line bg-surface px-4 py-3 text-xl font-extrabold leading-snug sm:text-2xl"
+        className="relative flex-1 rounded-[1.25rem] border border-line bg-surface px-4 py-3 text-xl font-semibold leading-snug shadow-card sm:text-2xl"
       >
         {tr(text)}
       </h1>
@@ -142,10 +142,13 @@ function Footer({
   const tr = useL10n();
   if (feedback === 'correct') {
     return (
-      <Card tone="primary" role="status" data-testid="feedback" data-result="correct" className="flex flex-col gap-3">
-        <p className="text-xl font-extrabold text-primary-shadow dark:text-primary">{t('learn.correct')}</p>
-        {success && <p className="font-bold">{tr(success)}</p>}
-        <Button block size="lg" onClick={onContinue}>
+      <Card tone="secondary" role="status" data-testid="feedback" data-result="correct" className="flex flex-col gap-3">
+        <p className="flex items-center gap-2 text-xl font-bold text-secondary-shadow dark:text-secondary">
+          <CheckCircle2 aria-hidden className="h-6 w-6" />
+          {t('learn.correct')}
+        </p>
+        {success && <p className="font-medium">{tr(success)}</p>}
+        <Button block size="lg" variant="secondary" onClick={onContinue}>
           {t('learn.continue')}
         </Button>
       </Card>
@@ -154,8 +157,11 @@ function Footer({
   if (feedback === 'wrong') {
     return (
       <Card tone="danger" role="status" data-testid="feedback" data-result="wrong" className="flex flex-col gap-3">
-        <p className="text-xl font-extrabold text-danger">{t('learn.wrong')}</p>
-        {hint && <p className="font-bold">{tr(hint)}</p>}
+        <p className="flex items-center gap-2 text-xl font-bold text-danger">
+          <XCircle aria-hidden className="h-6 w-6" />
+          {t('learn.wrong')}
+        </p>
+        {hint && <p className="font-medium">{tr(hint)}</p>}
         <Button block size="lg" variant="danger" onClick={onRetry}>
           {t('learn.tryAgain')}
         </Button>
@@ -286,8 +292,8 @@ function QuizStep({ step, feedback, onAnswer, onContinue, onRetry }: StepProps<E
             disabled={feedback !== null}
             onClick={() => setChoice(i)}
             className={cn(
-              'rounded-2xl border-2 border-b-4 px-4 py-3 text-left text-lg font-bold transition-colors active:translate-y-0.5 active:border-b-2',
-              choice === i ? 'border-secondary bg-secondary-soft text-secondary' : 'border-line bg-surface hover:bg-surface-2',
+              'rounded-2xl border px-4 py-3 text-left text-lg font-medium shadow-card transition-colors',
+              choice === i ? 'border-primary bg-primary-soft text-primary ring-1 ring-primary' : 'border-line bg-surface hover:bg-surface-2',
             )}
           >
             {tr(c)}

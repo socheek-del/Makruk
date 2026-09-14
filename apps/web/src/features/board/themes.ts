@@ -10,15 +10,16 @@ export interface BoardTheme {
   hint: string;
 }
 
+/** Highlights use the "Wat" palette: temple gold (last move), indigo or jade (selection), lacquer red (check). */
 export const BOARD_THEMES: readonly BoardTheme[] = [
   {
     id: 'teak',
     board: '#e6b877',
     line: '#8a5a2b',
     coordinate: '#6b4119',
-    lastMove: 'rgba(255, 214, 10, 0.45)',
-    selected: 'rgba(28, 176, 246, 0.35)',
-    check: 'rgba(255, 75, 75, 0.75)',
+    lastMove: 'rgba(224, 169, 59, 0.5)',
+    selected: 'rgba(58, 63, 155, 0.3)',
+    check: 'rgba(182, 58, 43, 0.7)',
     hint: 'rgba(59, 42, 26, 0.35)',
   },
   {
@@ -26,9 +27,9 @@ export const BOARD_THEMES: readonly BoardTheme[] = [
     board: '#a8d8b9',
     line: '#2f6b4f',
     coordinate: '#245a41',
-    lastMove: 'rgba(255, 214, 10, 0.5)',
-    selected: 'rgba(28, 176, 246, 0.35)',
-    check: 'rgba(255, 75, 75, 0.75)',
+    lastMove: 'rgba(224, 169, 59, 0.55)',
+    selected: 'rgba(58, 63, 155, 0.3)',
+    check: 'rgba(182, 58, 43, 0.7)',
     hint: 'rgba(20, 60, 40, 0.35)',
   },
   {
@@ -37,28 +38,28 @@ export const BOARD_THEMES: readonly BoardTheme[] = [
     line: '#d4a24c',
     coordinate: '#e8c27a',
     lastMove: 'rgba(212, 162, 76, 0.45)',
-    selected: 'rgba(73, 192, 248, 0.4)',
-    check: 'rgba(255, 75, 75, 0.8)',
+    selected: 'rgba(158, 164, 244, 0.4)',
+    check: 'rgba(240, 138, 122, 0.8)',
     hint: 'rgba(232, 194, 122, 0.45)',
   },
   {
     id: 'night',
     board: '#1f2d4f',
-    line: '#49c0f8',
-    coordinate: '#8fd8fb',
-    lastMove: 'rgba(147, 211, 51, 0.4)',
-    selected: 'rgba(255, 150, 0, 0.4)',
-    check: 'rgba(255, 75, 75, 0.8)',
-    hint: 'rgba(143, 216, 251, 0.45)',
+    line: '#7c83e6',
+    coordinate: '#b9bdf7',
+    lastMove: 'rgba(226, 182, 90, 0.4)',
+    selected: 'rgba(79, 194, 159, 0.4)',
+    check: 'rgba(240, 138, 122, 0.8)',
+    hint: 'rgba(185, 189, 247, 0.45)',
   },
   {
     id: 'minimal',
     board: '#f3efe6',
     line: '#b9b0a0',
     coordinate: '#8a8170',
-    lastMove: 'rgba(255, 200, 0, 0.4)',
-    selected: 'rgba(28, 176, 246, 0.3)',
-    check: 'rgba(255, 75, 75, 0.7)',
+    lastMove: 'rgba(224, 169, 59, 0.4)',
+    selected: 'rgba(58, 63, 155, 0.25)',
+    check: 'rgba(182, 58, 43, 0.65)',
     hint: 'rgba(60, 60, 60, 0.28)',
   },
   {

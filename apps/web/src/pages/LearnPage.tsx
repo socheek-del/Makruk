@@ -1,20 +1,26 @@
 import type { PieceType } from '@makruk/engine';
-import { Check, Crown, Hash, type LucideIcon, Star, Swords, Zap } from 'lucide-react';
+import { Check, Crown, Hash, type LucideIcon, Sparkles, Star, Swords } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { PieceSvg } from '../features/board/PieceSvg';
-import { ALL_LESSONS, UNITS } from '../features/learn/lessons';
+import { UNITS } from '../features/learn/lessons';
 import { type Lesson, useL10n } from '../features/learn/types';
 import { cn } from '../lib/cn';
 import { useProgress } from '../stores/progress';
+import { ALL_LESSONS } from '../features/learn/lessons';
 
 /** Every lesson is open; `current` just marks the first one not yet completed. */
 type Status = 'completed' | 'current' | 'unlocked';
 
-/** Horizontal offsets (rem) that give the path its Duolingo-style zig-zag. */
-const ZIGZAG = [0, 3, 4.5, 3, 0, -3, -4.5, -3];
+/** Unit banners cycle indigo, jade and temple gold (dark ink on gold for contrast). */
+const UNIT_STYLES = ['bg-primary text-on-accent', 'bg-secondary text-on-accent', 'bg-gold text-[#1f1d36]'];
 
-const UNIT_COLORS = ['bg-primary border-primary-shadow', 'bg-secondary border-secondary-shadow', 'bg-gold border-gold-shadow'];
+/** Diamond "temple step" per lesson state. */
+const STEP_STYLES: Record<Status, string> = {
+  completed: 'border-gold bg-gold text-[#1f1d36]',
+  current: 'border-primary bg-primary text-on-accent ring-4 ring-gold/50',
+  unlocked: 'border-line bg-surface text-primary',
+};
 
 const ICONS: Partial<Record<Lesson['icon'], LucideIcon>> = {
   board: Hash,
@@ -26,14 +32,15 @@ const ICONS: Partial<Record<Lesson['icon'], LucideIcon>> = {
 };
 
 function LessonIcon({ lesson, status }: { lesson: Lesson; status: Status }) {
-  if (status === 'completed') return <Check aria-hidden className="h-9 w-9" strokeWidth={3} />;
+  if (status === 'completed') return <Check aria-hidden className="h-7 w-7" strokeWidth={3} />;
   if (lesson.icon.length === 1) {
-    return <PieceSvg piece={{ color: 'w', type: lesson.icon as PieceType, promoted: false }} className="h-11 w-11" />;
+    return <PieceSvg piece={{ color: 'w', type: lesson.icon as PieceType, promoted: false }} className="h-9 w-9" />;
   }
   const Icon = ICONS[lesson.icon] ?? Star;
-  return <Icon aria-hidden className="h-8 w-8" strokeWidth={2.5} />;
+  return <Icon aria-hidden className="h-6 w-6" strokeWidth={2.25} />;
 }
 
+/** learn-005: lessons as a temple stairway — diamond steps joined by a dotted gold line. */
 export function LearnPage() {
   const { t } = useTranslation();
   const tr = useL10n();
@@ -46,75 +53,59 @@ export function LearnPage() {
     return lesson === firstOpen ? 'current' : 'unlocked';
   };
 
-  let index = 0;
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-8">
       <header className="flex items-center justify-between gap-4">
-        <h1 className="text-3xl font-extrabold">{t('learn.title')}</h1>
-        <div className="flex items-center gap-4 text-lg font-extrabold">
-          <span className="flex items-center gap-1 text-secondary" title={t('learn.xpLabel')}>
-            <Zap aria-hidden className="h-6 w-6 fill-secondary" />
-            <span data-testid="xp">{xp} XP</span>
-          </span>
-        </div>
+        <h1 className="text-3xl font-bold">{t('learn.title')}</h1>
+        <span className="flex items-center gap-1.5 rounded-full bg-warning-soft px-3 py-1.5 text-base font-semibold text-gold" title={t('learn.xpLabel')}>
+          <Sparkles aria-hidden className="h-5 w-5" />
+          <span data-testid="xp">{xp} XP</span>
+        </span>
       </header>
 
       {UNITS.map((unit, u) => (
-        <section key={unit.id} className="flex flex-col items-center gap-6">
-          {/* A plain div: Card's surface background would override the unit colour and hide the white text. */}
-          <div data-testid="unit-banner" className={cn('w-full rounded-2xl border-2 border-b-4 p-4 text-white', UNIT_COLORS[u % UNIT_COLORS.length])}>
-            <p className="text-sm font-extrabold uppercase opacity-80">{t('learn.unit', { number: u + 1 })}</p>
-            <h2 className="text-xl font-extrabold">{tr(unit.title)}</h2>
+        <section key={unit.id} className="flex flex-col gap-4">
+          <div
+            data-testid="unit-banner"
+            className={cn('motif-diamonds relative w-full overflow-hidden rounded-[1.25rem] p-5 shadow-card', UNIT_STYLES[u % UNIT_STYLES.length])}
+          >
+            <p className="text-sm font-medium opacity-85">{t('learn.unit', { number: u + 1 })}</p>
+            <h2 className="text-xl font-bold">{tr(unit.title)}</h2>
           </div>
-          <ol className="flex w-full flex-col items-center gap-5">
+          <ol className="relative flex flex-col gap-2 before:absolute before:bottom-8 before:left-10 before:top-8 before:border-l-2 before:border-dotted before:border-gold/60">
             {unit.lessons.map((lesson) => {
               const state = status(lesson);
               const stars = lessons[lesson.id]?.stars ?? 0;
-              const offset = ZIGZAG[index++ % ZIGZAG.length]!;
-              const node = (
-                <span className="flex flex-col items-center gap-1.5">
-                  <span className="relative">
-                    {state === 'current' && (
-                      <span className="absolute -top-9 left-1/2 -translate-x-1/2 animate-bounce whitespace-nowrap rounded-xl border-2 border-line bg-surface px-3 py-1 text-sm font-extrabold text-primary">
-                        {t('learn.start')}
-                      </span>
-                    )}
-                    <span
-                      className={cn(
-                        'grid h-20 w-20 place-items-center rounded-full border-b-[6px] text-white transition-transform',
-                        state === 'completed' && 'border-gold-shadow bg-gold',
-                        state === 'current' && 'border-primary-shadow bg-primary ring-8 ring-primary/20',
-                        state === 'unlocked' && 'border-secondary-shadow bg-secondary',
-                      )}
-                    >
-                      <LessonIcon lesson={lesson} status={state} />
-                    </span>
-                  </span>
-                  <span className="max-w-40 text-center text-sm font-extrabold">
-                    {tr(lesson.title)}
-                  </span>
-                  {stars > 0 && (
-                    <span className="flex" aria-label={t('learn.stars', { count: stars })}>
-                      {[1, 2, 3].map((i) => (
-                        <Star key={i} aria-hidden className={cn('h-4 w-4', i <= stars ? 'fill-gold text-gold' : 'text-line')} />
-                      ))}
-                    </span>
-                  )}
-                </span>
-              );
               return (
-                <li
-                  key={lesson.id}
-                  data-lesson={lesson.id}
-                  data-status={state === 'current' ? 'unlocked' : state}
-                  style={{ transform: `translateX(${offset}rem)` }}
-                >
+                <li key={lesson.id} data-lesson={lesson.id} data-status={state === 'current' ? 'unlocked' : state} className="relative">
                   <Link
                     to={lesson.route ?? `/learn/${lesson.id}`}
                     aria-label={tr(lesson.title)}
-                    className="block rounded-3xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-secondary/40 active:translate-y-1"
+                    className="group flex items-center gap-5 rounded-[1.25rem] p-3 transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
                   >
-                    {node}
+                    <span
+                      className={cn(
+                        'grid h-14 w-14 shrink-0 rotate-45 place-items-center rounded-2xl border-2 shadow-card transition-transform duration-150 group-hover:scale-105',
+                        STEP_STYLES[state],
+                      )}
+                    >
+                      <span className="-rotate-45">
+                        <LessonIcon lesson={lesson} status={state} />
+                      </span>
+                    </span>
+                    <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <span className="font-semibold">{tr(lesson.title)}</span>
+                      {stars > 0 && (
+                        <span className="flex" aria-label={t('learn.stars', { count: stars })}>
+                          {[1, 2, 3].map((i) => (
+                            <Star key={i} aria-hidden className={cn('h-4 w-4', i <= stars ? 'fill-gold text-gold' : 'text-line')} />
+                          ))}
+                        </span>
+                      )}
+                    </span>
+                    {state === 'current' && (
+                      <span className="shrink-0 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-on-accent">{t('learn.start')}</span>
+                    )}
                   </Link>
                 </li>
               );

@@ -20,9 +20,10 @@ export function AppShell() {
       <SeoController />
       <nav
         aria-label={t('nav.label')}
-        className="fixed inset-x-0 bottom-0 z-30 flex border-t-2 border-line bg-canvas px-2 pb-[env(safe-area-inset-bottom)] md:sticky md:top-0 md:h-dvh md:w-64 md:flex-col md:gap-2 md:border-t-0 md:border-r-2 md:px-4 md:py-6"
+        className="fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-surface/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur md:sticky md:top-0 md:h-dvh md:w-64 md:flex-col md:gap-1 md:border-t-0 md:border-r md:bg-canvas md:px-4 md:py-6"
       >
-        <Link to="/" className="mb-4 hidden px-3 text-3xl font-extrabold text-primary md:block">
+        <Link to="/" className="mb-5 hidden items-center gap-2.5 px-3 text-2xl font-bold text-primary md:flex">
+          <span aria-hidden className="h-3.5 w-3.5 rotate-45 rounded-[3px] bg-gold" />
           {t('app.name')}
         </Link>
         {NAV.map(({ to, key, icon: Icon, end }) => (
@@ -32,12 +33,12 @@ export function AppShell() {
             end={end}
             className={({ isActive }) =>
               cn(
-                'flex flex-1 flex-col items-center gap-1 rounded-2xl py-2 text-xs font-extrabold uppercase md:flex-none md:flex-row md:gap-4 md:border-2 md:px-3 md:py-3 md:text-sm',
-                isActive ? 'text-secondary md:border-secondary md:bg-secondary-soft' : 'text-muted md:border-transparent hover:md:bg-surface-2',
+                'flex flex-1 flex-col items-center gap-1 rounded-2xl py-2 text-xs font-semibold transition-colors md:flex-none md:flex-row md:gap-3 md:px-3 md:py-2.5 md:text-sm',
+                isActive ? 'text-primary md:bg-primary-soft' : 'text-muted hover:text-ink md:hover:bg-surface-2',
               )
             }
           >
-            <Icon aria-hidden className="h-7 w-7" strokeWidth={2.5} />
+            <Icon aria-hidden className="h-6 w-6" strokeWidth={2.25} />
             <span>{t(key)}</span>
           </NavLink>
         ))}

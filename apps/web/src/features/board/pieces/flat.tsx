@@ -2,18 +2,18 @@ import type { Piece } from '@makruk/engine';
 import { SHAPES } from './classic';
 
 /**
- * theme-002: "modern flat" set — the same Makruk silhouettes as solid Duolingo-style shapes with a
- * soft bottom shadow instead of outlines and carving details.
+ * theme-002: "modern flat" set — the same Makruk silhouettes as solid shapes with a soft bottom shadow
+ * instead of outlines and carving details. Marks use the app's indigo and temple gold.
  */
 const FLAT = {
-  w: { fill: '#ffffff', shadow: '#b8b8b8', mark: '#1cb0f6' },
-  b: { fill: '#3c3c3c', shadow: '#141414', mark: '#ffc800' },
+  w: { fill: '#fffdf9', shadow: '#bdb4a4', mark: '#3a3f9b' },
+  b: { fill: '#2a2838', shadow: '#12111c', mark: '#e2b65a' },
 } as const;
 
 export function FlatPiece({ piece, className }: { piece: Piece; className?: string }) {
   const colors = FLAT[piece.color];
   const shape = SHAPES[piece.promoted ? 'p' : piece.type];
-  const outline = piece.color === 'w' ? '#3c3c3c' : '#141414';
+  const outline = piece.color === 'w' ? '#2a2838' : '#12111c';
   return (
     <svg viewBox="0 0 100 100" className={className} aria-hidden focusable="false" data-set="flat" data-type={piece.promoted ? 'p~' : piece.type}>
       <g transform="translate(0 4)" fill={colors.shadow}>

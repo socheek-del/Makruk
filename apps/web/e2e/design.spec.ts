@@ -18,8 +18,9 @@ for (const width of [390, 1280]) {
 
     const canvas = (theme: string) =>
       page.getByTestId(`showcase-${theme}`).evaluate((el) => getComputedStyle(el).backgroundColor);
-    expect(await canvas('light')).toBe('rgb(255, 255, 255)');
-    expect(await canvas('dark')).toBe('rgb(19, 31, 36)');
+    // "Wat" palette: temple paper and night indigo (docs/design.md).
+    expect(await canvas('light')).toBe('rgb(248, 244, 236)');
+    expect(await canvas('dark')).toBe('rgb(18, 18, 38)');
 
     const fitsWidth = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
     expect(fitsWidth).toBe(true);

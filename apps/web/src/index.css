@@ -2,66 +2,76 @@
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
-/* Design tokens. Light is the default; [data-theme] may be set on <html> or any subtree. */
+/*
+ * "Wat" design tokens (docs/design.md): temple paper, indigo, jade, lacquer red, saffron and temple gold.
+ * Light is the default; [data-theme] may be set on <html> or any subtree. `-shadow` = stronger shade.
+ */
 :root,
 [data-theme='light'] {
-  --canvas: #ffffff;
-  --surface: #ffffff;
-  --surface-2: #f7f7f7;
-  --line: #e5e5e5;
-  --ink: #3c3c3c;
-  --muted: #777777;
-  --subtle: #afafaf;
+  --canvas: #f8f4ec;
+  --surface: #fffdf9;
+  --surface-2: #f1eadf;
+  --line: #e3d9c8;
+  --ink: #1f1d36;
+  --muted: #625e78;
+  --subtle: #a49fb4;
 
-  --primary: #58cc02;
-  --primary-shadow: #58a700;
-  --primary-soft: #d7ffb8;
-  --secondary: #1cb0f6;
-  --secondary-shadow: #1899d6;
-  --secondary-soft: #ddf4ff;
-  --danger: #ff4b4b;
-  --danger-shadow: #ea2b2b;
-  --danger-soft: #ffdfe0;
-  --warning: #ffc800;
-  --warning-shadow: #e5a400;
-  --warning-soft: #fff5d3;
-  --gold: #ff9600;
-  --gold-shadow: #e08500;
-  --on-accent: #ffffff;
+  --primary: #3a3f9b;
+  --primary-shadow: #2b2f78;
+  --primary-soft: #e6e7f7;
+  --secondary: #17866b;
+  --secondary-shadow: #11664f;
+  --secondary-soft: #dcf0e9;
+  --danger: #b63a2b;
+  --danger-shadow: #8e2c20;
+  --danger-soft: #f6e0db;
+  --warning: #d99a1e;
+  --warning-shadow: #a87414;
+  --warning-soft: #f8eccf;
+  --gold: #b7862a;
+  --gold-shadow: #8c6620;
+  --on-accent: #fffdf9;
+
+  --card-shadow: 0 1px 2px rgb(31 29 54 / 0.06), 0 8px 24px -12px rgb(31 29 54 / 0.18);
 
   color-scheme: light;
 }
 
 [data-theme='dark'] {
-  --canvas: #131f24;
-  --surface: #131f24;
-  --surface-2: #202f36;
-  --line: #37464f;
-  --ink: #f1f7fb;
-  --muted: #8b9ca5;
-  --subtle: #52656d;
+  --canvas: #121226;
+  --surface: #1a1a33;
+  --surface-2: #24254a;
+  --line: #34365e;
+  --ink: #f2eee4;
+  --muted: #aba8c4;
+  --subtle: #6e6b8e;
 
-  --primary: #93d333;
-  --primary-shadow: #79b933;
-  --primary-soft: #26361a;
-  --secondary: #49c0f8;
-  --secondary-shadow: #1899d6;
-  --secondary-soft: #173645;
-  --danger: #ff4b4b;
-  --danger-shadow: #d43333;
-  --danger-soft: #3d1f22;
-  --warning: #ffc800;
-  --warning-shadow: #cc9f00;
-  --warning-soft: #3a3217;
-  --gold: #ff9600;
-  --gold-shadow: #cc7800;
-  --on-accent: #131f24;
+  --primary: #9ea4f4;
+  --primary-shadow: #7c83e6;
+  --primary-soft: #2a2c5a;
+  --secondary: #4fc29f;
+  --secondary-shadow: #33a281;
+  --secondary-soft: #173a32;
+  --danger: #f08a7a;
+  --danger-shadow: #d26a5a;
+  --danger-soft: #3f2025;
+  --warning: #f0c055;
+  --warning-shadow: #d4a23a;
+  --warning-soft: #3a3019;
+  --gold: #e2b65a;
+  --gold-shadow: #c4973f;
+  --on-accent: #121226;
+
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 28px -14px rgb(0 0 0 / 0.6);
 
   color-scheme: dark;
 }
 
 @theme inline {
-  --font-sans: 'Nunito Variable', 'Mitr', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Prompt', ui-sans-serif, system-ui, sans-serif;
+  /* Confident headings without a chunky look: extrabold renders at 700. */
+  --font-weight-extrabold: 700;
+  --shadow-card: var(--card-shadow);
 
   --color-canvas: var(--canvas);
   --color-surface: var(--surface);
@@ -96,6 +106,20 @@ body {
 body {
   font-family: var(--font-sans);
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Gold temple-lattice ornament for banners and hero areas; the element needs `relative overflow-hidden`. */
+.motif-diamonds::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 55%;
+  pointer-events: none;
+  background:
+    linear-gradient(45deg, transparent 44%, rgb(255 255 255 / 0.2) 44% 56%, transparent 56%),
+    linear-gradient(-45deg, transparent 44%, rgb(255 255 255 / 0.2) 44% 56%, transparent 56%);
+  background-size: 22px 22px;
+  mask-image: linear-gradient(to left, black 10%, transparent);
 }
 
 /* polish-003: the moved piece slides in from its origin square. */

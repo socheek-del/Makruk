@@ -94,7 +94,7 @@ function WaitingRoom({ code }: { code: string }) {
       <p className="text-muted">{t('online.shareHint')}</p>
       <div
         data-testid="room-code"
-        className="rounded-2xl border-2 border-b-4 border-line bg-surface px-6 py-3 font-mono text-4xl font-extrabold tracking-[0.3em]"
+        className="rounded-[1.25rem] border border-line bg-surface px-6 py-3 font-mono text-4xl font-bold tracking-[0.3em] shadow-card"
       >
         {code}
       </div>

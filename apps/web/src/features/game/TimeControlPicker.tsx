@@ -16,8 +16,8 @@ function Option({ id, label, checked, onSelect }: { id: string; label: string; c
       data-time-control={id}
       onClick={onSelect}
       className={cn(
-        'min-h-11 rounded-xl border-2 border-b-4 px-2 font-extrabold tabular-nums transition-colors active:translate-y-0.5 active:border-b-2',
-        checked ? 'border-secondary bg-secondary-soft text-secondary' : 'border-line bg-surface text-ink hover:bg-surface-2',
+        'min-h-11 rounded-full border px-2 font-semibold tabular-nums transition-colors',
+        checked ? 'border-primary bg-primary-soft text-primary ring-1 ring-primary' : 'border-line bg-surface text-ink hover:bg-surface-2',
       )}
     >
       {label}
@@ -62,7 +62,7 @@ export function TimeControlPicker({ value, onChange }: TimeControlPickerProps) {
               max={CUSTOM_LIMITS.maxMinutes}
               value={value.minutes}
               onChange={(e) => onChange({ ...value, minutes: Number(e.target.value) })}
-              className="h-11 rounded-xl border-2 border-line bg-surface px-3 text-base text-ink"
+              className="h-11 rounded-xl border border-line bg-surface px-3 text-base text-ink"
             />
           </label>
           <label className="flex flex-col gap-1 text-sm font-bold">
@@ -74,7 +74,7 @@ export function TimeControlPicker({ value, onChange }: TimeControlPickerProps) {
               max={CUSTOM_LIMITS.maxIncrement}
               value={value.increment}
               onChange={(e) => onChange({ ...value, increment: Number(e.target.value) })}
-              className="h-11 rounded-xl border-2 border-line bg-surface px-3 text-base text-ink"
+              className="h-11 rounded-xl border border-line bg-surface px-3 text-base text-ink"
             />
           </label>
         </div>

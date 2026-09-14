@@ -19,14 +19,9 @@ export function ProgressBar({ value, label, tone = 'primary', className }: Progr
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={pct}
-      className={cn('h-4 w-full overflow-hidden rounded-full bg-line', className)}
+      className={cn('h-2.5 w-full overflow-hidden rounded-full bg-surface-2', className)}
     >
-      <div
-        className={cn('relative h-full rounded-full transition-[width] duration-500 ease-out', FILL[tone])}
-        style={{ width: `${pct}%` }}
-      >
-        <span className="absolute inset-x-2 top-1 h-1 rounded-full bg-white/30" />
-      </div>
+      <div className={cn('h-full rounded-full transition-[width] duration-500 ease-out', FILL[tone])} style={{ width: `${pct}%` }} />
     </div>
   );
 }

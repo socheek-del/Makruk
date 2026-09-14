@@ -1,7 +1,9 @@
 # AGENTS.md
 
 Makruk (Thai chess) — web PWA with single player, pass-and-play, online play,
-Duolingo-style tutorials and themes. Full product plan: `docs/PLAN.md`.
+game-like tutorials and themes in its own "Wat" (Thai temple) design system (`docs/design.md`). Do not copy
+Duolingo's look (fonts, colours, chunky buttons, zig-zag path) — owner decision, legal risk. Full product
+plan: `docs/PLAN.md`.
 
 This repository is designed for long-running coding-agent work. The goal is not
 to maximize raw code output. The goal is to leave the repo in a state where the

@@ -8,11 +8,11 @@ import { Card } from '../components/ui/Card';
 
 type ServerStatus = 'checking' | 'ok' | 'down';
 
-const MODES: ReadonlyArray<{ key: string; icon: LucideIcon; color: string; to?: string }> = [
-  { key: 'single', icon: Bot, color: 'bg-secondary', to: '/play/computer' },
-  { key: 'local', icon: Users, color: 'bg-primary', to: '/play/local' },
-  { key: 'online', icon: Globe, color: 'bg-gold', to: '/play/online' },
-  { key: 'learn', icon: GraduationCap, color: 'bg-danger', to: '/learn' },
+const MODES: ReadonlyArray<{ key: string; icon: LucideIcon; tile: string; to?: string }> = [
+  { key: 'single', icon: Bot, tile: 'bg-primary-soft text-primary', to: '/play/computer' },
+  { key: 'local', icon: Users, tile: 'bg-secondary-soft text-secondary', to: '/play/local' },
+  { key: 'online', icon: Globe, tile: 'bg-warning-soft text-gold', to: '/play/online' },
+  { key: 'learn', icon: GraduationCap, tile: 'bg-danger-soft text-danger', to: '/learn' },
 ];
 
 export function HomePage() {
@@ -28,24 +28,24 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <header className="text-center md:text-left">
-        <h1 className="text-4xl font-extrabold text-primary md:hidden">{t('app.name')}</h1>
-        <p className="mt-2 text-lg text-muted">{t('app.tagline')}</p>
+      <header className="motif-diamonds relative overflow-hidden rounded-[1.5rem] bg-primary px-6 py-7 text-on-accent shadow-card">
+        <h1 className="text-4xl font-bold">{t('app.name')}</h1>
+        <p className="mt-2 max-w-md text-lg opacity-90">{t('app.tagline')}</p>
       </header>
 
       <section aria-labelledby="modes-heading" className="flex flex-col gap-3">
-        <h2 id="modes-heading" className="text-xl font-extrabold">
+        <h2 id="modes-heading" className="text-xl font-bold">
           {t('home.choose')}
         </h2>
         <ul className="grid gap-3 sm:grid-cols-2">
-          {MODES.map(({ key, icon: Icon, color, to }) => {
+          {MODES.map(({ key, icon: Icon, tile, to }) => {
             const content = (
               <>
-                <span className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl text-white ${color}`}>
-                  <Icon aria-hidden className="h-8 w-8" strokeWidth={2.5} />
+                <span className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl ${tile}`}>
+                  <Icon aria-hidden className="h-7 w-7" strokeWidth={2.25} />
                 </span>
                 <span className="flex min-w-0 flex-col gap-1">
-                  <span className="text-lg font-extrabold">{t(`modes.${key}`)}</span>
+                  <span className="text-lg font-semibold">{t(`modes.${key}`)}</span>
                   <span className="text-sm text-muted">{t(`modes.${key}Desc`)}</span>
                 </span>
               </>
@@ -53,7 +53,7 @@ export function HomePage() {
             return (
               <li key={key}>
                 {to ? (
-                  <Link to={to} className="block rounded-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-secondary/40">
+                  <Link to={to} className="block rounded-[1.25rem] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30">
                     <Card interactive className="flex items-center gap-4">
                       {content}
                     </Card>
@@ -72,7 +72,7 @@ export function HomePage() {
 
       <footer className="text-center text-sm text-muted">
         {t('status.label')}:{' '}
-        <span className={status === 'ok' ? 'text-primary' : status === 'down' ? 'text-danger' : ''}>
+        <span className={status === 'ok' ? 'text-secondary' : status === 'down' ? 'text-danger' : ''}>
           {t(`status.${status}`)}
         </span>
       </footer>

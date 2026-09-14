@@ -13,7 +13,7 @@ Status: draft for review · Date: 2026-09-13
 | Language | **Thai default**, English as option (i18n from day one, not bolted on) |
 | Deploy | `th-chess.beanroti.com` — Worker custom domain on existing `beanroti.com` zone |
 | Source control | GitHub `socheek-del/Makruk` via SSH alias → `git@github-socheek-del:socheek-del/Makruk.git` |
-| Design direction | Duolingo-style playful, gamified learning UI + Chess.com-style clean game/board UI; all illustrations & piece art made in-house |
+| Design direction | Own "Wat" (Thai temple) identity for a playful, game-like learning UI + clean, focused game/board UI; all illustrations & piece art made in-house. (Originally described as Duolingo-style; changed 2026-09-14 to avoid copying another product's trade dress — see `docs/design.md`.) |
 | Sign-in | Username + password, email confirmation, email password reset (optional; guest by default). No Google sign-in. |
 | Chat | None — no free text, no chat of any kind in online games |
 | Time controls | Quick match: 3+2, 5+0, 10+0 · Custom games: common presets (see §3) |
@@ -77,7 +77,7 @@ Status: draft for review · Date: 2026-09-13
 - Makruk vs Western chess cheat-sheet for chess players
 
 ### Design language
-- **Learning & app shell = Duolingo-style:** bright friendly palette, chunky rounded buttons with bottom "press" shadow, bouncy micro-animations, a Makruk mascot character (in-house), lesson path map with unlockable nodes, XP, stars per lesson (a daily streak was built, then removed at the owner's request), celebratory end-of-lesson screens
+- **Learning & app shell = warm and game-like ("Wat" design system, replaced the original Duolingo-inspired styling on 2026-09-14):** temple palette, soft pill buttons and cards, gentle micro-animations, a Makruk mascot character (in-house), lesson path map with unlockable nodes, XP, stars per lesson (a daily streak was built, then removed at the owner's request), celebratory end-of-lesson screens
 - **Game screen = Chess.com-style:** clean focused board, player cards with clocks, move list panel, post-game review with best-move/blunder markers, compact controls
 - **All art in-house:** SVG piece sets, mascot + poses, lesson illustrations, board textures. Plan a design-system step (tokens, components, illustration style guide) before bulk UI work
 
@@ -169,7 +169,7 @@ Copied from walkinglabs templates and filled for this repo:
 | `evaluator-rubric.md` | Scores agent output per feature |
 | `quality-document.md` | Codebase health scorecard per area (engine, web, worker, AI, tutorials) |
 
-Draft feature ids (priority order): `infra-001` scaffold · `infra-002` CI · `infra-003` deploy hello · `engine-001` board+FEN · `engine-002` movegen · `engine-003` check/mate/stalemate · `engine-004` promotion · `engine-005` counting rules · `engine-006` perft verification · `design-001` design system (tokens, Duolingo-style components, illustration style guide) · `i18n-001` i18n setup (TH default, EN toggle) · `play-001` board render (placeholder SVG pieces) · `play-002` tap/drag moves · `play-003` move list & history · `play-004` pass-and-play · `play-005` game settings & time-control presets · `theme-001` theme system · `ai-001` worker search · `ai-002` difficulty levels · `ai-003` hints · `learn-001` lesson engine · `learn-002` piece lessons · `learn-003` counting lesson · `learn-004` guided game · `learn-005` lesson path map, XP & streaks · `online-001` GameRoom DO · `online-002` private room link · `online-003` clocks · `online-004` reconnect/resign/draw/rematch · `acct-001` guest identity · `acct-002` sign-in · `online-005` quick match · `acct-003` ratings & history · `theme-002` piece sets & board themes · `art-001` final in-house piece set · `art-002` mascot & lesson illustrations · `polish-001` PWA offline · `polish-002` Thai translation review · `polish-003` sounds & animations
+Draft feature ids (priority order): `infra-001` scaffold · `infra-002` CI · `infra-003` deploy hello · `engine-001` board+FEN · `engine-002` movegen · `engine-003` check/mate/stalemate · `engine-004` promotion · `engine-005` counting rules · `engine-006` perft verification · `design-001` design system (tokens, components, illustration style guide) · `i18n-001` i18n setup (TH default, EN toggle) · `play-001` board render (placeholder SVG pieces) · `play-002` tap/drag moves · `play-003` move list & history · `play-004` pass-and-play · `play-005` game settings & time-control presets · `theme-001` theme system · `ai-001` worker search · `ai-002` difficulty levels · `ai-003` hints · `learn-001` lesson engine · `learn-002` piece lessons · `learn-003` counting lesson · `learn-004` guided game · `learn-005` lesson path map, XP & streaks · `online-001` GameRoom DO · `online-002` private room link · `online-003` clocks · `online-004` reconnect/resign/draw/rematch · `acct-001` guest identity · `acct-002` sign-in · `online-005` quick match · `acct-003` ratings & history · `theme-002` piece sets & board themes · `art-001` final in-house piece set · `art-002` mascot & lesson illustrations · `polish-001` PWA offline · `polish-002` Thai translation review · `polish-003` sounds & animations
 
 ## 8. Open questions
 

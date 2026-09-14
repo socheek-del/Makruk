@@ -31,8 +31,8 @@ export function MoveList({ records, currentPly, onSelect }: MoveListProps) {
   for (let i = 0; i < cells.length; i += 2) rows.push(cells.slice(i, i + 2));
 
   return (
-    <section aria-labelledby="move-list-heading" className="rounded-2xl border-2 border-line bg-surface">
-      <h2 id="move-list-heading" className="border-b-2 border-line px-4 py-2 font-extrabold">
+    <section aria-labelledby="move-list-heading" className="rounded-[1.25rem] border border-line bg-surface shadow-card">
+      <h2 id="move-list-heading" className="border-b border-line px-4 py-2 font-semibold">
         {t('play.moves')}
       </h2>
       {records.length === 0 ? (
@@ -59,8 +59,8 @@ export function MoveList({ records, currentPly, onSelect }: MoveListProps) {
                     aria-current={current || undefined}
                     onClick={() => onSelect(ply)}
                     className={cn(
-                      'rounded-lg px-2 py-1 text-left font-bold',
-                      current ? 'bg-secondary-soft text-secondary' : 'hover:bg-surface-2',
+                      'rounded-lg px-2 py-1 text-left font-medium',
+                      current ? 'bg-primary-soft text-primary' : 'hover:bg-surface-2',
                     )}
                   >
                     {record.san}

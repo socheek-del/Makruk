@@ -32,7 +32,7 @@ handoff; no agent updates it automatically.
   - M1: Makruk engine verified against Fairy-Stockfish (perft fixtures, lock-step random games, counting rules, insufficient material).
   - M2: design system, Thai-first i18n, board with tap/drag, move list/history/undo, pass-and-play views, clocks with presets, light/dark and board themes.
   - M3: alpha-beta AI in a Web Worker, 6 bot personas, hints and takeback; repetition-aware search with contempt and a "conversion mode" for won endgames.
-  - M4: data-driven lessons (10 piece/rule lessons + counting lesson), guided first game with coach, Duolingo-style path with XP (the daily streak was removed later at the owner's request).
+  - M4: data-driven lessons (10 piece/rule lessons + counting lesson), guided first game with coach, lesson path with XP (the daily streak was removed later at the owner's request; the path was restyled as a temple stairway in the 2026-09-14 Wat redesign).
   - M5: guest identity, GameRoom Durable Object (server validation, clocks, alarms, hibernation, reconnect/abandon, draw/resign/rematch), web client, quick-match Matchmaker.
   - M7: installable offline PWA, synthesized sounds + haptics + move animation, final classic piece set, flat set, mascot.
 - Verification run: see evidence per feature in `feature_list.json` (unit: engine 129, ai 18, web 105, worker 30; E2E 59 + PWA 2).

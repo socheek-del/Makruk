@@ -9,11 +9,11 @@ test('colour mode switches between light and dark and persists', async ({ page }
   await page.goto('/settings');
   const html = page.locator('html');
   await expect(html).toHaveAttribute('data-theme', 'light');
-  expect(await bodyBackground(page)).toBe('rgb(255, 255, 255)');
+  expect(await bodyBackground(page)).toBe('rgb(248, 244, 236)');
 
   await page.getByRole('radio', { name: 'มืด', exact: true }).click();
   await expect(html).toHaveAttribute('data-theme', 'dark');
-  expect(await bodyBackground(page)).toBe('rgb(19, 31, 36)');
+  expect(await bodyBackground(page)).toBe('rgb(18, 18, 38)');
   await page.screenshot({ path: 'e2e-evidence/settings-dark.png', fullPage: true });
 
   await page.reload();

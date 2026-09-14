@@ -3,15 +3,17 @@ import { cn } from '../../lib/cn';
 export type MascotPose = 'idle' | 'happy' | 'thinking' | 'sad' | 'celebrate';
 
 /**
- * art-002: "ขุนน้อย" (Little Khun), the in-house mascot — a round ivory Khun with a gold crown and a
- * green sash. Thick 3px rounded outlines and flat fills from the design tokens.
+ * art-002: "ขุนน้อย" (Little Khun), the in-house mascot — a round ivory Khun with a temple-gold crown and a
+ * jade sash. Thick 3px rounded outlines and flat fills from the "Wat" palette (docs/design.md).
  */
-const INK = '#3b2717';
+const INK = '#2a2230';
 const IVORY = '#fdf3e1';
 const SHADE = '#e6cfa6';
-const GOLD = '#ff9600';
-const GREEN = '#58cc02';
-const BLUSH = '#ffb3a7';
+const GOLD = '#e0a93b';
+const JADE = '#17866b';
+const INDIGO = '#3a3f9b';
+const LACQUER = '#b63a2b';
+const BLUSH = '#f4a896';
 
 function Eyes({ pose }: { pose: MascotPose }) {
   if (pose === 'happy' || pose === 'celebrate') {
@@ -101,9 +103,9 @@ export function Mascot({ pose = 'idle', className, title }: { pose?: MascotPose;
       {pose === 'celebrate' && (
         <g>
           <path d="M14 22 l3 6 6 1 -5 4 1 6 -5 -3 -5 3 1 -6 -5 -4 6 -1 z" fill={GOLD} />
-          <path d="M100 14 l2.5 5 5 .8 -3.8 3.5 .9 5 -4.6 -2.4 -4.4 2.4 .9 -5 -3.8 -3.5 5 -.8 z" fill="#1cb0f6" />
-          <circle cx="106" cy="42" r="3.5" fill="#ff4b4b" />
-          <circle cx="10" cy="48" r="3" fill={GREEN} />
+          <path d="M100 14 l2.5 5 5 .8 -3.8 3.5 .9 5 -4.6 -2.4 -4.4 2.4 .9 -5 -3.8 -3.5 5 -.8 z" fill={INDIGO} />
+          <rect x="102.5" y="38.5" width="7" height="7" rx="1.5" transform="rotate(45 106 42)" fill={LACQUER} />
+          <circle cx="10" cy="48" r="3" fill={JADE} />
         </g>
       )}
       {pose === 'thinking' && (
@@ -112,7 +114,7 @@ export function Mascot({ pose = 'idle', className, title }: { pose?: MascotPose;
           <circle cx="104" cy="18" r="6" />
         </g>
       )}
-      {pose === 'sad' && <path d="M84 44 Q88 52 84 56 Q80 52 84 44 Z" fill="#49c0f8" stroke={INK} strokeWidth="2" />}
+      {pose === 'sad' && <path d="M84 44 Q88 52 84 56 Q80 52 84 44 Z" fill="#8fb3e6" stroke={INK} strokeWidth="2" />}
 
       {/* crown */}
       <path d="M42 38 L38 18 L50 26 L60 10 L70 26 L82 18 L78 38 Z" fill={GOLD} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
@@ -121,7 +123,7 @@ export function Mascot({ pose = 'idle', className, title }: { pose?: MascotPose;
       <path d="M60 36 C84 36 94 56 94 76 C94 98 80 108 60 108 C40 108 26 98 26 76 C26 56 36 36 60 36 Z" fill={IVORY} stroke={INK} strokeWidth="3" />
       <path d="M36 84 C38 96 48 102 60 102" stroke={SHADE} strokeWidth="5" fill="none" strokeLinecap="round" />
       {/* sash */}
-      <path d="M30 88 Q60 98 90 88 L91 95 Q60 106 29 95 Z" fill={GREEN} stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+      <path d="M30 88 Q60 98 90 88 L91 95 Q60 106 29 95 Z" fill={JADE} stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
       <Arms pose={pose} />
       <Eyes pose={pose} />
       <circle cx="42" cy="70" r="4" fill={BLUSH} opacity="0.8" />

@@ -14,7 +14,7 @@ export function ThemeController() {
     const apply = () => {
       const resolved = resolveColorScheme(scheme, media.matches);
       document.documentElement.dataset.theme = resolved;
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', resolved === 'dark' ? '#131f24' : '#58cc02');
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', resolved === 'dark' ? '#121226' : '#3a3f9b');
     };
     apply();
     media.addEventListener('change', apply);

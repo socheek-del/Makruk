@@ -1,5 +1,5 @@
 import { MatchServerMessage, QuickPool } from '@makruk/protocol';
-import { LoaderCircle, Zap } from 'lucide-react';
+import { LoaderCircle, Timer } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -54,7 +54,7 @@ export function QuickMatch({ identity }: { identity: Identity | null }) {
   return (
     <Card className="flex flex-col gap-3" data-testid="quick-match">
       <h2 className="flex items-center gap-2 text-lg font-extrabold">
-        <Zap aria-hidden className="h-5 w-5 fill-gold text-gold" />
+        <Timer aria-hidden className="h-5 w-5 text-gold" />
         {t('online.quickTitle')}
       </h2>
       {searching ? (

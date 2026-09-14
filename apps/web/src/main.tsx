@@ -1,7 +1,8 @@
-import '@fontsource-variable/nunito';
-import '@fontsource/mitr/400.css';
-import '@fontsource/mitr/500.css';
-import '@fontsource/mitr/600.css';
+// Prompt (SIL OFL) by Cadson Demak: Thai + Latin, self-hosted so the PWA works offline.
+import '@fontsource/prompt/400.css';
+import '@fontsource/prompt/500.css';
+import '@fontsource/prompt/600.css';
+import '@fontsource/prompt/700.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router';

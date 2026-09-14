@@ -1,4 +1,4 @@
-import { Flame, Star } from 'lucide-react';
+import { Sparkles, Star } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '../components/ui/Badge';
@@ -68,7 +68,7 @@ function Showcase({ theme }: { theme: 'light' | 'dark' }) {
           <p className="text-sm text-muted">{t('design.cardBody')}</p>
         </Card>
         <div className="grid grid-cols-2 gap-3">
-          <Card tone="primary" className="font-extrabold text-primary-shadow dark:text-primary">
+          <Card tone="secondary" className="font-bold text-secondary-shadow dark:text-secondary">
             {t('design.correct')}
           </Card>
           <Card tone="danger" className="font-extrabold text-danger">
@@ -109,7 +109,7 @@ function Showcase({ theme }: { theme: 'light' | 'dark' }) {
           <Badge tone="warning">{t('design.variant.warning')}</Badge>
           <Badge tone="danger">{t('design.variant.danger')}</Badge>
           <Badge tone="gold">
-            <Flame aria-hidden className="h-3 w-3" /> 7
+            <Sparkles aria-hidden className="h-3 w-3" /> 20 XP
           </Badge>
         </div>
       </div>

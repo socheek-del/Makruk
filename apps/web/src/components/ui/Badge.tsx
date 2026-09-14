@@ -11,13 +11,13 @@ const TONES: Record<NonNullable<BadgeProps['tone']>, string> = {
   secondary: 'bg-secondary-soft text-secondary',
   warning: 'bg-warning-soft text-warning-shadow dark:text-warning',
   danger: 'bg-danger-soft text-danger',
-  gold: 'bg-gold text-white',
+  gold: 'bg-gold text-[#1f1d36]',
 };
 
 export function Badge({ tone = 'neutral', className, ...props }: BadgeProps) {
   return (
     <span
-      className={cn('inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-extrabold', TONES[tone], className)}
+      className={cn('inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold', TONES[tone], className)}
       {...props}
     />
   );
