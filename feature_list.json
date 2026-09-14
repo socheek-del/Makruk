@@ -998,13 +998,18 @@
       "milestone": "M10",
       "title": "Per-product languages",
       "user_visible_behavior": "Each game's site offers only its own languages with its own default (Makruk: Thai + English; Sittuyin: Burmese + English) and loads only those.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "product.config declares locales, default locale and fonts; i18n, <html lang>, ?lang= and the settings language switch use it.",
         "Locale test fails when any declared locale is missing a key in shared or app namespaces.",
         "Makruk E2E i18n suite passes unchanged; the Makruk production build contains no Burmese strings."
       ],
-      "evidence": [],
+      "evidence": [
+        "2026-09-14: new @chaturanga/game-shell. ProductConfig covers id, locales, defaultLocale, languageNames, ogLocales, fonts and storagePrefix. Helpers: isLocale, resolveLocale, localeFromSearch, storageKey, localizedUrl, and applySeo (one hreflang per declared language plus x-default). /testing exposes describeLocales and localeProblems. 7 unit tests on a my+en demo product cover language fallback, ?lang parsing, storage keys, URLs, head tags, and localeProblems reporting a missing key, an extra key, an empty text, a missing dictionary and an undeclared one.",
+        "2026-09-14: apps/makruk/web/product.config.ts (th default, en; Prompt; makruk.) now drives everything language-related.",
+        "What reads product.config: settings (Language type, default, storage key, migrate resolves unknown languages), i18n (fallback language), seo.ts / SeoController (wrappers over game-shell), sitemap.ts (all declared languages, node-safe for vite.config), SettingsPage (language options from languageNames; the duplicate settings.languageTh/En keys were removed from both locales), lesson L10n (Record over declared languages; lessons.test requires every language), locales.test (describeLocales), index.html (lang, pre-paint settings key and locale list via %DEFAULT_LOCALE% / %SETTINGS_KEY% / %LOCALES_JSON%) and the PWA manifest lang. The new src/product.test.ts checks the declared font is loaded and the placeholders are used.",
+        "2026-09-14 verification: npm run verify exit 0 (makruk-web 115 incl. describeLocales th/en; game-shell 7; all other workspaces unchanged). npm run build: 11 dist text files contain 0 Myanmar characters; dist/index.html has lang=th, no placeholders left, settings key makruk.settings, locales [\"th\",\"en\"]; manifest lang th; the generated sitemap.xml is byte-identical to production. npm run e2e 65/65, including i18n.spec (Thai default, English persists, makruk.settings) and seo.spec, both unchanged. npm run e2e:pwa 2/2."
+      ],
       "notes": ""
     },
     {
@@ -1054,8 +1059,11 @@
         "ai-core search with a Sittuyin evaluation and setup-placement policy; unit tests (mate in one, hanging piece, legal setup).",
         "Bot ladder: each level beats the level below in a majority of 20 games (GitHub Actions strength workflow)."
       ],
-      "evidence": [],
-      "notes": "Fairy-Stockfish WASM may back the strongest level."
+      "evidence": [
+        "2026-09-14 (52fce60): @chaturanga/ai-core ports the Makruk search behind a SearchAdapter; 11 tests on Nim cover forced win/loss mate scores, make/unmake balance, node budget, narrow root window, root and reply repetition, and noisy pick. @chaturanga/sittuyin-ai adds the adapter (drops, in-place promotion, hands in the key), evaluation (material incl. hands, Ne advance + promotion readiness, mop-up/trade-down), setup placement heuristics and six bots ne..mingyi. Its 21 tests cover mate in one, hanging Yahhta, check escape, promotion over quiet push at depth 1, position intact after search, null when no move, every level placing 16 pieces legally, level 6 sheltering its Min-gyi with a guard and a Yahhta in a corner, levels 1–3 playing legally into the game, conversion mode, level 2 mating with Yahhta + Sit-ke before the count, and seed reproducibility.",
+        "2026-09-14: ladder games start with each bot placing its own setup, then a seeded 4-ply opening, max 416 plies. GitHub Actions strength.yml with package=packages/sittuyin-ai, 20 games per pair: L2 sitke > L1 ne +20-0=0 (run 34823302145, all checkmates, avg 78 plies); L3 sin > L2 sitke +16-3=1 (run 34823305676, 1 fifty-move draw); L4 myin > L3 sin +15-0=5 (run 34823308807, draws 3 fifty-move + 2 insufficient material); L5 yahhta > L4 myin +18-0=2 (run 34823313120, 1 counting + 1 fifty-move draw). Local preview before dispatch matched pairs 1–2 exactly. L6 mingyi vs L5 yahhta (run 34823317321) still running."
+      ],
+      "notes": "Fairy-Stockfish WASM may back the strongest level. Sittuyin search runs about 55k nodes/s vs Makruk's 90–110k at equal budgets, so browser bots (time-capped) search shallower at the top level."
     },
     {
       "id": "sit-005",

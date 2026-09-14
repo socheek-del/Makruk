@@ -1,11 +1,13 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { type Language, PRODUCT } from '../product.config';
 import en from './locales/en.json';
 import th from './locales/th.json';
 import { languageFromSearch } from './features/seo/seo';
 import { useSettings } from './stores/settings';
 
-export const resources = { th: { translation: th }, en: { translation: en } } as const;
+/** One dictionary per language declared in product.config.ts (locales.test.ts checks they are complete). */
+export const resources: Record<Language, { translation: object }> = { th: { translation: th }, en: { translation: en } };
 
 // `?lang=en` (used by search results and shared links) selects the language and remembers it.
 const fromUrl = languageFromSearch(window.location.search);
@@ -16,7 +18,7 @@ const initial = useSettings.getState().language;
 void i18n.use(initReactI18next).init({
   resources,
   lng: initial,
-  fallbackLng: 'th',
+  fallbackLng: PRODUCT.defaultLocale,
   interpolation: { escapeValue: false },
 });
 

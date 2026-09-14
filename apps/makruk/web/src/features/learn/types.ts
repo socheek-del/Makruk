@@ -1,11 +1,10 @@
+import { resolveLocale } from '@chaturanga/game-shell';
 import type { PieceType } from '@chaturanga/makruk';
 import { useTranslation } from 'react-i18next';
+import { type Language, PRODUCT } from '../../../product.config';
 
-/** Lesson text lives with the lesson data, in both languages. */
-export interface L10n {
-  th: string;
-  en: string;
-}
+/** Lesson text lives with the lesson data, in every language the product declares. */
+export type L10n = Record<Language, string>;
 
 /** A counting-rule example the engine must agree with (checked in lessons.test.ts). */
 export interface CountingExample {
@@ -50,6 +49,6 @@ export interface Unit {
 
 export function useL10n() {
   const { i18n } = useTranslation();
-  const lang = i18n.language === 'en' ? 'en' : 'th';
+  const lang = resolveLocale(PRODUCT, i18n.language);
   return (text: L10n) => text[lang];
 }

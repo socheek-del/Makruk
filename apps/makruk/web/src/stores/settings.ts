@@ -1,8 +1,10 @@
+import { resolveLocale, storageKey } from '@chaturanga/game-shell';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { type Language, PRODUCT } from '../../product.config';
 import type { TimeControlChoice } from '../features/game/timeControls';
 
-export type Language = 'th' | 'en';
+export type { Language };
 export type ColorScheme = 'system' | 'light' | 'dark';
 /** Pass-and-play board view: fixed, rotate to the side to move, or tabletop (opponent's bar upside down). */
 export type PassAndPlayView = 'fixed' | 'rotate' | 'tabletop';
@@ -28,7 +30,7 @@ export interface SettingsState extends Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  language: 'th',
+  language: PRODUCT.defaultLocale,
   colorScheme: 'system',
   boardTheme: 'teak',
   pieceSet: 'classic',
@@ -43,7 +45,7 @@ export const DEFAULT_SETTINGS: Settings = {
   onlineColor: 'random',
 };
 
-export const SETTINGS_STORAGE_KEY = 'makruk.settings';
+export const SETTINGS_STORAGE_KEY = storageKey(PRODUCT, 'settings');
 
 export const useSettings = create<SettingsState>()(
   persist(
@@ -58,7 +60,10 @@ export const useSettings = create<SettingsState>()(
       partialize: ({ update: _update, ...settings }) => settings,
       // Settings live only in this browser (no account needed). Keep saved choices such as the language
       // when the stored format changes instead of silently falling back to defaults.
-      migrate: (saved) => ({ ...DEFAULT_SETTINGS, ...(saved as Partial<Settings>) }),
+      migrate: (saved) => {
+        const settings = { ...DEFAULT_SETTINGS, ...(saved as Partial<Settings>) };
+        return { ...settings, language: resolveLocale(PRODUCT, settings.language) };
+      },
     },
   ),
 );

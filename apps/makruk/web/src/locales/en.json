@@ -247,8 +247,6 @@
   "settings": {
     "title": "Settings",
     "language": "Language",
-    "languageTh": "ไทย",
-    "languageEn": "English",
     "appearance": "Appearance",
     "colorScheme": "Colour mode",
     "system": "System",

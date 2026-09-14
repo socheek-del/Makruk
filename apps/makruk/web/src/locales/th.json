@@ -246,8 +246,6 @@
   "settings": {
     "title": "ตั้งค่า",
     "language": "ภาษา",
-    "languageTh": "ไทย",
-    "languageEn": "English",
     "appearance": "รูปลักษณ์",
     "colorScheme": "โหมดสี",
     "system": "ตามระบบ",

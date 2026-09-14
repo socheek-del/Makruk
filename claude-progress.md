@@ -117,4 +117,12 @@ handoff; no agent updates it automatically.
   - `strength.yml` gained a `package` input.
   - The Sittuyin engine got a `/core` export plus `encodedToUci`, and promotion generation no longer allocates. Its tests are unchanged and passing.
   - Benchmark: Sittuyin search about 55k nodes/s vs Makruk 90–110k at the same budget.
-- Next best step: finish `sit-004`. Record the local ladder read, run all pairs on Actions (`-f package=packages/sittuyin-ai`), and tune bots if a pair fails. Then `plat-004`.
+- Local ladder preview: L2 > L1 +20-0=0; L3 > L2 +16-3=1. Actions runs were dispatched for all 5 pairs; pairs 1–4 passed (verdicts in sit-004 notes once pair 5 finishes).
+- `plat-004` passing.
+  - Built while the ladder ran on Actions, not locally.
+  - `@chaturanga/game-shell` holds the product config, locale helpers, SEO tags and `describeLocales`.
+  - Makruk is driven by `apps/makruk/web/product.config.ts`.
+  - Build ships 0 Myanmar characters, sitemap identical to production, E2E 65/65, PWA 2/2, verify green.
+- Next best step:
+  - Record the sit-004 ladder verdicts when pair 5 (L6 vs L5) finishes; tune and re-run on failure.
+  - Then `plat-005a`: board-ui with drops, hands and in-place promotion, with Makruk migrated.

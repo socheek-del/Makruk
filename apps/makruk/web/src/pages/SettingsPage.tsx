@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { PRODUCT } from '../../product.config';
 import { Card } from '../components/ui/Card';
 import { SegmentedControl } from '../components/ui/SegmentedControl';
 import { Switch } from '../components/ui/Switch';
@@ -46,10 +47,7 @@ export function SettingsPage() {
           label={t('settings.language')}
           value={language}
           onChange={(value) => update({ language: value })}
-          options={[
-            { value: 'th', label: t('settings.languageTh') },
-            { value: 'en', label: t('settings.languageEn') },
-          ]}
+          options={PRODUCT.locales.map((value) => ({ value, label: PRODUCT.languageNames[value] }))}
         />
       </Card>
 

@@ -1,9 +1,11 @@
 import { Game, moveToUci, parseSquare, squareName } from '@chaturanga/makruk';
 import { describe, expect, it } from 'vitest';
 import { ALL_LESSONS, UNITS } from './lessons';
+import { PRODUCT } from '../../../product.config';
 import type { L10n, LessonStep } from './types';
 
-const filled = (text: L10n | undefined) => !text || (text.th.trim().length > 0 && text.en.trim().length > 0);
+/** Lesson text must exist in every language the product declares (plat-004). */
+const filled = (text: L10n | undefined) => !text || PRODUCT.locales.every((lang) => text[lang].trim().length > 0);
 
 describe('lesson content', () => {
   it('lesson ids are unique', () => {

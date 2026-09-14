@@ -3,10 +3,14 @@ import react from '@vitejs/plugin-react';
 import type { Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vitest/config';
+import { PRODUCT } from './product.config';
 import { SITE_URL } from './site.config';
 import { buildRobots, buildSitemap } from './src/features/seo/sitemap';
 
-/** seo-001: puts the configured site address into index.html and serves/emits robots.txt and sitemap.xml. */
+/**
+ * seo-001 / plat-004: puts the configured site address and the product's languages and settings key into
+ * index.html, and serves/emits robots.txt and sitemap.xml.
+ */
 function siteAddress(): Plugin {
   const files: Record<string, { type: string; body: () => string }> = {
     '/robots.txt': { type: 'text/plain; charset=utf-8', body: () => buildRobots(SITE_URL) },
@@ -22,8 +26,13 @@ function siteAddress(): Plugin {
     });
   };
   return {
-    name: 'makruk-site-address',
-    transformIndexHtml: (html) => html.replaceAll('%SITE_URL%', SITE_URL),
+    name: 'site-address',
+    transformIndexHtml: (html) =>
+      html
+        .replaceAll('%SITE_URL%', SITE_URL)
+        .replaceAll('%DEFAULT_LOCALE%', PRODUCT.defaultLocale)
+        .replaceAll('%LOCALES_JSON%', JSON.stringify(PRODUCT.locales))
+        .replaceAll('%SETTINGS_KEY%', `${PRODUCT.storagePrefix}settings`),
     configureServer: serve,
     configurePreviewServer: serve,
     generateBundle() {
@@ -48,7 +57,7 @@ export default defineConfig({
         name: 'หมากรุกไทย · Makruk',
         short_name: 'หมากรุกไทย',
         description: 'เรียน เล่น และแข่งหมากรุกไทยได้ทุกที่ — Learn and play Thai chess',
-        lang: 'th',
+        lang: PRODUCT.defaultLocale,
         start_url: '/',
         scope: '/',
         display: 'standalone',

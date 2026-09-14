@@ -87,6 +87,9 @@ broken starting state.
   - `packages/sittuyin-ai` (`@chaturanga/sittuyin-ai`): Sittuyin bots (ai-core search, evaluation, setup
     placement policy). Product plan: `apps/sittuyin/docs/PLAN.md`.
   - `packages/protocol` (`@chaturanga/protocol`): Zod schemas for REST and WebSocket messages.
+  - `packages/game-shell` (`@chaturanga/game-shell`): shared app layer for the sites. `ProductConfig`
+    (languages, default, language names, Open Graph locales, fonts, storage prefix), locale helpers and SEO
+    tags; `/testing` has `describeLocales`. Each app declares its product in `apps/<game>/web/product.config.ts`.
   - `apps/makruk/web`, `apps/makruk/worker`: the Makruk product (`apps/makruk/AGENTS.md`).
 - **Commands:**
   - `npm run verify`: lint, typecheck and unit tests in every workspace.

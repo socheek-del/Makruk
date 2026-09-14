@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="th">
+<html lang="%DEFAULT_LOCALE%">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -76,12 +76,14 @@
     <script>
       // Apply saved colour scheme and language before first paint (avoids a light flash in dark mode).
       try {
-        var saved = (JSON.parse(localStorage.getItem('makruk.settings') || '{}').state) || {};
+        // %SETTINGS_KEY% and %LOCALES_JSON% come from product.config.ts (see vite.config.ts).
+        var saved = (JSON.parse(localStorage.getItem('%SETTINGS_KEY%') || '{}').state) || {};
         var scheme = saved.colorScheme || 'system';
         var dark = scheme === 'dark' || (scheme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
         document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        var locales = %LOCALES_JSON%;
         var urlLang = new URLSearchParams(location.search).get('lang');
-        var lang = urlLang === 'th' || urlLang === 'en' ? urlLang : saved.language;
+        var lang = locales.indexOf(urlLang) >= 0 ? urlLang : locales.indexOf(saved.language) >= 0 ? saved.language : null;
         if (lang) document.documentElement.lang = lang;
       } catch (e) {}
     </script>
