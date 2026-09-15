@@ -1,18 +1,8 @@
-import type { Square } from '@chaturanga/rules-core';
+import { type Square, squareOf } from '@chaturanga/rules-core';
 
-const FILE_LETTERS = 'abcdefghijklmnop';
-
-/** Square index (rank * files + file, a1 = 0) to its name, e.g. `e4` or `i10`. */
-export function squareNameOf(square: Square, files: number): string {
-  return FILE_LETTERS[square % files]! + String(Math.floor(square / files) + 1);
-}
-
-/** Square name to index, or null when it is not a square name. */
-export function squareOf(name: string, files: number): Square | null {
-  const match = /^([a-p])(\d{1,2})$/.exec(name);
-  if (!match) return null;
-  return (Number(match[2]) - 1) * files + (match[1]!.charCodeAt(0) - 97);
-}
+// Re-exported so existing board-ui consumers are unchanged; the canonical definitions moved to
+// rules-core (plat-007) so the lesson player and the conformance suite can use them too.
+export { squareNameOf, squareOf } from '@chaturanga/rules-core';
 
 export type ParsedMove =
   /** `R@a1`: a piece placed from hand (type in lower case). */

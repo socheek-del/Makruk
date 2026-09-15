@@ -334,3 +334,27 @@ handoff; no agent updates it automatically.
   (`xq-002`) is flagged as the highest-risk engine task — port from the Fairy-Stockfish source, do not invent.
 - Next best step: `plat-007` (size-aware rules-core helpers and lessons) — the first platform-prep feature,
   needed before `xq-001` can build the Xiangqi engine on `describeVariantConformance`.
+- `plat-007` started, paused mid-work by request (session paused, not ended). Status `in_progress`, notes in
+  `feature_list.json` have the exact resume point. Done so far:
+  - `squareNameOf`/`squareOf` moved to `packages/rules-core/src/coords.ts`, exported from rules-core's
+    `index.ts`; `packages/board-ui/src/coords.ts` re-exports both from rules-core (public API unchanged) and
+    keeps `parseUci`.
+  - `packages/rules-core/src/coords.test.ts` added: 8x8 round-trip, 9x10 round-trip incl. the two-digit-rank
+    cases the plan calls out (`a10` &lt;-&gt; 81, `i10` &lt;-&gt; 89 with `files=9`), and invalid-name rejection.
+  - `npm run verify` re-run clean at this checkpoint: exit 0, no errors or failures in the log.
+  - `packages/rules-core/src/board8.ts` (the Makruk-family 8x8 helpers) was deliberately left unchanged, as
+    the plan requires.
+- Not yet done (still open in `plat-007`):
+  - `packages/rules-core/src/testing/conformance.ts` still hardcodes the 8x8 assumptions: `expect(variant.files
+    * variant.ranks).toBe(64)`, the `square < 64` loop, and `squareName`/the `/[a-h][1-8]/g` match on the
+    move-record assertion. None of this has been touched yet.
+  - `packages/game-shell/src/ui/LessonPlayer.tsx` and `packages/game-shell/src/testing/lessons.ts` still use
+    the 8x8 `parseSquare`/`squareName` and fixed-width `.slice(0,4)`/`.slice(2,4)` UCI parsing. Not touched yet.
+  - Nothing from this feature is committed. `git status` at the pause point: modified
+    `packages/rules-core/src/index.ts`, rewritten `packages/board-ui/src/coords.ts`, new
+    `packages/rules-core/src/coords.ts` and `coords.test.ts` — all untracked/uncommitted.
+  - No E2E run yet (Makruk / Sittuyin learn specs) — do that only after the LessonPlayer/testing changes land,
+    since those are the files that actually touch lesson behaviour.
+- To resume: finish the two "still to do" files above, run `npm run verify` + both E2E suites, then commit as
+  `refactor(rules-core): board-size-aware squares for conformance and lessons (plat-007)` per the plan, and
+  only then mark `plat-007` `passing` with that evidence.
