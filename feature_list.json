@@ -1,6 +1,6 @@
 {
   "project": "Chaturanga — family of traditional chess games (Makruk live, Sittuyin in progress)",
-  "last_updated": "2026-09-14",
+  "last_updated": "2026-09-15",
   "rules": {
     "single_active_feature": true,
     "passing_requires_evidence": true,
@@ -1280,6 +1280,271 @@
         "Regression: full Sittuyin e2e 34/34, full Makruk e2e 67/67 (including board.spec's 360–1280px responsive and scroll checks, passplay tabletop and history), npm run verify exit 0. Screenshots reviewed: phone lesson info/move/feedback/quiz and game setup/playing at 390x664 and 390x844 (nothing under a nav, bars hug the board, no blank bands), tablet 820x1180 game (board at the top, banner and controls straight after) and desktop 1280x800 game, review mode and lesson (sidebar layout unchanged, lesson header pinned at y=0 after scrolling)."
       ],
       "notes": "Owner request 2026-09-15. Desktop keeps the sidebar nav and two-column game layout. Below md the lesson uses 100dvh, which follows the phone's collapsing address bar; the game board is re-measured on every resize."
+    },
+    {
+      "id": "plat-007",
+      "product": "platform",
+      "priority": 62,
+      "area": "platform",
+      "milestone": "M12",
+      "title": "Size-aware rules-core helpers and lessons",
+      "user_visible_behavior": "Shared square-coordinate helpers and the lesson player work for boards of any file/rank size, not just 8x8, with no behavior change for Makruk or Sittuyin.",
+      "status": "not_started",
+      "verification": [
+        "Move squareNameOf/squareOf into packages/rules-core and re-export unchanged from board-ui.",
+        "describeVariantConformance uses variant.files * variant.ranks instead of a hardcoded 64.",
+        "LessonPlayer.tsx and game-shell/src/testing/lessons.ts parse moves with parseUci/files instead of slicing UCI strings.",
+        "npm run verify; npm run e2e (Makruk); npm run e2e -w apps/sittuyin/web (learn specs)."
+      ],
+      "evidence": [],
+      "notes": "Platform prep for Xiangqi's 9x10 board. See docs/xiangqi-implementation-note.md section 4.1, 4.3 (untracked local briefing, not the system of record)."
+    },
+    {
+      "id": "xq-001",
+      "product": "xiangqi",
+      "priority": 63,
+      "area": "engine",
+      "milestone": "M12",
+      "title": "Xiangqi board, FEN and move generation",
+      "user_visible_behavior": "packages/xiangqi models the 9x10 board and generates legal moves for all seven piece types, verified against Fairy-Stockfish.",
+      "status": "not_started",
+      "verification": [
+        "fen.test.ts: FEN round-trip on 10+ ffish-generated positions; 10+ invalid FENs rejected.",
+        "movegen.test.ts: one test per piece rule incl. horse-leg and elephant-eye blocking, cannon screen capture, soldier before/after the river, the flying general, and a pin by facing generals.",
+        "perft.test.ts against a ffish-generated reference; fast depths in verify, all depths with PERFT_DEEP=1.",
+        "reference.test.ts: lock-step random games vs ffish comparing sorted legal moves, SAN and FEN on every ply (60 games in verify, 400 with PERFT_DEEP=1)."
+      ],
+      "evidence": [],
+      "notes": "Game status is only ongoing/checkmate at this step; full game end (stalemate loss, perpetual, chase, counting) is xq-002."
+    },
+    {
+      "id": "plat-008",
+      "product": "platform",
+      "priority": 64,
+      "area": "platform",
+      "milestone": "M12",
+      "title": "Decisive stalemate and perpetual results",
+      "user_visible_behavior": "GameStatus can express a stalemate, perpetual check or perpetual chase with a winner (not only a draw), with no behavior change for Makruk or Sittuyin, both of which keep stalemate as a draw.",
+      "status": "not_started",
+      "verification": [
+        "GameStatus (rules-core types.ts) gains stalemate.winner?, perpetual-check and perpetual-chase kinds.",
+        "Both resultFromStatus copies (game-shell, server-kit) and protocol ResultReason are updated together so they cannot drift.",
+        "game-shell/KEYS.md documents the new play.reason.* keys; isUndoableResult still allows takeback after a position-based loss.",
+        "npm run verify; Makruk and Sittuyin full E2E (game-over dialogs unchanged)."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "xq-002",
+      "product": "xiangqi",
+      "priority": 65,
+      "area": "engine",
+      "milestone": "M12",
+      "title": "Xiangqi game end: stalemate loss, perpetual check, chase, 50-move, material",
+      "user_visible_behavior": "A Xiangqi game correctly ends by checkmate, a losing stalemate, an idle repetition draw, a perpetual-check or perpetual-chase loss, the 50-move rule, or insufficient material, matching Fairy-Stockfish on every ply.",
+      "status": "not_started",
+      "verification": [
+        "Every probe in docs/xiangqi-implementation-note.md section 2.4 recorded as a named unit test (stalemate loses, perpetual check loses at the 3rd occurrence, perpetual chase loses, idle repetition draws, 50-move draw, insufficient material).",
+        "The chasing-rule algorithm is ported from the Fairy-Stockfish source (not invented) and documented in packages/xiangqi/RULES.md.",
+        "reference.test.ts extended with a repetition-biased move picker; the deep run reaches stalemate, repetition and at least one perpetual/chase ending.",
+        "describeVariantConformance registered for the xiangqi variant.",
+        "npm run verify; npm run test:deep -w packages/xiangqi."
+      ],
+      "evidence": [],
+      "notes": "Highest-risk engine step: chasing rules must match ffish exactly on every probed case, not an approximation."
+    },
+    {
+      "id": "xq-003",
+      "product": "xiangqi",
+      "priority": 66,
+      "area": "ai",
+      "milestone": "M12",
+      "title": "Xiangqi computer opponent and bot ladder",
+      "user_visible_behavior": "A user plays against six named Xiangqi bots of increasing strength, each beating the level below in a majority of 20 games.",
+      "status": "not_started",
+      "verification": [
+        "packages/xiangqi-ai: SearchAdapter, material+PST evaluation tuned via the ladder, repetition-loss handling for chases/perpetual check, six bot personas.",
+        "ai.test.ts: mate in one, hanging chariot, avoids a flying-general blunder, avoids losing by perpetual check when a winning alternative exists, deterministic with seeded rng.",
+        "Strength ladder run on GitHub Actions (packages/xiangqi-ai added to strength.yml); every level beats the level below in a majority of 20 games, scores recorded."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "plat-009",
+      "product": "platform",
+      "priority": 67,
+      "area": "platform",
+      "milestone": "M12",
+      "title": "Intersection boards and non-square board fitting",
+      "user_visible_behavior": "board-ui can draw pieces on line intersections instead of inside squares, and the mobile layout fits boards of any aspect ratio, with Makruk and Sittuyin visually unchanged.",
+      "status": "not_started",
+      "verification": [
+        "Board.tsx gains grid: 'squares' | 'points' (default squares) and an underlay prop drawn under the pieces.",
+        "useFittedBoard takes an aspect ratio (files/ranks); a ratio of 1 keeps today's Makruk/Sittuyin result unchanged.",
+        "Board.test.tsx cases for the points grid (point count, square names, Black orientation).",
+        "npm run verify; both products' full E2E, e2e:pwa, and screenshot captures compared before/after."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "xq-004",
+      "product": "xiangqi",
+      "priority": 68,
+      "area": "design",
+      "milestone": "M13",
+      "title": "Xiangqi design identity and piece art (owner approval gate)",
+      "user_visible_behavior": "Xiangqi has its own visual identity (not Makruk's Wat, not Sittuyin's Daung, not Duolingo) with SVG-path piece characters, approved by the owner.",
+      "status": "not_started",
+      "verification": [
+        "apps/xiangqi/docs/design.md written: palette (light+dark, every token listed in packages/ui/TOKENS.md), typography, board look, and a piece set for all 7 types x 2 colors.",
+        "DesignPage.tsx showcase plus a capture-design.mjs script; screenshots at 390/1280px, light+dark, saved to apps/xiangqi/docs/evidence/.",
+        "Owner reviews and approves the direction; the feature stays in_progress until approved."
+      ],
+      "evidence": [],
+      "notes": "Stays in_progress until the owner signs off, the same pattern as sit-005."
+    },
+    {
+      "id": "xq-005",
+      "product": "xiangqi",
+      "priority": 69,
+      "area": "play",
+      "milestone": "M13",
+      "title": "Xiangqi web app: pass-and-play, computer, PWA, languages",
+      "user_visible_behavior": "A user plays Xiangqi locally or vs computer on an installable, offline-capable PWA in Simplified Chinese (default) or English.",
+      "status": "not_started",
+      "verification": [
+        "play.spec.ts: tap/drag moves; illegal targets refused (horse leg, elephant across the river, a flying-general move not offered); undo; board flips for Black.",
+        "computer.spec.ts: the bot replies as both colors; a hint shows.",
+        "i18n.spec.ts: <html lang=\"zh-Hans\"> by default, English persists after reload, ?lang=en works.",
+        "mobile.spec.ts: the full 9x10 board is visible at 390x844 without scrolling.",
+        "A refresh restores a local game; e2e-pwa/offline.spec.ts installs and plays offline.",
+        "Game-over dialog shows the winner (not 'draw') on a stalemate.",
+        "npm run verify; npm run e2e -w apps/xiangqi/web; npm run e2e:pwa -w apps/xiangqi/web."
+      ],
+      "evidence": [],
+      "notes": "Depends on xq-004's approved art/theme. D1-D10 owner decisions accepted 2026-09-15 (see docs/PLATFORM.md)."
+    },
+    {
+      "id": "xq-006",
+      "product": "xiangqi",
+      "priority": 70,
+      "area": "learn",
+      "milestone": "M13",
+      "title": "Xiangqi lessons",
+      "user_visible_behavior": "A beginner learns the board, every piece, the flying general, repetition rules and basic mating patterns through interactive lessons in Chinese and English.",
+      "status": "not_started",
+      "verification": [
+        "lessons.test.ts: describeLessons coverage, every piece type has its own lesson, squares answers enforced by targetsOf, text present in both languages.",
+        "learn.spec.ts completes one lesson in each language."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "xq-007",
+      "product": "xiangqi",
+      "priority": 71,
+      "area": "online",
+      "milestone": "M13",
+      "title": "Xiangqi online play",
+      "user_visible_behavior": "Two users play a Xiangqi game online by room code, validated by the server, with no chat.",
+      "status": "not_started",
+      "verification": [
+        "apps/xiangqi/worker: GameRoom on the xiangqi variant, D1 xiangqi, registerPlayRoutes.",
+        "workerd tests: illegal move rejected, out-of-turn rejected, a legal move is broadcast, the clock runs from the first move (no setup phase), a stalemate/perpetual finish stores the right winner and reason, resign stores variant 'xiangqi', chat is rejected, quick match pairs players, health reports xiangqi.",
+        "apps/xiangqi/web/e2e/online.spec.ts: two browser contexts create/join by code, play 4 moves, boards and move lists match, no textbox anywhere.",
+        "npm run verify (workerd tests included); the online E2E."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "xq-008",
+      "product": "xiangqi",
+      "priority": 72,
+      "area": "infra",
+      "milestone": "M13",
+      "title": "Deploy Xiangqi on its own subdomain",
+      "user_visible_behavior": "Xiangqi is live in production on its own subdomain over HTTPS, with a path-filtered CI deploy that does not touch Makruk or Sittuyin.",
+      "status": "not_started",
+      "verification": [
+        "Owner-chosen address set in site.config.ts, wrangler.jsonc routes, and the deploy-xiangqi job's environment.url.",
+        "D1 xiangqi created; AUTH_SECRET set on the xiangqi Worker.",
+        "CI changes filter and deploy-xiangqi job added; gh run watch confirms a Xiangqi-only push deploys only Xiangqi.",
+        "Production smoke: Chinese home page, computer game, online room between two browsers, PWA install."
+      ],
+      "evidence": [],
+      "notes": "Needs the owner's subdomain choice (D8); never hardcode it."
+    },
+    {
+      "id": "plat-010",
+      "product": "platform",
+      "priority": 73,
+      "area": "platform",
+      "milestone": "M13",
+      "title": "Family tests independent of the number of games",
+      "user_visible_behavior": "The 'more games' links and their tests work for any number of sibling games, so adding a game never requires editing another game's test files again.",
+      "status": "not_started",
+      "verification": [
+        "packages/family/src/family.test.ts, apps/makruk/web/e2e/family.spec.ts and apps/sittuyin/web/e2e/family.spec.ts loop over familyLinks(id) instead of asserting a fixed sibling count.",
+        "npm run verify; both products' family.spec.ts."
+      ],
+      "evidence": [],
+      "notes": "The last time those two apps' test files change for a new game joining the family."
+    },
+    {
+      "id": "xq-009",
+      "product": "xiangqi",
+      "priority": 74,
+      "area": "platform",
+      "milestone": "M13",
+      "title": "Xiangqi joins the family links",
+      "user_visible_behavior": "Xiangqi appears in the 'more games' section and footer on all three sites, and Makruk/Sittuyin gain a Xiangqi link in their own languages.",
+      "status": "not_started",
+      "verification": [
+        "packages/family/src/games.ts: 'xiangqi' added to GameId, the new FamilyLanguage added, every game named in every language.",
+        "packages/family/src/sites.ts imports the Xiangqi PRODUCT and SITE_URL.",
+        "apps/xiangqi/web/e2e/family.spec.ts written generically from the start (depends on plat-010).",
+        "All three sites smoke-tested for correct 'more games' links after deploy."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "xq-010",
+      "product": "xiangqi",
+      "priority": 75,
+      "area": "growth",
+      "milestone": "M13",
+      "title": "Xiangqi SEO, About page and README",
+      "user_visible_behavior": "Xiangqi has per-page SEO tags, an About page with GitHub contribution links, and a showcase README in Chinese and English with media captured from production, with no domain visible.",
+      "status": "not_started",
+      "verification": [
+        "Per-language titles/descriptions, hreflang, canonical, JSON-LD, sitemap+robots generated from SITE_URL, and an Open Graph image.",
+        "About page with GitHub contribution links.",
+        "apps/xiangqi/README.md plus README.zh-Hans.md, media captured via capture:readme; no domain visible in the media.",
+        "apps/xiangqi/AGENTS.md completed; root AGENTS.md, README.md and docs/PLATFORM.md list Xiangqi as live."
+      ],
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "xq-011",
+      "product": "xiangqi",
+      "priority": 76,
+      "area": "polish",
+      "milestone": "M13",
+      "title": "Native Chinese review",
+      "user_visible_behavior": "A native Simplified Chinese speaker has reviewed every user-visible string, lesson, bot name and terminology choice.",
+      "status": "not_started",
+      "verification": [
+        "apps/xiangqi/docs/i18n-review.md written: UI strings, lessons, bots, SEO, manifest, OG image text, family names, and a terminology table."
+      ],
+      "evidence": [],
+      "notes": "Expected to stay blocked on a human reviewer once the review doc exists, the same pattern as sit-011 and polish-002."
     }
   ]
 }

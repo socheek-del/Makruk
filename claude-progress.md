@@ -305,3 +305,32 @@ handoff; no agent updates it automatically.
   empty bands around the board, because the board is width-limited there. Measuring the column fixed it.
 - Pitfall again: Bash calls that `cd` move the working directory for parallel calls. Playwright run from the
   repo root has no config and fails every test at once; that is not a real result.
+
+### Session 008
+
+- Date: 2026-09-15.
+- Goal: start Xiangqi (Chinese chess), the third product, per a local implementation-note briefing
+  (`docs/xiangqi-implementation-note.md` — untracked, `.git/info/exclude`; not the system of record).
+- Baseline on entry: `./init.sh` green (all workspaces pass).
+- Step 0 (plan into tracked artifacts) done:
+  - Owner accepted all 10 suggested defaults (languages `zh-Hans`+`en`, Fairy-Stockfish `xiangqi` as rules
+    authority, SVG-path piece art, Red/Black colours, engine SAN notation first, its own approved design
+    identity, subdomain chosen at deploy, system CJK font stack, six piece-named bots).
+  - `apps/xiangqi/docs/PLAN.md` written (product decisions, architecture, gap analysis against the platform's
+    Makruk/Sittuyin-shaped assumptions, 15-step work breakdown, terminology table, risks) — same shape as
+    `apps/sittuyin/docs/PLAN.md`.
+  - `docs/PLATFORM.md` updated: Xiangqi listed as the third product, target layout gained
+    `apps/xiangqi/{web,worker}`, a pointer to the new plan, and the two open questions (brand identity,
+    subdomain) it still needs an owner call on.
+  - Root `AGENTS.md` product list updated (Sittuyin corrected to live; Xiangqi added as planned).
+  - `feature_list.json` gained 15 `not_started` features: `plat-007..010` (size-aware rules-core/lessons,
+    decisive stalemate+perpetual results, intersection board + non-square fitting, family tests independent of
+    game count) and `xq-001..011` (engine, game end, AI, design, web app, lessons, online, deploy, join family,
+    SEO/About/README, native review), in the dependency order the plan lays out. No feature was marked
+    `passing` — this session did docs only.
+- Known risk: Xiangqi breaks two platform assumptions Makruk and Sittuyin share (8x8 board, pieces on
+  squares). The `plat-007/008/009/010` features exist specifically to remove those assumptions generically;
+  each one must leave Makruk and Sittuyin's full E2E and PWA suites green. The chasing-rule algorithm
+  (`xq-002`) is flagged as the highest-risk engine task — port from the Fairy-Stockfish source, do not invent.
+- Next best step: `plat-007` (size-aware rules-core helpers and lessons) — the first platform-prep feature,
+  needed before `xq-001` can build the Xiangqi engine on `describeVariantConformance`.

@@ -6,7 +6,8 @@ Owner decisions, 2026-09-14:
 - Every game is a **separate product**: its own site, brand, PWA, languages, lessons, Worker and D1 database. Games never share one UI. The only link between them is a "more games" section and footer.
 - Sites live on **subdomains** for now. Parent domains are temporary, so no code, image or doc hardcodes them. Each app reads its address from its own config, as Makruk does today with `apps/web/site.config.ts`.
 - **Sittuyin (Burmese chess)** is the second game. Its languages are Burmese (default) and English. Makruk stays Thai (default) and English.
-- Shogi, Xiangqi and others come later, after Sittuyin ships.
+- **Xiangqi (Chinese chess)** is the third game, planned 2026-09-15. Its languages are Simplified Chinese (default) and English. Full plan: `apps/xiangqi/docs/PLAN.md`. It is the first game to break the 8x8-board and pieces-on-squares assumptions the platform code carried from Makruk and Sittuyin (9x10 board, pieces on intersections); the platform-prep features `plat-007..010` remove those assumptions generically before Xiangqi's own features (`xq-001..011`) build on them.
+- Shogi and others may come later.
 
 ## The one rule
 
@@ -42,6 +43,7 @@ packages/
 apps/
   makruk/web      makruk/worker      Wat theme · th, en
   sittuyin/web    sittuyin/worker    own theme · my, en
+  xiangqi/web     xiangqi/worker     own theme · zh-Hans, en (planned)
 ```
 
 The root README describes the family. Each game has its own README and translated README (`README.th.md`, `README.my.md`). The root `AGENTS.md` holds platform rules; `apps/<game>/AGENTS.md` holds game facts. `feature_list.json` features carry a `product` field (`platform`, `makruk`, `sittuyin`).
@@ -118,6 +120,12 @@ Every step leaves Makruk green: `npm run verify`, `npm run e2e`, CI deploy.
 Implementation details, product defaults (setup UX, clocks after setup, promotion UX, font, bots) and the
 step-by-step work breakdown: `apps/sittuyin/docs/PLAN.md`.
 
+## Xiangqi product plan
+
+Owner decisions (D1-D10, accepted 2026-09-15), architecture, gap analysis against the platform's Makruk/Sittuyin
+assumptions, and the step-by-step work breakdown: `apps/xiangqi/docs/PLAN.md`. Xiangqi's rules authority is
+Fairy-Stockfish's `xiangqi` variant, the same "follow the Fairy-Stockfish variant" rule as Makruk and Sittuyin.
+
 ## Sittuyin rules reference (from Fairy-Stockfish `sittuyin`, probed with ffish 0.7.10)
 
 - Start: `8/8/4pppp/pppp4/4PPPP/PPPP4/8/8[KFRRSSNNkfrrssnn] w - - 0 1`. Pawns are on the board; the other 16 pieces start in hand.
@@ -138,3 +146,5 @@ step-by-step work breakdown: `apps/sittuyin/docs/PLAN.md`.
 
 - Sittuyin brand identity: its own design document with shared component primitives. Decided in sit-005.
 - Subdomain names (e.g. one per game under the current parent domain). Chosen at deploy time in sit-009, never hardcoded.
+- Xiangqi brand identity: its own design document, approved before styling. Decided in xq-004.
+- Xiangqi subdomain: chosen at deploy time in xq-008, never hardcoded.

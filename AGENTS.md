@@ -3,8 +3,9 @@
 Chaturanga is a family of traditional chess games. Each game is its own web PWA product:
 
 - **Makruk** (Thai chess): live.
-- **Sittuyin** (Burmese chess): rules engine done, app planned.
-- Shogi, Xiangqi and others may follow.
+- **Sittuyin** (Burmese chess): live.
+- **Xiangqi** (Chinese chess): planned (`apps/xiangqi/docs/PLAN.md`).
+- Shogi and others may follow.
 
 Owner decisions, target layout and order of work are in `docs/PLATFORM.md`. Facts about a single game live next
 to that game: `apps/makruk/AGENTS.md` for the Makruk product, `apps/sittuyin/AGENTS.md` for the Sittuyin product, and `packages/<game>/RULES.md` for the rules
