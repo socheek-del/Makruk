@@ -106,7 +106,9 @@ broken starting state.
     tags, results, time controls, `createGameSession(variant)`, lesson shapes and progress, and the online
     client (`createIdentity(storageKey)`, room API, WebSocket connection, `createOnlineSession(variant)`);
     `/testing` has `describeLocales` and `describeLessons`. `/ui` has the game screen (board, hand trays,
-    player bars, move list, controls, result dialog), the lesson player, and the online lobby and room,
+    player bars, move list, controls, result dialog), the lesson player, and the online lobby and room.
+    Games and lessons call `useFocusMode`, and each app's AppShell uses `useFocusModeProvider` to hide its phone
+    nav bar and show a back link. All of these come
     with the product's art, words, sounds and counting injected — the keys they read are in
     `packages/game-shell/KEYS.md`. Each app declares its product in `apps/<game>/web/product.config.ts` and
     `@source`s `game-shell/src/ui`.

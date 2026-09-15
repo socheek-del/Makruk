@@ -5,6 +5,7 @@ import { CheckCircle2, Star, X, XCircle } from 'lucide-react';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { type L10n, type Lesson, type LessonStep, starsFor } from '../lessons';
+import { useFocusMode } from './focusMode';
 
 type Feedback = null | 'correct' | 'wrong';
 
@@ -57,6 +58,7 @@ export function LessonPlayer<G extends VariantGame, Verify = never>(props: Lesso
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [done, setDone] = useState(false);
   const step = lesson.steps[index]!;
+  useFocusMode('lesson');
 
   const answer = (correct: boolean) => {
     setFeedback(correct ? 'correct' : 'wrong');
@@ -78,8 +80,15 @@ export function LessonPlayer<G extends VariantGame, Verify = never>(props: Lesso
   const completed = index + (feedback === 'correct' || step.kind === 'info' ? 1 : 0);
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-5" data-testid="lesson-player" data-step={index} data-step-kind={step.kind}>
-      <header className="flex items-center gap-3">
+    // On a phone the lesson fills the screen: the header stays on top, the step's actions stay at the bottom,
+    // and the board takes whatever height is left (polish-003). Wider screens keep the page flow.
+    <div
+      className="mx-auto flex w-full max-w-2xl flex-col gap-3 max-md:h-dvh md:gap-5"
+      data-testid="lesson-player"
+      data-step={index}
+      data-step-kind={step.kind}
+    >
+      <header data-testid="lesson-header" className="z-20 flex shrink-0 items-center gap-3 bg-canvas pt-1 md:sticky md:top-0 md:py-2">
         <Button variant="ghost" size="icon" aria-label={t('learn.exit')} onClick={props.onExit}>
           <X aria-hidden className="h-6 w-6 text-muted" />
         </Button>
@@ -139,10 +148,11 @@ function Prompt({
 }) {
   return (
     <div className="flex items-end gap-3">
-      {renderMascot?.(mood, 'h-20 w-20 shrink-0 sm:h-24 sm:w-24')}
+      {renderMascot?.(mood, 'h-14 w-14 shrink-0 sm:h-20 sm:w-20 md:h-24 md:w-24')}
+      {/* No tight leading here: a product's own line height keeps stacked scripts such as Burmese readable. */}
       <h1
         data-testid="lesson-prompt"
-        className="relative flex-1 rounded-[1.25rem] border border-line bg-surface px-4 py-3 text-xl font-semibold leading-snug shadow-card sm:text-2xl"
+        className="relative flex-1 rounded-[1.25rem] border border-line bg-surface px-4 py-2.5 text-lg font-semibold shadow-card sm:text-xl md:py-3 md:text-2xl"
       >
         {translate(text)}
       </h1>
@@ -150,8 +160,32 @@ function Prompt({
   );
 }
 
-function LessonBoard({ children }: { children: ReactNode }) {
-  return <div className="mx-auto w-full max-w-[min(100%,calc(100dvh-22rem),28rem)]">{children}</div>;
+/**
+ * One step's layout. On a phone the prompt, board and anything under it scroll inside the space between the
+ * header and the actions, and the board shrinks to fit that space (a size container), so the actions are
+ * never pushed off screen. Wider screens stack everything in the page flow.
+ */
+function StepLayout({ prompt, board, below, actions }: { prompt: ReactNode; board?: ReactNode; below?: ReactNode; actions: ReactNode }) {
+  return (
+    <>
+      <div data-testid="lesson-body" className="flex flex-col gap-3 max-md:min-h-0 max-md:flex-1 max-md:overflow-y-auto md:gap-5">
+        {prompt}
+        {board ? (
+          <div className="flex items-center justify-center max-md:min-h-36 max-md:flex-1 max-md:[container-type:size]">
+            <div className="mx-auto w-full max-w-[min(100%,calc(100dvh-22rem),28rem)] max-md:w-[min(100cqw,100cqh)] max-md:max-w-[28rem]">
+              {board}
+            </div>
+          </div>
+        ) : (
+          <div className="max-md:flex-1" />
+        )}
+        {below && <div className="mx-auto flex w-full max-w-[28rem] shrink-0 flex-col gap-3">{below}</div>}
+      </div>
+      <div data-testid="lesson-actions" className="flex shrink-0 flex-col gap-3 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        {actions}
+      </div>
+    </>
+  );
 }
 
 /** The lesson board never animates: every step starts from its own FEN and is played once. */
@@ -173,20 +207,18 @@ function StepBoard<G extends VariantGame, Verify>({
   handle?: React.RefObject<BoardHandle | null>;
 }) {
   return (
-    <LessonBoard>
-      <Board
-        files={props.variant.files}
-        ranks={props.variant.ranks}
-        pieces={game.pieces()}
-        theme={props.theme}
-        showCoordinates={props.showCoordinates}
-        renderPiece={props.renderPiece}
-        label={props.boardLabel}
-        describeSquare={props.describeSquare}
-        overlay={props.boardOverlay}
-        {...rest}
-      />
-    </LessonBoard>
+    <Board
+      files={props.variant.files}
+      ranks={props.variant.ranks}
+      pieces={game.pieces()}
+      theme={props.theme}
+      showCoordinates={props.showCoordinates}
+      renderPiece={props.renderPiece}
+      label={props.boardLabel}
+      describeSquare={props.describeSquare}
+      overlay={props.boardOverlay}
+      {...rest}
+    />
   );
 }
 
@@ -253,11 +285,11 @@ function InfoStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, Ext
   const { step, feedback } = props;
   const [game] = useState(() => (step.fen ? props.variant.createGame(step.fen) : null));
   return (
-    <>
-      <Prompt text={step.text} mood={moodFor(step.kind, feedback)} translate={props.translate} renderMascot={props.renderMascot} />
-      {game && <StepBoard props={props} game={game} targets={(step.highlight ?? []).map(parseSquare)} />}
-      <Footer feedback={feedback} onContinue={props.onContinue} onRetry={props.onRetry} translate={props.translate} />
-    </>
+    <StepLayout
+      prompt={<Prompt text={step.text} mood={moodFor(step.kind, feedback)} translate={props.translate} renderMascot={props.renderMascot} />}
+      board={game && <StepBoard props={props} game={game} targets={(step.highlight ?? []).map(parseSquare)} />}
+      actions={<Footer feedback={feedback} onContinue={props.onContinue} onRetry={props.onRetry} translate={props.translate} />}
+    />
   );
 }
 
@@ -287,23 +319,25 @@ function MoveStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, Ext
   const inHand = props.variant.hasHands ? game.hand(turn) : [];
   const showTray = inHand.length > 0 && !!props.handLabel && !!props.describeHandPiece;
   return (
-    <>
-      <Prompt text={step.text} mood={moodFor(step.kind, feedback)} translate={props.translate} renderMascot={props.renderMascot} />
-      <StepBoard
-        props={props}
-        game={game}
-        lastMove={last ? { from: parsedLast?.kind === 'move' ? parsedLast.from : null, to: last.to } : null}
-        checkSquare={game.checkedKingSquare()}
-        selected={input.selected}
-        targets={input.targets}
-        promotionTargets={input.promotionTargets}
-        onSquareClick={input.onSquareClick}
-        canDrag={input.canDrag}
-        onDrop={input.onDrop}
-        handle={boardHandle}
-      />
-      {showTray && (
-        <LessonBoard>
+    <StepLayout
+      prompt={<Prompt text={step.text} mood={moodFor(step.kind, feedback)} translate={props.translate} renderMascot={props.renderMascot} />}
+      board={
+        <StepBoard
+          props={props}
+          game={game}
+          lastMove={last ? { from: parsedLast?.kind === 'move' ? parsedLast.from : null, to: last.to } : null}
+          checkSquare={game.checkedKingSquare()}
+          selected={input.selected}
+          targets={input.targets}
+          promotionTargets={input.promotionTargets}
+          onSquareClick={input.onSquareClick}
+          canDrag={input.canDrag}
+          onDrop={input.onDrop}
+          handle={boardHandle}
+        />
+      }
+      below={
+        showTray && (
           <HandTray
             color={turn}
             pieces={inHand}
@@ -317,24 +351,28 @@ function MoveStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, Ext
             board={boardHandle}
             onDropOnBoard={input.onDropFromHand}
           />
-        </LessonBoard>
-      )}
-      {input.canPromoteInPlace && feedback === null && (
-        <Button block variant="warning" data-testid="promote-in-place" onClick={() => input.promoteInPlace()}>
-          {t('play.promote')}
-        </Button>
-      )}
-      {feedback !== null && (
-        <Footer
-          feedback={feedback}
-          onContinue={props.onContinue}
-          onRetry={props.onRetry}
-          hint={step.hint}
-          success={step.success}
-          translate={props.translate}
-        />
-      )}
-    </>
+        )
+      }
+      actions={
+        <>
+          {input.canPromoteInPlace && feedback === null && (
+            <Button block variant="warning" data-testid="promote-in-place" onClick={() => input.promoteInPlace()}>
+              {t('play.promote')}
+            </Button>
+          )}
+          {feedback !== null && (
+            <Footer
+              feedback={feedback}
+              onContinue={props.onContinue}
+              onRetry={props.onRetry}
+              hint={step.hint}
+              success={step.success}
+              translate={props.translate}
+            />
+          )}
+        </>
+      }
+    />
   );
 }
 
@@ -348,19 +386,21 @@ function SquaresStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, 
     setPicked((p) => (p.includes(name) ? p.filter((s) => s !== name) : [...p, name]));
   };
   return (
-    <>
-      <Prompt text={step.text} mood={moodFor(step.kind, feedback)} translate={props.translate} renderMascot={props.renderMascot} />
-      <StepBoard props={props} game={game} targets={picked.map(parseSquare)} onSquareClick={toggle} />
-      <Footer
-        feedback={feedback}
-        onCheck={() => onAnswer([...picked].sort().join() === [...step.answer].sort().join())}
-        canCheck={picked.length > 0}
-        onContinue={props.onContinue}
-        onRetry={props.onRetry}
-        hint={step.hint}
-        translate={props.translate}
-      />
-    </>
+    <StepLayout
+      prompt={<Prompt text={step.text} mood={moodFor(step.kind, feedback)} translate={props.translate} renderMascot={props.renderMascot} />}
+      board={<StepBoard props={props} game={game} targets={picked.map(parseSquare)} onSquareClick={toggle} />}
+      actions={
+        <Footer
+          feedback={feedback}
+          onCheck={() => onAnswer([...picked].sort().join() === [...step.answer].sort().join())}
+          canCheck={picked.length > 0}
+          onContinue={props.onContinue}
+          onRetry={props.onRetry}
+          hint={step.hint}
+          translate={props.translate}
+        />
+      }
+    />
   );
 }
 
@@ -369,38 +409,42 @@ function QuizStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, Ext
   const [game] = useState(() => (step.fen ? props.variant.createGame(step.fen) : null));
   const [choice, setChoice] = useState<number | null>(null);
   return (
-    <>
-      <Prompt text={step.text} mood={moodFor(step.kind, feedback)} translate={translate} renderMascot={props.renderMascot} />
-      {game && <StepBoard props={props} game={game} />}
-      <div role="radiogroup" aria-label={translate(step.text)} className="flex flex-col gap-3">
-        {step.choices.map((c, i) => (
-          <button
-            key={i}
-            type="button"
-            role="radio"
-            aria-checked={choice === i}
-            data-choice={i}
-            disabled={feedback !== null}
-            onClick={() => setChoice(i)}
-            className={cn(
-              'rounded-2xl border px-4 py-3 text-left text-lg font-medium shadow-card transition-colors',
-              choice === i ? 'border-primary bg-primary-soft text-primary ring-1 ring-primary' : 'border-line bg-surface hover:bg-surface-2',
-            )}
-          >
-            {translate(c)}
-          </button>
-        ))}
-      </div>
-      <Footer
-        feedback={feedback}
-        onCheck={() => onAnswer(choice === step.correct)}
-        canCheck={choice !== null}
-        onContinue={props.onContinue}
-        onRetry={props.onRetry}
-        hint={step.hint}
-        translate={translate}
-      />
-    </>
+    <StepLayout
+      prompt={<Prompt text={step.text} mood={moodFor(step.kind, feedback)} translate={translate} renderMascot={props.renderMascot} />}
+      board={game && <StepBoard props={props} game={game} />}
+      below={
+        <div role="radiogroup" aria-label={translate(step.text)} className="flex flex-col gap-2 md:gap-3">
+          {step.choices.map((c, i) => (
+            <button
+              key={i}
+              type="button"
+              role="radio"
+              aria-checked={choice === i}
+              data-choice={i}
+              disabled={feedback !== null}
+              onClick={() => setChoice(i)}
+              className={cn(
+                'rounded-2xl border px-4 py-2.5 text-left text-base font-medium shadow-card transition-colors md:py-3 md:text-lg',
+                choice === i ? 'border-primary bg-primary-soft text-primary ring-1 ring-primary' : 'border-line bg-surface hover:bg-surface-2',
+              )}
+            >
+              {translate(c)}
+            </button>
+          ))}
+        </div>
+      }
+      actions={
+        <Footer
+          feedback={feedback}
+          onCheck={() => onAnswer(choice === step.correct)}
+          canCheck={choice !== null}
+          onContinue={props.onContinue}
+          onRetry={props.onRetry}
+          hint={step.hint}
+          translate={translate}
+        />
+      }
+    />
   );
 }
 

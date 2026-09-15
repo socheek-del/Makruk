@@ -28,7 +28,8 @@ describe('Button', () => {
   it('applies the variant, the size and a caller class', () => {
     const classes = buttonClasses({ variant: 'danger', size: 'lg', block: true, className: 'mt-2' });
     expect(classes).toContain('bg-danger');
-    expect(classes).toContain('h-14');
+    // A minimum height, so a label that wraps grows the button instead of spilling out of it.
+    expect(classes).toContain('min-h-14');
     expect(classes).toContain('w-full');
     expect(classes).toContain('mt-2');
   });
@@ -36,7 +37,7 @@ describe('Button', () => {
   it('defaults to the primary variant at medium size and is not block', () => {
     const classes = buttonClasses();
     expect(classes).toContain('bg-primary');
-    expect(classes).toContain('h-12');
+    expect(classes).toContain('min-h-12');
     expect(classes).not.toContain('w-full');
   });
 

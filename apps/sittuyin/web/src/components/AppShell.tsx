@@ -1,7 +1,7 @@
 import { resolveLocale } from '@chaturanga/game-shell';
-import { MoreGames } from '@chaturanga/game-shell/ui';
+import { MoreGames, useFocusModeProvider } from '@chaturanga/game-shell/ui';
 import { cn } from '@chaturanga/ui';
-import { GraduationCap, Info, type LucideIcon, Settings, Swords } from 'lucide-react';
+import { ArrowLeft, GraduationCap, Info, type LucideIcon, Settings, Swords } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink, Outlet } from 'react-router';
 import { PRODUCT } from '../../product.config';
@@ -17,13 +17,19 @@ const NAV: ReadonlyArray<{ to: string; key: string; icon: LucideIcon; end?: bool
 
 export function AppShell() {
   const { t, i18n } = useTranslation();
+  // polish-003: games and lessons get the whole phone screen — no bottom nav; a game gets a back link instead
+  // (a lesson has its own close button).
+  const { focus, FocusProvider } = useFocusModeProvider();
   return (
     <div className="min-h-dvh bg-canvas text-ink md:flex">
       <ThemeController />
       <SeoController />
       <nav
         aria-label={t('nav.label')}
-        className="fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-surface/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur md:sticky md:top-0 md:h-dvh md:w-64 md:flex-col md:gap-1 md:border-t-0 md:border-r md:bg-canvas md:px-4 md:py-6"
+        className={cn(
+          'fixed inset-x-0 bottom-0 z-30 flex border-t border-line bg-surface/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur md:sticky md:top-0 md:h-dvh md:w-64 md:flex-col md:gap-1 md:border-t-0 md:border-r md:bg-canvas md:px-4 md:py-6',
+          focus && 'max-md:hidden',
+        )}
       >
         <Link to="/" className="mb-5 hidden items-center gap-2.5 px-3 text-2xl font-bold text-primary md:flex">
           <span aria-hidden className="h-3.5 w-3.5 rounded-full border-[3px] border-gold" />
@@ -46,9 +52,29 @@ export function AppShell() {
           </NavLink>
         ))}
       </nav>
-      <main className="mx-auto w-full max-w-5xl px-4 pb-28 pt-6 md:pb-10">
-        <Outlet />
-        <MoreGames sites={__FAMILY__} locale={resolveLocale(PRODUCT, i18n.language)} variant="footer" />
+      <main
+        data-focus={focus ?? undefined}
+        className={cn(
+          'mx-auto w-full max-w-5xl px-4 pb-28 pt-6 md:pb-10',
+          focus && 'max-md:px-3 max-md:pb-0 max-md:pt-0',
+        )}
+      >
+        {focus === 'game' && (
+          <div className="flex h-11 items-center md:hidden">
+            <Link
+              to="/"
+              data-testid="focus-back"
+              className="-ml-1 flex h-10 items-center gap-1.5 rounded-full px-2 text-sm font-semibold text-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
+            >
+              <ArrowLeft aria-hidden className="h-5 w-5" />
+              {t('nav.back')}
+            </Link>
+          </div>
+        )}
+        <FocusProvider>
+          <Outlet />
+        </FocusProvider>
+        {!focus && <MoreGames sites={__FAMILY__} locale={resolveLocale(PRODUCT, i18n.language)} variant="footer" />}
       </main>
     </div>
   );

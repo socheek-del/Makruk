@@ -26,6 +26,9 @@
 - sit-007 lessons, sit-008 online play, plat-006 links between games, sit-009 deploy, sit-010 SEO/About/README: `passing`.
 - sit-011: review sheet `apps/sittuyin/docs/i18n-review.md` written; `blocked` on a native reviewer.
 - CI deploys each product only when its paths, a shared package or the lock file change (`changes` job).
+- Session 007: polish-003 mobile focus layout, owner request, `passing`. Nav hidden in games and lessons on
+  phones; lessons fit one screen; the board is measured to fit; Burmese line heights raised. Checks: `e2e/mobile.spec.ts`
+  in both apps.
 - Online client and lobby/room UI moved from the Makruk app into game-shell; seat tokens and play routes into server-kit.
 - Site address overrides are per product: `MAKRUK_SITE_URL`, `SITTUYIN_SITE_URL`.
 

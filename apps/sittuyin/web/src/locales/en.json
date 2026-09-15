@@ -8,6 +8,7 @@
   },
   "nav": {
     "label": "Main",
+    "back": "Back",
     "play": "Play",
     "about": "About",
     "settings": "Settings",

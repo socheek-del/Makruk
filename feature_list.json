@@ -1258,6 +1258,28 @@
         "2026-09-14 (session 006): apps/sittuyin/docs/i18n-review.md prepared — review scope (my.json UI, lesson my: strings, bots, SEO and index.html, online play, family names, manifest, OG image text), Unicode-only guidance, a terminology table to confirm, a corrections table and a sign-off table. The About page links to it. Automated guard already in place: locales.test.ts fails on a missing or empty my/en key and on any literal t('key') not defined."
       ],
       "notes": "BLOCKED on a human: the verification requires a native Burmese speaker's review, which an agent cannot provide or fabricate. Hand apps/sittuyin/docs/i18n-review.md to a reviewer (ideally a Sittuyin player), apply their corrections and record the sign-off row."
+    },
+    {
+      "id": "polish-003",
+      "product": "platform",
+      "priority": 61,
+      "area": "polish",
+      "milestone": "M12",
+      "title": "Mobile focus layout for games and lessons",
+      "user_visible_behavior": "On a phone browser, games and lessons fill the screen without the bottom nav bar: the board, the turn banner and the main action (Auto-arrange, Promote, Check, Continue) are reachable without scrolling or being hidden behind the nav, the lesson progress bar stays at the top, a back control replaces the nav, and Burmese text has enough line height that stacked marks never overlap. (Owner request 2026-09-15.)",
+      "status": "passing",
+      "verification": [
+        "Playwright at phone sizes (390x844 and a 390x664 browser viewport) in both products: the nav bar is hidden on game and lesson screens and shown elsewhere; the board, turn banner and primary action are fully inside the viewport; a lesson's progress bar stays pinned at the top when the page scrolls; the back control returns to the previous screen.",
+        "Burmese text: computed line height is at least 1.6x the font size for headings, prompts and buttons, and no button's text overflows its box.",
+        "Full e2e for both products and npm run verify stay green; screenshots before/after reviewed."
+      ],
+      "evidence": [
+        "2026-09-15 baseline (Sittuyin dev, 390x664 and 390x844, scratchpad script): the bottom nav covered the lesson Continue/feedback and the game's turn banner and Auto-arrange were a scroll away (game page 1227px tall on a 664px screen); lesson prompts used leading-snug, so wrapped Burmese lines nearly touched; a two-line Burmese label spilled out of a fixed-height button on the About page.",
+        "Changes: game-shell focusMode (useFocusMode in GameScreen and LessonPlayer; useFocusModeProvider in each app's AppShell hides the nav below md and shows a back link above games; the more-games footer is hidden on focus screens). LessonPlayer on phones is one screen tall: the header (close + progress) stays on top, the step's actions (Check / Continue / feedback / Promote) stay at the bottom, and the prompt, board and tray/choices share the space in between with the board as a size container, scrolling inside only on very short screens. GameScreen below lg measures the column (useFittedBoard) and sizes the board so bars, trays, board, turn banner and the product's actions fit the visible screen, with history, controls and moves in the page flow after it; 'Back to live' moved under the history buttons so entering review no longer shifts them (this fixed a hover-edge jitter that made Sittuyin play.spec history fail 3/3). ui Button uses min-heights so long labels wrap inside. Sittuyin theme raises every text-size line height (1.55–1.8) and leading-tight/snug/normal for Burmese.",
+        "E2E apps/sittuyin/web/e2e/mobile.spec.ts 5/5 at 390x664: nav visible on home and the local setup page, hidden in a lesson and a game, back link returns home and the game is still there; lesson header at y<=8 with prompt, board and Continue in view and no page scroll, also on the placement step with its tray, after feedback, and on the quiz; at 390x440 the step body overflows and scrolls while the progress bar stays at the top and Continue stays in view; game setup shows back link, both player bars, the board, the turn banner and Auto-arrange in view, and after Auto-arrange bars, square board and banner stay in view with scrollY 0; prompt line height >= 1.6x font size, home h1 >= 1.55x, every About link >= 1.6x with no overflow. apps/makruk/web/e2e/mobile.spec.ts 1/1: nav hidden in /learn/khun with header, prompt and Continue in view and no page scroll; local game bars, board and banner in view; back link restores the nav.",
+        "Regression: full Sittuyin e2e 34/34, full Makruk e2e 67/67 (including board.spec's 360–1280px responsive and scroll checks, passplay tabletop and history), npm run verify exit 0. Screenshots reviewed: phone lesson info/move/feedback/quiz and game setup/playing at 390x664 and 390x844 (nothing under a nav, bars hug the board, no blank bands), tablet 820x1180 game (board at the top, banner and controls straight after) and desktop 1280x800 game, review mode and lesson (sidebar layout unchanged, lesson header pinned at y=0 after scrolling)."
+      ],
+      "notes": "Owner request 2026-09-15. Desktop keeps the sidebar nav and two-column game layout. Below md the lesson uses 100dvh, which follows the phone's collapsing address bar; the game board is re-measured on every resize."
     }
   ]
 }

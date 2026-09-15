@@ -7,6 +7,8 @@ import { capturedBy, type GameResult, isUndoableResult, materialBalance } from '
 import { type GameSessionStore, inSetupPhase } from '../session';
 import { type GameSound, soundForMove } from './format';
 import { GameControls } from './GameControls';
+import { useFittedBoard } from './fittedBoard';
+import { useFocusMode } from './focusMode';
 import { GameOverModal, resultTitleKey } from './GameOverModal';
 import { MoveList } from './MoveList';
 import { PlayerBar } from './PlayerBar';
@@ -84,6 +86,7 @@ export function GameScreen<G extends VariantGame>({
 }: GameScreenProps<G>) {
   const { t } = useTranslation();
   const s = useSession();
+  useFocusMode('game');
   const { game, version, result, clock, viewPly, startFen } = s;
   const [dismissedVersion, setDismissedVersion] = useState<number | null>(null);
   const [confirmResign, setConfirmResign] = useState(false);
@@ -120,6 +123,7 @@ export function GameScreen<G extends VariantGame>({
   );
 
   const placing = inSetupPhase(game);
+  const fit = useFittedBoard();
   const input = useMoveInput({
     game,
     version,
@@ -172,11 +176,19 @@ export function GameScreen<G extends VariantGame>({
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 lg:flex-row lg:items-start">
+    // Below lg the board is sized so that it, the player bars, the trays, the turn banner and the product's actions
+    // all fit on one screen (polish-003); history, controls and the move list follow straight after. From lg the
+    // board sits beside a sidebar holding everything else.
+    <div className="mx-auto w-full max-w-6xl lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-x-4">
       <h1 className="sr-only">{title}</h1>
-      <div className="mx-auto flex w-full max-w-[min(100%,calc(100dvh-13rem),44rem)] flex-col gap-2">
-        {bar(top, rotateTopBar)}
+      <div ref={fit.columnRef} data-testid="game-focus" className="flex flex-col gap-2 lg:contents">
+      <div className="flex flex-col gap-1.5 lg:row-span-2 lg:mx-auto lg:w-full lg:max-w-[min(100%,calc(100dvh-13rem),44rem)] lg:gap-2">
+        {/* Bars take the board's width so they stay aligned with it; trays keep the full width so pieces never wrap. */}
+        <div className="mx-auto w-full" style={fit.style}>
+          {bar(top, rotateTopBar)}
+        </div>
         {variant.hasHands && tray(top)}
+        <div ref={fit.boardRef} className="mx-auto w-full" style={fit.style}>
         <Board
           pieces={shown.pieces()}
           theme={theme}
@@ -200,16 +212,19 @@ export function GameScreen<G extends VariantGame>({
           handle={boardHandle}
           overlay={boardOverlay}
         />
+        </div>
         {variant.hasHands && tray(orientation)}
-        {bar(orientation)}
+        <div className="mx-auto w-full" style={fit.style}>
+          {bar(orientation)}
+        </div>
       </div>
 
-      <aside className="flex w-full flex-col gap-3 lg:w-80 lg:shrink-0">
+      <div className="flex shrink-0 flex-col gap-2 lg:col-start-2 lg:row-start-1 lg:gap-3">
         <Card
           role="status"
           data-testid="turn-banner"
           tone={result ? 'secondary' : game.inCheck() ? 'danger' : 'default'}
-          className="py-3 text-center text-lg font-extrabold"
+          className="py-2 text-center text-base font-extrabold lg:py-3 lg:text-lg"
         >
           {result
             ? t(resultTitleKey(result))
@@ -223,13 +238,12 @@ export function GameScreen<G extends VariantGame>({
             {t('play.promote')}
           </Button>
         )}
-        {viewPly !== null && (
-          <Button variant="secondary" onClick={() => s.setViewPly(null)}>
-            {t('play.backToLive')}
-          </Button>
-        )}
         {renderCounting?.(shown)}
         {actions}
+      </div>
+      </div>
+
+      <div className="mt-3 flex flex-col gap-3 pb-[env(safe-area-inset-bottom)] lg:col-start-2 lg:row-start-2 lg:mt-3">
         <GameControls
           canBack={shownPly > 0}
           canForward={shownPly < livePly}
@@ -243,11 +257,18 @@ export function GameScreen<G extends VariantGame>({
           onResign={() => setConfirmResign(true)}
           canResign={!result}
         />
+        {/* Right under the history buttons: entering review must not push those buttons away from the finger or
+            pointer that pressed them, and on a phone it keeps the board's height steady. */}
+        {viewPly !== null && (
+          <Button variant="secondary" onClick={() => s.setViewPly(null)}>
+            {t('play.backToLive')}
+          </Button>
+        )}
         <MoveList records={records} currentPly={shownPly} onSelect={(ply) => s.setViewPly(ply)} />
         <Button variant="ghost" onClick={s.exitToSetup}>
           {t('play.newGame')}
         </Button>
-      </aside>
+      </div>
 
       {result && showResultDialog && (
         <GameOverModal

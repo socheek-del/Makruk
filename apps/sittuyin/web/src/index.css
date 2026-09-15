@@ -110,6 +110,25 @@
   --color-scrim: var(--scrim);
 }
 
+/*
+ * Burmese stacks vowel signs and medials above and below the consonant, so the default Tailwind line heights
+ * (1.2 for headings, 1.375 for `leading-snug`) let neighbouring lines touch. Every text size gets room for
+ * the marks (polish-003); Latin text simply looks a little airier.
+ */
+@theme {
+  --text-xs--line-height: 1.8;
+  --text-sm--line-height: 1.8;
+  --text-base--line-height: 1.8;
+  --text-lg--line-height: 1.75;
+  --text-xl--line-height: 1.7;
+  --text-2xl--line-height: 1.65;
+  --text-3xl--line-height: 1.6;
+  --text-4xl--line-height: 1.55;
+  --leading-tight: 1.6;
+  --leading-snug: 1.7;
+  --leading-normal: 1.8;
+}
+
 html,
 body {
   background: var(--canvas);

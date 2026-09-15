@@ -57,6 +57,7 @@
   },
   "nav": {
     "label": "Main menu",
+    "back": "Back",
     "play": "Play",
     "learn": "Learn",
     "about": "About",

@@ -286,3 +286,22 @@ handoff; no agent updates it automatically.
   - The root README lists Sittuyin as live.
 - Remaining (humans only): `polish-002` (Thai review) and `sit-011` (Burmese review). Submitting the Sittuyin
   sitemap in Search Console is an owner action.
+
+### Session 007
+
+- Date: 2026-09-15
+- Goal: owner request about phone browsers. Buttons hid behind the nav bar; lessons needed scrolling; the nav
+  should be hidden during games and lessons; Burmese lines overlapped; the lesson progress bar should be sticky.
+- Added feature `polish-003` (platform), now `passing`:
+  - Focus mode in game-shell: on phones, games and lessons hide the nav, and a game gets a back link.
+  - Lessons fill one screen: the progress header on top, the actions at the bottom, and the board fitting the
+    space in between.
+  - The game board is measured to fit the screen together with the bars, trays, turn banner and actions.
+  - "Back to live" moved under the history buttons.
+  - Buttons grow with wrapped labels, and Sittuyin line heights were raised for Burmese.
+- Verification: new `mobile.spec.ts` in both apps (Sittuyin 5, Makruk 1), full e2e Sittuyin 34/34 and Makruk
+  67/67, `npm run verify` exit 0, and phone/tablet/desktop screenshots reviewed before and after.
+- A container-query version of the game layout was tried first and dropped. On tablets and tall phones it left
+  empty bands around the board, because the board is width-limited there. Measuring the column fixed it.
+- Pitfall again: Bash calls that `cd` move the working directory for parallel calls. Playwright run from the
+  repo root has no config and fails every test at once; that is not a real result.

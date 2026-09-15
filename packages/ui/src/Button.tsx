@@ -13,10 +13,14 @@ const VARIANTS: Record<ButtonVariant, string> = {
   ghost: 'bg-transparent text-primary border-transparent hover:bg-surface-2',
 };
 
+/**
+ * Minimum heights rather than fixed ones: a long label (Burmese wraps often) grows the button instead of
+ * spilling out of it. A one-line label looks exactly as before.
+ */
 const SIZES: Record<ButtonSize, string> = {
-  sm: 'h-10 px-4 text-sm',
-  md: 'h-12 px-5 text-base',
-  lg: 'h-14 px-7 text-lg',
+  sm: 'min-h-10 px-4 py-1 text-sm',
+  md: 'min-h-12 px-5 py-1.5 text-base',
+  lg: 'min-h-14 px-7 py-2 text-lg',
   icon: 'h-11 w-11 p-0',
 };
 
@@ -30,7 +34,7 @@ export interface ButtonStyleOptions {
 /** Pill button: soft shadow, lifts slightly on hover and settles when pressed. */
 export function buttonClasses({ variant = 'primary', size = 'md', block, className }: ButtonStyleOptions = {}) {
   return cn(
-    'inline-flex select-none items-center justify-center gap-2 rounded-full border font-semibold',
+    'inline-flex select-none items-center justify-center gap-2 rounded-full border text-center font-semibold',
     'transition-[transform,filter,background-color,box-shadow] duration-150 hover:-translate-y-px active:translate-y-0 active:scale-[0.98]',
     'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30',
     'disabled:pointer-events-none disabled:opacity-50',

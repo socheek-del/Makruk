@@ -7,6 +7,7 @@
  */
 export { AiCancelled, type AiClient, type AiResponse, createAiClient } from './aiClient';
 export { formatClock, type GameSound, soundForMove } from './format';
+export { type FocusKind, useFocusMode, useFocusModeProvider } from './focusMode';
 export { GameControls, type GameControlsProps } from './GameControls';
 export { GameOverModal, type GameOverModalProps, resultTitleKey } from './GameOverModal';
 export { GameScreen, type GameScreenProps, undoAllowed } from './GameScreen';
