@@ -1289,15 +1289,20 @@
       "milestone": "M12",
       "title": "Size-aware rules-core helpers and lessons",
       "user_visible_behavior": "Shared square-coordinate helpers and the lesson player work for boards of any file/rank size, not just 8x8, with no behavior change for Makruk or Sittuyin.",
-      "status": "in_progress",
+      "status": "passing",
       "verification": [
         "Move squareNameOf/squareOf into packages/rules-core and re-export unchanged from board-ui.",
         "describeVariantConformance uses variant.files * variant.ranks instead of a hardcoded 64.",
         "LessonPlayer.tsx and game-shell/src/testing/lessons.ts parse moves with parseUci/files instead of slicing UCI strings.",
         "npm run verify; npm run e2e (Makruk); npm run e2e -w apps/sittuyin/web (learn specs)."
       ],
-      "evidence": [],
-      "notes": "In progress (session 008, paused mid-work). Done: squareNameOf/squareOf moved to packages/rules-core/src/coords.ts (exported from index.ts), board-ui/src/coords.ts re-exports them from rules-core and keeps parseUci; new packages/rules-core/src/coords.test.ts covers 8x8 and 9x10 round-trips (a10<->81, i10<->89). npm run verify green (exit 0) at this checkpoint. Still to do: generalise packages/rules-core/src/testing/conformance.ts (drop the hardcoded 'toBe(64)' check, loop to variant.files*variant.ranks, use squareNameOf(record.to, variant.files) against /[a-p]\\d{1,2}/g instead of the 8x8 squareName/regex); generalise packages/game-shell/src/ui/LessonPlayer.tsx (parseSquare/squareName at lines ~290/385/391) and packages/game-shell/src/testing/lessons.ts (parseSquare/slice(0,4)/slice(2,4) at lines ~48/53/60/65-66) to use squareOf/squareNameOf/parseUci with variant.files instead of the fixed 8x8 helpers. Then: npm run verify; npm run e2e (Makruk); npm run e2e -w apps/sittuyin/web (learn specs). Not yet run or committed."
+      "evidence": [
+        "session 009: packages/rules-core/src/testing/conformance.ts generalised — startFen check is now files*ranks > 0, the pieces()/pieceAt() loop runs to boardSize, and the seeded-playout square check uses squareNameOf(record.to, variant.files) against /[a-p]\\d{1,2}/g.",
+        "session 009: packages/game-shell/src/ui/LessonPlayer.tsx generalised — InfoStep/SquaresStep highlight and picked squares use squareOf/squareNameOf(*, variant.files); MoveStep compares solutions to the played move with a new sameSquares() helper built on board-ui's parseUci instead of uci.slice(0, 4), so a two-digit rank no longer breaks solution matching.",
+        "session 009: packages/game-shell/src/testing/lessons.ts generalised the same way (highlight/answer squares via squareOf, move-solution and targetsOf checks via parseUci) instead of parseSquare/slice(0,4)/slice(2,4).",
+        "session 009: npm run verify exit 0 (all workspaces). npm run e2e (Makruk) 67/67. npm run e2e -w apps/sittuyin/web 34/34 (full suite, not just learn specs)."
+      ],
+      "notes": "Passing as of session 009. Finished the two files left open at the session 008 pause (conformance.ts, LessonPlayer.tsx, lessons.ts) exactly per the resume note in claude-progress.md, then ran full verification and committed. No behavior change for Makruk or Sittuyin (both full E2E suites green); the size-aware helpers are now exercised by rules-core's own 8x8/9x10 coords.test.ts plus the two products' existing lesson/conformance tests."
     },
     {
       "id": "xq-001",

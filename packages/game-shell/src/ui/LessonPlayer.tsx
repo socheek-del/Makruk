@@ -1,5 +1,5 @@
 import { Board, type BoardHandle, type BoardTheme, HandTray, parseUci, useMoveInput } from '@chaturanga/board-ui';
-import { type Color, parseSquare, type Piece, type Square, squareName, type Variant, type VariantGame } from '@chaturanga/rules-core';
+import { type Color, type Piece, type Square, squareNameOf, squareOf, type Variant, type VariantGame } from '@chaturanga/rules-core';
 import { Button, Card, cn, ProgressBar } from '@chaturanga/ui';
 import { CheckCircle2, Star, X, XCircle } from 'lucide-react';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
@@ -287,10 +287,27 @@ function InfoStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, Ext
   return (
     <StepLayout
       prompt={<Prompt text={step.text} mood={moodFor(step.kind, feedback)} translate={props.translate} renderMascot={props.renderMascot} />}
-      board={game && <StepBoard props={props} game={game} targets={(step.highlight ?? []).map(parseSquare)} />}
+      board={
+        game && (
+          <StepBoard
+            props={props}
+            game={game}
+            targets={(step.highlight ?? []).map((s) => squareOf(s, props.variant.files) ?? -1)}
+          />
+        )
+      }
       actions={<Footer feedback={feedback} onContinue={props.onContinue} onRetry={props.onRetry} translate={props.translate} />}
     />
   );
+}
+
+/** Compares two engine move strings by square only, ignoring a promotion-letter suffix. */
+function sameSquares(a: string, b: string, files: number): boolean {
+  const pa = parseUci(a, files);
+  const pb = parseUci(b, files);
+  if (!pa || !pb || pa.kind !== pb.kind) return false;
+  if (pa.kind === 'drop') return pb.kind === 'drop' && pa.type === pb.type && pa.to === pb.to;
+  return pb.kind === 'move' && pa.from === pb.from && pa.to === pb.to;
 }
 
 function MoveStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, Extract<LessonStep<Verify>, { kind: 'move' }>>) {
@@ -308,7 +325,7 @@ function MoveStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, Ext
       const record = game.move(move);
       setVersion((v) => v + 1);
       // Compare the squares only: a lesson accepts the move, whichever promotion letter it carries.
-      onAnswer(step.solutions.some((s) => s.slice(0, 4) === record.uci.slice(0, 4)));
+      onAnswer(step.solutions.some((s) => sameSquares(s, record.uci, props.variant.files)));
     },
   });
   const last = game.lastMove();
@@ -382,13 +399,20 @@ function SquaresStep<G extends VariantGame, Verify>(props: StepProps<G, Verify, 
   const [picked, setPicked] = useState<string[]>([]);
   const toggle = (square: Square) => {
     if (feedback !== null) return;
-    const name = squareName(square);
+    const name = squareNameOf(square, props.variant.files);
     setPicked((p) => (p.includes(name) ? p.filter((s) => s !== name) : [...p, name]));
   };
   return (
     <StepLayout
       prompt={<Prompt text={step.text} mood={moodFor(step.kind, feedback)} translate={props.translate} renderMascot={props.renderMascot} />}
-      board={<StepBoard props={props} game={game} targets={picked.map(parseSquare)} onSquareClick={toggle} />}
+      board={
+        <StepBoard
+          props={props}
+          game={game}
+          targets={picked.map((s) => squareOf(s, props.variant.files) ?? -1)}
+          onSquareClick={toggle}
+        />
+      }
       actions={
         <Footer
           feedback={feedback}

@@ -3,7 +3,7 @@
  * can rely on the same behaviour from any game.
  */
 import { describe, expect, it } from 'vitest';
-import { squareName } from '../board8';
+import { squareNameOf } from '../coords';
 import { FenError, IllegalMoveError } from '../errors';
 import type { Color } from '../types';
 import type { Variant, VariantGame } from '../variant';
@@ -35,7 +35,7 @@ export function describeVariantConformance<G extends VariantGame>(
       expect(game.moves()).toEqual([]);
       expect(game.lastMove()).toBeNull();
       expect(game.status()).toEqual({ kind: 'ongoing' });
-      expect(variant.files * variant.ranks).toBe(64);
+      expect(variant.files * variant.ranks).toBeGreaterThan(0);
       if (!variant.hasHands) expect([...game.hand('w'), ...game.hand('b')]).toEqual([]);
     });
 
@@ -54,10 +54,12 @@ export function describeVariantConformance<G extends VariantGame>(
     });
 
     it('pieces() agrees with pieceAt(), using only the declared piece types', () => {
+      const boardSize = variant.files * variant.ranks;
       for (const fen of [variant.startFen, ...fixtures.fens]) {
         const game = variant.createGame(fen);
         const listed = new Map(game.pieces().map(({ square, piece }) => [square, piece]));
-        for (let square = 0; square < 64; square++) expect(game.pieceAt(square)).toEqual(listed.get(square) ?? null);
+        for (let square = 0; square < boardSize; square++)
+          expect(game.pieceAt(square)).toEqual(listed.get(square) ?? null);
         const types = [...listed.values()].map((p) => p.type).concat(game.hand('w'), game.hand('b'));
         for (const type of types) expect(variant.pieceTypes).toContain(type);
       }
@@ -76,7 +78,7 @@ export function describeVariantConformance<G extends VariantGame>(
           const mover = game.turn;
           const record = game.move(uci);
           expect(record).toMatchObject({ uci, color: mover, fenAfter: game.fen() });
-          expect(squareName(record.to)).toBe(uci.match(/[a-h][1-8]/g)!.at(-1));
+          expect(squareNameOf(record.to, variant.files)).toBe(uci.match(/[a-p]\d{1,2}/g)!.at(-1));
           expect(game.lastMove()).toBe(record);
           expect(game.turn).not.toBe(mover);
           expect(game.pieceAt(record.to)?.color).toBe(mover);

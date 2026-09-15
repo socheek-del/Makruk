@@ -358,3 +358,35 @@ handoff; no agent updates it automatically.
 - To resume: finish the two "still to do" files above, run `npm run verify` + both E2E suites, then commit as
   `refactor(rules-core): board-size-aware squares for conformance and lessons (plat-007)` per the plan, and
   only then mark `plat-007` `passing` with that evidence.
+
+### Session 009
+
+- Date: 2026-09-15.
+- Goal: resume `plat-007`, paused mid-work at the end of session 008.
+- Baseline on entry: `git status` clean (the session 008 checkpoint was already committed as `af4b5a1`).
+  `./init.sh` green.
+- `plat-007` is now `passing`. Finished the two files the resume note flagged:
+  - `packages/rules-core/src/testing/conformance.ts`: dropped the hardcoded `expect(variant.files *
+    variant.ranks).toBe(64)` for a `> 0` check; the `pieces()`/`pieceAt()` loop now runs to `variant.files *
+    variant.ranks` instead of a literal `64`; the seeded-playout assertion switched from the 8x8
+    `squareName`/`/[a-h][1-8]/g` to `squareNameOf(record.to, variant.files)` against `/[a-p]\d{1,2}/g`, so a
+    two-digit rank (e.g. `i10`) still matches.
+  - `packages/game-shell/src/ui/LessonPlayer.tsx`: `InfoStep`/`SquaresStep` now build/read square names with
+    `squareOf`/`squareNameOf(*, props.variant.files)` instead of the fixed 8x8 `parseSquare`/`squareName`.
+    `MoveStep` no longer compares solutions to the played move with `uci.slice(0, 4)` (which assumes a
+    2-character square on both sides); a new `sameSquares()` helper parses both strings with board-ui's
+    `parseUci(uci, files)` and compares by square index (and, for a drop, piece type), which is correct for
+    any board size.
+  - `packages/game-shell/src/testing/lessons.ts`: the same swap — `highlight`/`answer` squares validated with
+    `squareOf`, and the move-step / `targetsOf` legality checks now parse every candidate UCI with `parseUci`
+    instead of slicing fixed offsets.
+  - No other file needed touching; `board8.ts`'s fixed 8x8 `squareName`/`parseSquare` stay as-is for
+    Makruk/Sittuyin's own engine code, per the plan.
+- Verification: `npm run verify` exit 0 (all workspaces, including the new `coords.test.ts` from session 008).
+  `npm run e2e` (Makruk) 67/67. `npm run e2e -w apps/sittuyin/web` 34/34 — the full suite, not just the
+  `learn.spec.ts` the plan called out, as an extra regression check since board-ui/game-shell are shared.
+- Committed as `refactor(rules-core): board-size-aware squares for conformance and lessons (plat-007)`.
+- Next best step: `xq-001` (Xiangqi engine) is next per `apps/xiangqi/docs/PLAN.md`'s work breakdown, now that
+  `plat-007` no longer blocks it. `plat-008/009/010` (decisive stalemate+perpetual results, intersection board
+  + non-square fitting, family tests independent of game count) are still `not_started` and are on the same
+  critical path before Xiangqi's board/UI work, per the plan's dependency order.

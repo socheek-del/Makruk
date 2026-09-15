@@ -7,7 +7,8 @@
  * A product registers this beside its own checks; anything game-specific (Makruk's counting examples,
  * a coverage list) belongs in the product's own test.
  */
-import { parseSquare, squareName, type Variant, type VariantGame } from '@chaturanga/rules-core';
+import { parseUci } from '@chaturanga/board-ui';
+import { squareNameOf, squareOf, type Variant, type VariantGame } from '@chaturanga/rules-core';
 import { describe, expect, it } from 'vitest';
 import type { L10n, Lesson, LessonStep } from '../lessons';
 import type { ProductConfig } from '../product';
@@ -45,25 +46,31 @@ export function describeLessons<L extends string, G extends VariantGame, Verify>
 
             switch (step.kind) {
               case 'info':
-                for (const sq of step.highlight ?? []) expect(parseSquare(sq), sq).toBeGreaterThanOrEqual(0);
+                for (const sq of step.highlight ?? []) expect(squareOf(sq, variant.files), sq).not.toBeNull();
                 break;
               case 'move': {
                 const legal = game!.legalUci();
                 expect(step.solutions.length, 'a move step needs a solution').toBeGreaterThan(0);
-                for (const s of step.solutions) expect(legal.map((m) => m.slice(0, 4)), s).toContain(s.slice(0, 4));
+                const squares = (uci: string) => {
+                  const parsed = parseUci(uci, variant.files);
+                  return parsed?.kind === 'drop' ? `${parsed.type}@${parsed.to}` : parsed && `${parsed.from}-${parsed.to}`;
+                };
+                const legalSquares = legal.map(squares);
+                for (const s of step.solutions) expect(legalSquares, s).toContain(squares(s));
                 expect(legal.length, 'there must be a wrong move to make').toBeGreaterThan(step.solutions.length);
                 if (step.success) expect(filled(step.success), 'success').toBe(true);
                 break;
               }
               case 'squares': {
                 expect(step.answer.length, 'a squares step needs an answer').toBeGreaterThan(0);
-                for (const sq of step.answer) expect(parseSquare(sq), sq).toBeGreaterThanOrEqual(0);
+                for (const sq of step.answer) expect(squareOf(sq, variant.files), sq).not.toBeNull();
                 if (step.targetsOf) {
-                  const from = step.targetsOf;
-                  const targets = game!
+                  const from = squareOf(step.targetsOf, variant.files);
+                  const moves = game!
                     .legalUci()
-                    .filter((uci) => uci.slice(0, 2) === from && uci.slice(2, 4) !== from)
-                    .map((uci) => squareName(parseSquare(uci.slice(2, 4))));
+                    .map((uci) => parseUci(uci, variant.files))
+                    .filter((m): m is Extract<NonNullable<typeof m>, { kind: 'move' }> => m?.kind === 'move');
+                  const targets = moves.filter((m) => m.from === from && m.to !== from).map((m) => squareNameOf(m.to, variant.files));
                   expect([...step.answer].sort()).toEqual([...new Set(targets)].sort());
                 }
                 break;
